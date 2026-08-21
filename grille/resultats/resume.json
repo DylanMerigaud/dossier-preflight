@@ -1,0 +1,3993 @@
+{
+  "champ_requis": {
+    "reglage_texte": "capteur_texte=encre, seuil_encre=128",
+    "point": {
+      "seuil": -0.345,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "precision_grille": 1.0,
+      "precision_prevalence": 1.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 11520
+    },
+    "seuil": -0.345,
+    "n_cellules": 288,
+    "calibration": {
+      "seuil": -0.345,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 11520,
+      "n_dossiers": 576,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9933747423434263,
+        1.0
+      ],
+      "ic_fpr": [
+        0.0,
+        0.0003333610555702189
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.006625257656573795
+      ]
+    },
+    "validation": {
+      "seuil": -0.345,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 288,
+      "fp": 0,
+      "n_pos": 288,
+      "n_neg": 5760,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9868366949742601,
+        1.0
+      ],
+      "ic_fpr": [
+        0.0,
+        0.0006664999260215617
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.01316330502573999
+      ]
+    },
+    "ensemble": {
+      "seuil": -0.345,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 864,
+      "fp": 0,
+      "n_pos": 864,
+      "n_neg": 17280,
+      "n_dossiers": 864,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9955733857422827,
+        0.9999999999999999
+      ],
+      "ic_fpr": [
+        1.3552527156068805e-20,
+        0.00022226540192314649
+      ],
+      "ic_fpr_dossier": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ]
+    },
+    "facteurs": {
+      "angle": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.25": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.5": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "1.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "2.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "4.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        }
+      },
+      "dpi": {
+        "150": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "200": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "300": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        }
+      },
+      "jpeg": {
+        "30": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "55": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "75": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "95": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      },
+      "sigma": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "3.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "6.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "12.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      }
+    },
+    "tombees": {},
+    "frontiere": {
+      "angle": {
+        "0.0": [
+          0,
+          48
+        ],
+        "0.25": [
+          0,
+          48
+        ],
+        "0.5": [
+          0,
+          48
+        ],
+        "1.0": [
+          0,
+          48
+        ],
+        "2.0": [
+          0,
+          48
+        ],
+        "4.0": [
+          0,
+          48
+        ]
+      },
+      "dpi": {
+        "150": [
+          0,
+          96
+        ],
+        "200": [
+          0,
+          96
+        ],
+        "300": [
+          0,
+          96
+        ]
+      },
+      "jpeg": {
+        "30": [
+          0,
+          72
+        ],
+        "55": [
+          0,
+          72
+        ],
+        "75": [
+          0,
+          72
+        ],
+        "95": [
+          0,
+          72
+        ]
+      },
+      "sigma": {
+        "0.0": [
+          0,
+          72
+        ],
+        "3.0": [
+          0,
+          72
+        ],
+        "6.0": [
+          0,
+          72
+        ],
+        "12.0": [
+          0,
+          72
+        ]
+      }
+    },
+    "cibles_fautives": [],
+    "cibles_non_certifiables": [],
+    "restreint": null,
+    "classement": [
+      {
+        "reglage": "capteur_texte=union, conf_min=0.0",
+        "rappel": 1.0,
+        "fpr": 0.00026041666666666666,
+        "seuil": -1.0
+      },
+      {
+        "reglage": "capteur_texte=encre, seuil_encre=128",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -0.345
+      },
+      {
+        "reglage": "capteur_texte=encre, seuil_encre=160",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -0.59
+      },
+      {
+        "reglage": "capteur_texte=encre, seuil_encre=190",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -0.5895
+      },
+      {
+        "reglage": "capteur_texte=page, conf_min=0.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=page, conf_min=10.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=page, conf_min=20.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=page, conf_min=40.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=page, conf_min=60.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=page, conf_min=80.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=zone, conf_min=0.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=zone, conf_min=10.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=zone, conf_min=20.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=zone, conf_min=40.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=zone, conf_min=60.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=zone, conf_min=80.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=union, conf_min=10.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=union, conf_min=20.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=union, conf_min=40.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=union, conf_min=60.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      },
+      {
+        "reglage": "capteur_texte=union, conf_min=80.0",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.0
+      }
+    ],
+    "domaine": 150,
+    "hors_domaine": {
+      "seuil": -0.345,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 288,
+      "fp": 0,
+      "n_pos": 288,
+      "n_neg": 5760,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9868366949742601,
+        1.0
+      ],
+      "ic_fpr": [
+        0.0,
+        0.0006664999260215617
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.01316330502573999
+      ]
+    }
+  },
+  "case_obligatoire": {
+    "reglage_texte": "part_disque=0.3, seuil_encre=128",
+    "point": {
+      "seuil": -14.375,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "precision_grille": 1.0,
+      "precision_prevalence": 1.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 1728
+    },
+    "seuil": -14.375,
+    "n_cellules": 288,
+    "calibration": {
+      "seuil": -14.375,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 1728,
+      "n_dossiers": 576,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9933747423434263,
+        1.0
+      ],
+      "ic_fpr": [
+        2.168404344971009e-19,
+        0.0022182167237465595
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.006625257656573795
+      ]
+    },
+    "validation": {
+      "seuil": -14.375,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 288,
+      "fp": 0,
+      "n_pos": 288,
+      "n_neg": 864,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9868366949742601,
+        1.0
+      ],
+      "ic_fpr": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.01316330502573999
+      ]
+    },
+    "ensemble": {
+      "seuil": -14.375,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 864,
+      "fp": 0,
+      "n_pos": 864,
+      "n_neg": 2592,
+      "n_dossiers": 864,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9955733857422827,
+        0.9999999999999999
+      ],
+      "ic_fpr": [
+        0.0,
+        0.0014799053994665932
+      ],
+      "ic_fpr_dossier": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ]
+    },
+    "facteurs": {
+      "angle": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.25": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.5": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "1.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "2.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "4.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        }
+      },
+      "dpi": {
+        "150": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "200": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "300": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        }
+      },
+      "jpeg": {
+        "30": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "55": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "75": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "95": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      },
+      "sigma": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "3.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "6.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "12.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      }
+    },
+    "tombees": {},
+    "frontiere": {
+      "angle": {
+        "0.0": [
+          0,
+          48
+        ],
+        "0.25": [
+          0,
+          48
+        ],
+        "0.5": [
+          0,
+          48
+        ],
+        "1.0": [
+          0,
+          48
+        ],
+        "2.0": [
+          0,
+          48
+        ],
+        "4.0": [
+          0,
+          48
+        ]
+      },
+      "dpi": {
+        "150": [
+          0,
+          96
+        ],
+        "200": [
+          0,
+          96
+        ],
+        "300": [
+          0,
+          96
+        ]
+      },
+      "jpeg": {
+        "30": [
+          0,
+          72
+        ],
+        "55": [
+          0,
+          72
+        ],
+        "75": [
+          0,
+          72
+        ],
+        "95": [
+          0,
+          72
+        ]
+      },
+      "sigma": {
+        "0.0": [
+          0,
+          72
+        ],
+        "3.0": [
+          0,
+          72
+        ],
+        "6.0": [
+          0,
+          72
+        ],
+        "12.0": [
+          0,
+          72
+        ]
+      }
+    },
+    "cibles_fautives": [],
+    "cibles_non_certifiables": [],
+    "restreint": null,
+    "classement": [
+      {
+        "reglage": "part_disque=0.3, seuil_encre=128",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -14.375
+      },
+      {
+        "reglage": "part_disque=0.3, seuil_encre=160",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -15.422
+      },
+      {
+        "reglage": "part_disque=0.3, seuil_encre=190",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -16.883
+      },
+      {
+        "reglage": "part_disque=0.42, seuil_encre=128",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -7.622
+      },
+      {
+        "reglage": "part_disque=0.42, seuil_encre=160",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -10.958
+      },
+      {
+        "reglage": "part_disque=0.42, seuil_encre=190",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -11.862499999999999
+      },
+      {
+        "reglage": "part_disque=0.55, seuil_encre=128",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -7.651
+      },
+      {
+        "reglage": "part_disque=0.7, seuil_encre=128",
+        "rappel": 1.0,
+        "fpr": 0.0011574074074074073,
+        "seuil": -6.5385
+      },
+      {
+        "reglage": "part_disque=0.55, seuil_encre=160",
+        "rappel": 0.8350694444444444,
+        "fpr": 0.0,
+        "seuil": -5.797000000000001
+      },
+      {
+        "reglage": "part_disque=0.55, seuil_encre=190",
+        "rappel": 0.8194444444444444,
+        "fpr": 0.0005787037037037037,
+        "seuil": -5.4115
+      },
+      {
+        "reglage": "part_disque=0.7, seuil_encre=160",
+        "rappel": 0.6111111111111112,
+        "fpr": 0.0,
+        "seuil": 0.7475
+      },
+      {
+        "reglage": "part_disque=0.7, seuil_encre=190",
+        "rappel": 0.15625,
+        "fpr": 0.0005787037037037037,
+        "seuil": 5.057
+      }
+    ],
+    "domaine": 150,
+    "hors_domaine": {
+      "seuil": -14.375,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 288,
+      "fp": 0,
+      "n_pos": 288,
+      "n_neg": 864,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9868366949742601,
+        1.0
+      ],
+      "ic_fpr": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.01316330502573999
+      ]
+    }
+  },
+  "signature": {
+    "reglage_texte": "seuil_encre=128, capteur_signature=composantes",
+    "point": {
+      "seuil": -342.05,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "precision_grille": 1.0,
+      "precision_prevalence": 1.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 576
+    },
+    "seuil": -342.05,
+    "n_cellules": 288,
+    "calibration": {
+      "seuil": -342.05,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 576,
+      "n_dossiers": 576,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9933747423434263,
+        1.0
+      ],
+      "ic_fpr": [
+        0.0,
+        0.006625257656573795
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.006625257656573795
+      ]
+    },
+    "validation": {
+      "seuil": -342.05,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 288,
+      "fp": 0,
+      "n_pos": 288,
+      "n_neg": 288,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9868366949742601,
+        1.0
+      ],
+      "ic_fpr": [
+        0.0,
+        0.01316330502573999
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.01316330502573999
+      ]
+    },
+    "ensemble": {
+      "seuil": -342.05,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 864,
+      "fp": 0,
+      "n_pos": 864,
+      "n_neg": 864,
+      "n_dossiers": 864,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9955733857422827,
+        0.9999999999999999
+      ],
+      "ic_fpr": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ],
+      "ic_fpr_dossier": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ]
+    },
+    "facteurs": {
+      "angle": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.25": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.5": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "1.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "2.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "4.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        }
+      },
+      "dpi": {
+        "150": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "200": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "300": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        }
+      },
+      "jpeg": {
+        "30": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "55": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "75": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "95": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      },
+      "sigma": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "3.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "6.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "12.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      }
+    },
+    "tombees": {},
+    "frontiere": {
+      "angle": {
+        "0.0": [
+          0,
+          48
+        ],
+        "0.25": [
+          0,
+          48
+        ],
+        "0.5": [
+          0,
+          48
+        ],
+        "1.0": [
+          0,
+          48
+        ],
+        "2.0": [
+          0,
+          48
+        ],
+        "4.0": [
+          0,
+          48
+        ]
+      },
+      "dpi": {
+        "150": [
+          0,
+          96
+        ],
+        "200": [
+          0,
+          96
+        ],
+        "300": [
+          0,
+          96
+        ]
+      },
+      "jpeg": {
+        "30": [
+          0,
+          72
+        ],
+        "55": [
+          0,
+          72
+        ],
+        "75": [
+          0,
+          72
+        ],
+        "95": [
+          0,
+          72
+        ]
+      },
+      "sigma": {
+        "0.0": [
+          0,
+          72
+        ],
+        "3.0": [
+          0,
+          72
+        ],
+        "6.0": [
+          0,
+          72
+        ],
+        "12.0": [
+          0,
+          72
+        ]
+      }
+    },
+    "cibles_fautives": [],
+    "cibles_non_certifiables": [],
+    "restreint": null,
+    "classement": [
+      {
+        "reglage": "seuil_encre=128, capteur_signature=composantes",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -342.05
+      },
+      {
+        "reglage": "seuil_encre=128, capteur_signature=encre",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -3.822
+      },
+      {
+        "reglage": "seuil_encre=160, capteur_signature=composantes",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -342.05
+      },
+      {
+        "reglage": "seuil_encre=160, capteur_signature=encre",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -4.0425
+      },
+      {
+        "reglage": "seuil_encre=190, capteur_signature=composantes",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -342.7
+      },
+      {
+        "reglage": "seuil_encre=190, capteur_signature=encre",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -4.226
+      }
+    ],
+    "domaine": 150,
+    "hors_domaine": {
+      "seuil": -342.05,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 288,
+      "fp": 0,
+      "n_pos": 288,
+      "n_neg": 288,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9868366949742601,
+        1.0
+      ],
+      "ic_fpr": [
+        0.0,
+        0.01316330502573999
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.01316330502573999
+      ]
+    }
+  },
+  "validite": {
+    "reglage_texte": "conf_min=0.0, capteur_texte=page",
+    "point": {
+      "seuil": -207.5,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "precision_grille": 1.0,
+      "precision_prevalence": 1.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 575
+    },
+    "seuil": -207.5,
+    "n_cellules": 288,
+    "calibration": {
+      "seuil": -207.5,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 575,
+      "n_dossiers": 576,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9933747423434263,
+        1.0
+      ],
+      "ic_fpr": [
+        0.0,
+        0.006636703374463755
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.006625257656573795
+      ]
+    },
+    "validation": {
+      "seuil": -207.5,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 288,
+      "fp": 0,
+      "n_pos": 288,
+      "n_neg": 288,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9868366949742601,
+        1.0
+      ],
+      "ic_fpr": [
+        0.0,
+        0.01316330502573999
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.01316330502573999
+      ]
+    },
+    "ensemble": {
+      "seuil": -207.5,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 864,
+      "fp": 0,
+      "n_pos": 864,
+      "n_neg": 863,
+      "n_dossiers": 864,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9955733857422827,
+        0.9999999999999999
+      ],
+      "ic_fpr": [
+        0.0,
+        0.004431720858805115
+      ],
+      "ic_fpr_dossier": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ]
+    },
+    "facteurs": {
+      "angle": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.25": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.5": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "1.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "2.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "4.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        }
+      },
+      "dpi": {
+        "150": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "200": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "300": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        }
+      },
+      "jpeg": {
+        "30": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "55": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "75": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "95": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      },
+      "sigma": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "3.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "6.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "12.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      }
+    },
+    "tombees": {},
+    "frontiere": {
+      "angle": {
+        "0.0": [
+          0,
+          48
+        ],
+        "0.25": [
+          0,
+          48
+        ],
+        "0.5": [
+          0,
+          48
+        ],
+        "1.0": [
+          0,
+          48
+        ],
+        "2.0": [
+          0,
+          48
+        ],
+        "4.0": [
+          0,
+          48
+        ]
+      },
+      "dpi": {
+        "150": [
+          0,
+          96
+        ],
+        "200": [
+          0,
+          96
+        ],
+        "300": [
+          0,
+          96
+        ]
+      },
+      "jpeg": {
+        "30": [
+          0,
+          72
+        ],
+        "55": [
+          0,
+          72
+        ],
+        "75": [
+          0,
+          72
+        ],
+        "95": [
+          0,
+          72
+        ]
+      },
+      "sigma": {
+        "0.0": [
+          0,
+          72
+        ],
+        "3.0": [
+          0,
+          72
+        ],
+        "6.0": [
+          0,
+          72
+        ],
+        "12.0": [
+          0,
+          72
+        ]
+      }
+    },
+    "cibles_fautives": [],
+    "cibles_non_certifiables": [],
+    "restreint": null,
+    "classement": [
+      {
+        "reglage": "conf_min=0.0, capteur_texte=page",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=0.0, capteur_texte=zone",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=0.0, capteur_texte=union",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=10.0, capteur_texte=page",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=10.0, capteur_texte=zone",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=10.0, capteur_texte=union",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=20.0, capteur_texte=page",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=20.0, capteur_texte=zone",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=20.0, capteur_texte=union",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=40.0, capteur_texte=page",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=40.0, capteur_texte=zone",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=40.0, capteur_texte=union",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=60.0, capteur_texte=page",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=60.0, capteur_texte=zone",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=60.0, capteur_texte=union",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=80.0, capteur_texte=page",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=80.0, capteur_texte=zone",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      },
+      {
+        "reglage": "conf_min=80.0, capteur_texte=union",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -207.5
+      }
+    ],
+    "domaine": 150,
+    "hors_domaine": {
+      "seuil": -207.5,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 5,
+      "fp": 0,
+      "n_pos": 5,
+      "n_neg": 2,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.5655085052479191,
+        1.0
+      ],
+      "ic_fpr": [
+        0.0,
+        0.6576280471103807
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.01316330502573999
+      ]
+    }
+  },
+  "coherence": {
+    "reglage_texte": "conf_min=0.0, capteur_texte=zone",
+    "point": {
+      "seuil": 0.393939393939394,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "precision_grille": 1.0,
+      "precision_prevalence": 1.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 576
+    },
+    "seuil": 0.393939393939394,
+    "n_cellules": 288,
+    "calibration": {
+      "seuil": 0.393939393939394,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 576,
+      "n_dossiers": 576,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9933747423434263,
+        1.0
+      ],
+      "ic_fpr": [
+        0.0,
+        0.006625257656573795
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.006625257656573795
+      ]
+    },
+    "validation": {
+      "seuil": 0.393939393939394,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 288,
+      "fp": 0,
+      "n_pos": 288,
+      "n_neg": 288,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9868366949742601,
+        1.0
+      ],
+      "ic_fpr": [
+        0.0,
+        0.01316330502573999
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.01316330502573999
+      ]
+    },
+    "ensemble": {
+      "seuil": 0.393939393939394,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 864,
+      "fp": 0,
+      "n_pos": 864,
+      "n_neg": 864,
+      "n_dossiers": 864,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9955733857422827,
+        0.9999999999999999
+      ],
+      "ic_fpr": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ],
+      "ic_fpr_dossier": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ]
+    },
+    "facteurs": {
+      "angle": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.25": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.5": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "1.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "2.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "4.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        }
+      },
+      "dpi": {
+        "150": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "200": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "300": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        }
+      },
+      "jpeg": {
+        "30": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "55": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "75": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "95": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      },
+      "sigma": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "3.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "6.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "12.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      }
+    },
+    "tombees": {},
+    "frontiere": {
+      "angle": {
+        "0.0": [
+          0,
+          48
+        ],
+        "0.25": [
+          0,
+          48
+        ],
+        "0.5": [
+          0,
+          48
+        ],
+        "1.0": [
+          0,
+          48
+        ],
+        "2.0": [
+          0,
+          48
+        ],
+        "4.0": [
+          0,
+          48
+        ]
+      },
+      "dpi": {
+        "150": [
+          0,
+          96
+        ],
+        "200": [
+          0,
+          96
+        ],
+        "300": [
+          0,
+          96
+        ]
+      },
+      "jpeg": {
+        "30": [
+          0,
+          72
+        ],
+        "55": [
+          0,
+          72
+        ],
+        "75": [
+          0,
+          72
+        ],
+        "95": [
+          0,
+          72
+        ]
+      },
+      "sigma": {
+        "0.0": [
+          0,
+          72
+        ],
+        "3.0": [
+          0,
+          72
+        ],
+        "6.0": [
+          0,
+          72
+        ],
+        "12.0": [
+          0,
+          72
+        ]
+      }
+    },
+    "cibles_fautives": [],
+    "cibles_non_certifiables": [],
+    "restreint": null,
+    "classement": [
+      {
+        "reglage": "conf_min=0.0, capteur_texte=zone",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": 0.393939393939394
+      },
+      {
+        "reglage": "conf_min=0.0, capteur_texte=union",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": 0.4415584415584416
+      },
+      {
+        "reglage": "conf_min=10.0, capteur_texte=zone",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": 0.393939393939394
+      },
+      {
+        "reglage": "conf_min=10.0, capteur_texte=union",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": 0.4415584415584416
+      },
+      {
+        "reglage": "conf_min=20.0, capteur_texte=zone",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": 0.393939393939394
+      },
+      {
+        "reglage": "conf_min=20.0, capteur_texte=union",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": 0.393939393939394
+      },
+      {
+        "reglage": "conf_min=40.0, capteur_texte=union",
+        "rappel": 1.0,
+        "fpr": 0.001736111111111111,
+        "seuil": 0.48484848484848486
+      },
+      {
+        "reglage": "conf_min=0.0, capteur_texte=page",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 2.0
+      },
+      {
+        "reglage": "conf_min=10.0, capteur_texte=page",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 2.0
+      },
+      {
+        "reglage": "conf_min=20.0, capteur_texte=page",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 2.0
+      },
+      {
+        "reglage": "conf_min=40.0, capteur_texte=page",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 2.0
+      },
+      {
+        "reglage": "conf_min=40.0, capteur_texte=zone",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 2.0
+      },
+      {
+        "reglage": "conf_min=60.0, capteur_texte=page",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 2.0
+      },
+      {
+        "reglage": "conf_min=60.0, capteur_texte=zone",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 2.0
+      },
+      {
+        "reglage": "conf_min=60.0, capteur_texte=union",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 2.0
+      },
+      {
+        "reglage": "conf_min=80.0, capteur_texte=page",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 2.0
+      },
+      {
+        "reglage": "conf_min=80.0, capteur_texte=zone",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 2.0
+      },
+      {
+        "reglage": "conf_min=80.0, capteur_texte=union",
+        "rappel": 0.0,
+        "fpr": 0.0,
+        "seuil": 1.8
+      }
+    ],
+    "domaine": 150,
+    "hors_domaine": {
+      "seuil": 0.393939393939394,
+      "rappel": 0.9583333333333334,
+      "fpr": 0.8402777777777778,
+      "tp": 276,
+      "fp": 242,
+      "n_pos": 288,
+      "n_neg": 288,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.8402777777777778,
+      "ic_rappel": [
+        0.9285932465131456,
+        0.9760070572132596
+      ],
+      "ic_fpr": [
+        0.7935289414243666,
+        0.8780682537664494
+      ],
+      "ic_fpr_dossier": [
+        0.7935289414243666,
+        0.8780682537664494
+      ]
+    }
+  },
+  "valeur_interdite": {
+    "reglage_texte": "conf_min=0.0, capteur_texte=page",
+    "point": {
+      "seuil": 0.7213622291021672,
+      "rappel": 0.9913194444444444,
+      "fpr": 0.0008680555555555555,
+      "precision_grille": 0.9947735191637631,
+      "precision_prevalence": 0.9921807124239792,
+      "tp": 571,
+      "fp": 3,
+      "n_pos": 576,
+      "n_neg": 3456
+    },
+    "seuil": 0.7213622291021672,
+    "n_cellules": 288,
+    "calibration": {
+      "seuil": 0.7213622291021672,
+      "rappel": 0.9913194444444444,
+      "fpr": 0.0008680555555555555,
+      "tp": 571,
+      "fp": 3,
+      "n_pos": 576,
+      "n_neg": 3456,
+      "n_dossiers": 576,
+      "fpr_dossier": 0.005208333333333333,
+      "ic_rappel": [
+        0.9798419495618019,
+        0.9962867035048287
+      ],
+      "ic_fpr": [
+        0.00029525481176600056,
+        0.002549268475080426
+      ],
+      "ic_fpr_dossier": [
+        0.0017728191639145123,
+        0.015200092058736639
+      ]
+    },
+    "validation": {
+      "seuil": 0.7213622291021672,
+      "rappel": 0.9965277777777778,
+      "fpr": 0.0005787037037037037,
+      "tp": 287,
+      "fp": 1,
+      "n_pos": 288,
+      "n_neg": 1728,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.003472222222222222,
+      "ic_rappel": [
+        0.9805968422560195,
+        0.999386820114253
+      ],
+      "ic_fpr": [
+        0.00010216009099450144,
+        0.0032708966596921665
+      ],
+      "ic_fpr_dossier": [
+        0.0006131798857472621,
+        0.01940315774398065
+      ]
+    },
+    "ensemble": {
+      "seuil": 0.7213622291021672,
+      "rappel": 0.9930555555555556,
+      "fpr": 0.0007716049382716049,
+      "tp": 858,
+      "fp": 4,
+      "n_pos": 864,
+      "n_neg": 5184,
+      "n_dossiers": 864,
+      "fpr_dossier": 0.004629629629629629,
+      "ic_rappel": [
+        0.9849324080593068,
+        0.9968135695476666
+      ],
+      "ic_fpr": [
+        0.000300096867445608,
+        0.0019824708963812596
+      ],
+      "ic_fpr_dossier": [
+        0.0018017720972496364,
+        0.011843114250673761
+      ]
+    },
+    "facteurs": {
+      "angle": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.25": {
+          "rappel": 0.9930555555555556,
+          "n": 144,
+          "fpr": 0.003472222222222222,
+          "fpr_dossier": 0.020833333333333332,
+          "ic": [
+            0.9617143276425165,
+            0.9987731129695979
+          ]
+        },
+        "0.5": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "1.0": {
+          "rappel": 0.9861111111111112,
+          "n": 144,
+          "fpr": 0.0011574074074074073,
+          "fpr_dossier": 0.006944444444444444,
+          "ic": [
+            0.9507765031823722,
+            0.9961829453084451
+          ]
+        },
+        "2.0": {
+          "rappel": 0.9861111111111112,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9507765031823722,
+            0.9961829453084451
+          ]
+        },
+        "4.0": {
+          "rappel": 0.9930555555555556,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9617143276425165,
+            0.9987731129695979
+          ]
+        }
+      },
+      "dpi": {
+        "150": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "200": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0023148148148148147,
+          "fpr_dossier": 0.013888888888888888,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "300": {
+          "rappel": 0.9791666666666666,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9553006110478205,
+            0.990417888302512
+          ]
+        }
+      },
+      "jpeg": {
+        "30": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "55": {
+          "rappel": 0.9953703703703703,
+          "n": 216,
+          "fpr": 0.0023148148148148147,
+          "fpr_dossier": 0.013888888888888888,
+          "ic": [
+            0.9742458312701834,
+            0.9991823097186012
+          ]
+        },
+        "75": {
+          "rappel": 0.9953703703703703,
+          "n": 216,
+          "fpr": 0.0007716049382716049,
+          "fpr_dossier": 0.004629629629629629,
+          "ic": [
+            0.9742458312701834,
+            0.9991823097186012
+          ]
+        },
+        "95": {
+          "rappel": 0.9814814814814815,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9533601149657861,
+            0.9927756482382665
+          ]
+        }
+      },
+      "sigma": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0023148148148148147,
+          "fpr_dossier": 0.013888888888888888,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "3.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "6.0": {
+          "rappel": 0.9953703703703703,
+          "n": 216,
+          "fpr": 0.0007716049382716049,
+          "fpr_dossier": 0.004629629629629629,
+          "ic": [
+            0.9742458312701834,
+            0.9991823097186012
+          ]
+        },
+        "12.0": {
+          "rappel": 0.9768518518518519,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9469652554392134,
+            0.9900730485032616
+          ]
+        }
+      }
+    },
+    "tombees": {
+      "(0.25, 300, 55, 12.0)": [
+        0.6666666666666666,
+        3
+      ],
+      "(1.0, 300, 95, 6.0)": [
+        0.6666666666666666,
+        3
+      ],
+      "(1.0, 300, 95, 12.0)": [
+        0.6666666666666666,
+        3
+      ],
+      "(2.0, 300, 75, 12.0)": [
+        0.6666666666666666,
+        3
+      ],
+      "(2.0, 300, 95, 12.0)": [
+        0.6666666666666666,
+        3
+      ],
+      "(4.0, 300, 95, 12.0)": [
+        0.6666666666666666,
+        3
+      ]
+    },
+    "frontiere": {
+      "angle": {
+        "0.0": [
+          0,
+          48
+        ],
+        "0.25": [
+          1,
+          48
+        ],
+        "0.5": [
+          0,
+          48
+        ],
+        "1.0": [
+          2,
+          48
+        ],
+        "2.0": [
+          2,
+          48
+        ],
+        "4.0": [
+          1,
+          48
+        ]
+      },
+      "dpi": {
+        "150": [
+          0,
+          96
+        ],
+        "200": [
+          0,
+          96
+        ],
+        "300": [
+          6,
+          96
+        ]
+      },
+      "jpeg": {
+        "30": [
+          0,
+          72
+        ],
+        "55": [
+          1,
+          72
+        ],
+        "75": [
+          1,
+          72
+        ],
+        "95": [
+          4,
+          72
+        ]
+      },
+      "sigma": {
+        "0.0": [
+          0,
+          72
+        ],
+        "3.0": [
+          0,
+          72
+        ],
+        "6.0": [
+          1,
+          72
+        ],
+        "12.0": [
+          5,
+          72
+        ]
+      }
+    },
+    "cibles_fautives": [
+      [
+        [
+          "identite",
+          "A COMPLETER"
+        ],
+        4,
+        864
+      ]
+    ],
+    "cibles_non_certifiables": [],
+    "restreint": null,
+    "classement": [
+      {
+        "reglage": "conf_min=0.0, capteur_texte=page",
+        "rappel": 0.9913194444444444,
+        "fpr": 0.0008680555555555555,
+        "seuil": 0.7213622291021672
+      },
+      {
+        "reglage": "conf_min=0.0, capteur_texte=zone",
+        "rappel": 0.9913194444444444,
+        "fpr": 0.0008680555555555555,
+        "seuil": 0.7213622291021672
+      },
+      {
+        "reglage": "conf_min=0.0, capteur_texte=union",
+        "rappel": 0.9913194444444444,
+        "fpr": 0.0008680555555555555,
+        "seuil": 0.7213622291021672
+      },
+      {
+        "reglage": "conf_min=10.0, capteur_texte=page",
+        "rappel": 0.9166666666666666,
+        "fpr": 0.0008680555555555555,
+        "seuil": 0.743421052631579
+      },
+      {
+        "reglage": "conf_min=10.0, capteur_texte=zone",
+        "rappel": 0.9166666666666666,
+        "fpr": 0.0008680555555555555,
+        "seuil": 0.743421052631579
+      },
+      {
+        "reglage": "conf_min=10.0, capteur_texte=union",
+        "rappel": 0.9166666666666666,
+        "fpr": 0.0008680555555555555,
+        "seuil": 0.743421052631579
+      },
+      {
+        "reglage": "conf_min=20.0, capteur_texte=page",
+        "rappel": 0.9079861111111112,
+        "fpr": 0.0,
+        "seuil": 0.8486842105263157
+      },
+      {
+        "reglage": "conf_min=20.0, capteur_texte=zone",
+        "rappel": 0.9079861111111112,
+        "fpr": 0.0,
+        "seuil": 0.8486842105263157
+      },
+      {
+        "reglage": "conf_min=20.0, capteur_texte=union",
+        "rappel": 0.9079861111111112,
+        "fpr": 0.0,
+        "seuil": 0.8486842105263157
+      },
+      {
+        "reglage": "conf_min=40.0, capteur_texte=page",
+        "rappel": 0.9045138888888888,
+        "fpr": 0.0,
+        "seuil": 0.8236842105263158
+      },
+      {
+        "reglage": "conf_min=40.0, capteur_texte=zone",
+        "rappel": 0.9045138888888888,
+        "fpr": 0.0,
+        "seuil": 0.8236842105263158
+      },
+      {
+        "reglage": "conf_min=40.0, capteur_texte=union",
+        "rappel": 0.9045138888888888,
+        "fpr": 0.0,
+        "seuil": 0.8236842105263158
+      },
+      {
+        "reglage": "conf_min=60.0, capteur_texte=page",
+        "rappel": 0.9027777777777778,
+        "fpr": 0.0,
+        "seuil": 0.8236842105263158
+      },
+      {
+        "reglage": "conf_min=60.0, capteur_texte=zone",
+        "rappel": 0.9027777777777778,
+        "fpr": 0.0,
+        "seuil": 0.8236842105263158
+      },
+      {
+        "reglage": "conf_min=60.0, capteur_texte=union",
+        "rappel": 0.9027777777777778,
+        "fpr": 0.0,
+        "seuil": 0.8236842105263158
+      },
+      {
+        "reglage": "conf_min=80.0, capteur_texte=page",
+        "rappel": 0.6857638888888888,
+        "fpr": 0.0,
+        "seuil": 0.8236842105263158
+      },
+      {
+        "reglage": "conf_min=80.0, capteur_texte=zone",
+        "rappel": 0.6857638888888888,
+        "fpr": 0.0,
+        "seuil": 0.8236842105263158
+      },
+      {
+        "reglage": "conf_min=80.0, capteur_texte=union",
+        "rappel": 0.6857638888888888,
+        "fpr": 0.0,
+        "seuil": 0.8236842105263158
+      }
+    ],
+    "domaine": 150,
+    "hors_domaine": {
+      "seuil": 0.7213622291021672,
+      "rappel": 0.041666666666666664,
+      "fpr": 0.0,
+      "tp": 12,
+      "fp": 0,
+      "n_pos": 288,
+      "n_neg": 1728,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.023992942786740433,
+        0.07140675348685457
+      ],
+      "ic_fpr": [
+        2.168404344971009e-19,
+        0.0022182167237465595
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.01316330502573999
+      ]
+    }
+  },
+  "resolution": {
+    "reglage_texte": "aucun reglage",
+    "point": {
+      "seuil": -150.0,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "precision_grille": 1.0,
+      "precision_prevalence": 1.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 1728
+    },
+    "seuil": -150.0,
+    "n_cellules": 288,
+    "calibration": {
+      "seuil": -110.99,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 1728,
+      "n_dossiers": 576,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9933747423434263,
+        1.0
+      ],
+      "ic_fpr": [
+        2.168404344971009e-19,
+        0.0022182167237465595
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.006625257656573795
+      ]
+    },
+    "validation": {
+      "seuil": -110.99,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 288,
+      "fp": 0,
+      "n_pos": 288,
+      "n_neg": 864,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9868366949742601,
+        1.0
+      ],
+      "ic_fpr": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.01316330502573999
+      ]
+    },
+    "ensemble": {
+      "seuil": -110.99,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 864,
+      "fp": 0,
+      "n_pos": 864,
+      "n_neg": 2592,
+      "n_dossiers": 864,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9955733857422827,
+        0.9999999999999999
+      ],
+      "ic_fpr": [
+        0.0,
+        0.0014799053994665932
+      ],
+      "ic_fpr_dossier": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ]
+    },
+    "facteurs": {
+      "angle": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.25": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.5": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "1.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "2.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "4.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        }
+      },
+      "dpi": {
+        "150": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "200": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "300": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        }
+      },
+      "jpeg": {
+        "30": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "55": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "75": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "95": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      },
+      "sigma": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "3.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "6.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "12.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      }
+    },
+    "tombees": {},
+    "frontiere": {
+      "angle": {
+        "0.0": [
+          0,
+          48
+        ],
+        "0.25": [
+          0,
+          48
+        ],
+        "0.5": [
+          0,
+          48
+        ],
+        "1.0": [
+          0,
+          48
+        ],
+        "2.0": [
+          0,
+          48
+        ],
+        "4.0": [
+          0,
+          48
+        ]
+      },
+      "dpi": {
+        "150": [
+          0,
+          96
+        ],
+        "200": [
+          0,
+          96
+        ],
+        "300": [
+          0,
+          96
+        ]
+      },
+      "jpeg": {
+        "30": [
+          0,
+          72
+        ],
+        "55": [
+          0,
+          72
+        ],
+        "75": [
+          0,
+          72
+        ],
+        "95": [
+          0,
+          72
+        ]
+      },
+      "sigma": {
+        "0.0": [
+          0,
+          72
+        ],
+        "3.0": [
+          0,
+          72
+        ],
+        "6.0": [
+          0,
+          72
+        ],
+        "12.0": [
+          0,
+          72
+        ]
+      }
+    },
+    "cibles_fautives": [],
+    "cibles_non_certifiables": [],
+    "restreint": null,
+    "classement": [
+      {
+        "reglage": "aucun reglage",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": -110.99
+      }
+    ],
+    "domaine": 150,
+    "hors_domaine": {
+      "seuil": -110.99,
+      "rappel": 1.0,
+      "fpr": 1.0,
+      "tp": 288,
+      "fp": 864,
+      "n_pos": 288,
+      "n_neg": 864,
+      "n_dossiers": 288,
+      "fpr_dossier": 1.0,
+      "ic_rappel": [
+        0.9868366949742601,
+        1.0
+      ],
+      "ic_fpr": [
+        0.9955733857422827,
+        0.9999999999999999
+      ],
+      "ic_fpr_dossier": [
+        0.9868366949742601,
+        1.0
+      ]
+    },
+    "plancher_dpi": 150,
+    "seuil_courbe_propre": -110.99,
+    "rappel_par_dpi_des_dependants": {
+      "champ_requis": {
+        "150": 1.0,
+        "200": 1.0,
+        "300": 1.0
+      },
+      "validite": {
+        "150": 1.0,
+        "200": 1.0,
+        "300": 1.0
+      },
+      "coherence": {
+        "150": 1.0,
+        "200": 1.0,
+        "300": 1.0
+      },
+      "valeur_interdite": {
+        "150": 1.0,
+        "200": 1.0,
+        "300": 0.979
+      }
+    }
+  },
+  "page_coupee": {
+    "reglage_texte": "aucun reglage",
+    "point": {
+      "seuil": 0.08794999999999997,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "precision_grille": 1.0,
+      "precision_prevalence": 1.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 1728
+    },
+    "seuil": 0.08794999999999997,
+    "n_cellules": 288,
+    "calibration": {
+      "seuil": 0.08794999999999997,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 1728,
+      "n_dossiers": 576,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9933747423434263,
+        1.0
+      ],
+      "ic_fpr": [
+        2.168404344971009e-19,
+        0.0022182167237465595
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.006625257656573795
+      ]
+    },
+    "validation": {
+      "seuil": 0.08794999999999997,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 288,
+      "fp": 0,
+      "n_pos": 288,
+      "n_neg": 864,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9868366949742601,
+        1.0
+      ],
+      "ic_fpr": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.01316330502573999
+      ]
+    },
+    "ensemble": {
+      "seuil": 0.08794999999999997,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 864,
+      "fp": 0,
+      "n_pos": 864,
+      "n_neg": 2592,
+      "n_dossiers": 864,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9955733857422827,
+        0.9999999999999999
+      ],
+      "ic_fpr": [
+        0.0,
+        0.0014799053994665932
+      ],
+      "ic_fpr_dossier": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ]
+    },
+    "facteurs": {
+      "angle": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.25": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.5": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "1.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "2.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "4.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        }
+      },
+      "dpi": {
+        "150": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "200": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "300": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        }
+      },
+      "jpeg": {
+        "30": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "55": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "75": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "95": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      },
+      "sigma": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "3.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "6.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "12.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      }
+    },
+    "tombees": {},
+    "frontiere": {
+      "angle": {
+        "0.0": [
+          0,
+          48
+        ],
+        "0.25": [
+          0,
+          48
+        ],
+        "0.5": [
+          0,
+          48
+        ],
+        "1.0": [
+          0,
+          48
+        ],
+        "2.0": [
+          0,
+          48
+        ],
+        "4.0": [
+          0,
+          48
+        ]
+      },
+      "dpi": {
+        "150": [
+          0,
+          96
+        ],
+        "200": [
+          0,
+          96
+        ],
+        "300": [
+          0,
+          96
+        ]
+      },
+      "jpeg": {
+        "30": [
+          0,
+          72
+        ],
+        "55": [
+          0,
+          72
+        ],
+        "75": [
+          0,
+          72
+        ],
+        "95": [
+          0,
+          72
+        ]
+      },
+      "sigma": {
+        "0.0": [
+          0,
+          72
+        ],
+        "3.0": [
+          0,
+          72
+        ],
+        "6.0": [
+          0,
+          72
+        ],
+        "12.0": [
+          0,
+          72
+        ]
+      }
+    },
+    "cibles_fautives": [],
+    "cibles_non_certifiables": [],
+    "restreint": null,
+    "classement": [
+      {
+        "reglage": "aucun reglage",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": 0.08794999999999997
+      }
+    ],
+    "domaine": 150,
+    "hors_domaine": {
+      "seuil": 0.08794999999999997,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 288,
+      "fp": 0,
+      "n_pos": 288,
+      "n_neg": 864,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9868366949742601,
+        1.0
+      ],
+      "ic_fpr": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.01316330502573999
+      ]
+    }
+  },
+  "page_tournee": {
+    "reglage_texte": "aucun reglage",
+    "point": {
+      "seuil": 0.35855,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "precision_grille": 1.0,
+      "precision_prevalence": 1.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 1728
+    },
+    "seuil": 0.35855,
+    "n_cellules": 288,
+    "calibration": {
+      "seuil": 0.35855,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 576,
+      "fp": 0,
+      "n_pos": 576,
+      "n_neg": 1728,
+      "n_dossiers": 576,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9933747423434263,
+        1.0
+      ],
+      "ic_fpr": [
+        2.168404344971009e-19,
+        0.0022182167237465595
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.006625257656573795
+      ]
+    },
+    "validation": {
+      "seuil": 0.35855,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 288,
+      "fp": 0,
+      "n_pos": 288,
+      "n_neg": 864,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9868366949742601,
+        1.0
+      ],
+      "ic_fpr": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.01316330502573999
+      ]
+    },
+    "ensemble": {
+      "seuil": 0.35855,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 864,
+      "fp": 0,
+      "n_pos": 864,
+      "n_neg": 2592,
+      "n_dossiers": 864,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9955733857422827,
+        0.9999999999999999
+      ],
+      "ic_fpr": [
+        0.0,
+        0.0014799053994665932
+      ],
+      "ic_fpr_dossier": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ]
+    },
+    "facteurs": {
+      "angle": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.25": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "0.5": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "1.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "2.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        },
+        "4.0": {
+          "rappel": 1.0,
+          "n": 144,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.974015432733412,
+            0.9999999999999999
+          ]
+        }
+      },
+      "dpi": {
+        "150": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "200": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        },
+        "300": {
+          "rappel": 1.0,
+          "n": 288,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9868366949742601,
+            1.0
+          ]
+        }
+      },
+      "jpeg": {
+        "30": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "55": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "75": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "95": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      },
+      "sigma": {
+        "0.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "3.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "6.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        },
+        "12.0": {
+          "rappel": 1.0,
+          "n": 216,
+          "fpr": 0.0,
+          "fpr_dossier": 0.0,
+          "ic": [
+            0.9825256002503623,
+            1.0
+          ]
+        }
+      }
+    },
+    "tombees": {},
+    "frontiere": {
+      "angle": {
+        "0.0": [
+          0,
+          48
+        ],
+        "0.25": [
+          0,
+          48
+        ],
+        "0.5": [
+          0,
+          48
+        ],
+        "1.0": [
+          0,
+          48
+        ],
+        "2.0": [
+          0,
+          48
+        ],
+        "4.0": [
+          0,
+          48
+        ]
+      },
+      "dpi": {
+        "150": [
+          0,
+          96
+        ],
+        "200": [
+          0,
+          96
+        ],
+        "300": [
+          0,
+          96
+        ]
+      },
+      "jpeg": {
+        "30": [
+          0,
+          72
+        ],
+        "55": [
+          0,
+          72
+        ],
+        "75": [
+          0,
+          72
+        ],
+        "95": [
+          0,
+          72
+        ]
+      },
+      "sigma": {
+        "0.0": [
+          0,
+          72
+        ],
+        "3.0": [
+          0,
+          72
+        ],
+        "6.0": [
+          0,
+          72
+        ],
+        "12.0": [
+          0,
+          72
+        ]
+      }
+    },
+    "cibles_fautives": [],
+    "cibles_non_certifiables": [],
+    "restreint": null,
+    "classement": [
+      {
+        "reglage": "aucun reglage",
+        "rappel": 1.0,
+        "fpr": 0.0,
+        "seuil": 0.35855
+      }
+    ],
+    "domaine": 150,
+    "hors_domaine": {
+      "seuil": 0.35855,
+      "rappel": 1.0,
+      "fpr": 0.0,
+      "tp": 288,
+      "fp": 0,
+      "n_pos": 288,
+      "n_neg": 864,
+      "n_dossiers": 288,
+      "fpr_dossier": 0.0,
+      "ic_rappel": [
+        0.9868366949742601,
+        1.0
+      ],
+      "ic_fpr": [
+        4.336808689942018e-19,
+        0.004426614257717076
+      ],
+      "ic_fpr_dossier": [
+        0.0,
+        0.01316330502573999
+      ]
+    }
+  }
+}

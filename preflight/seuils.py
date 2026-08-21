@@ -14,12 +14,26 @@ FICHIER = os.path.join(RACINE, "seuils.json")
 _MEMO = {}
 
 
-def charger_seuils(chemin=FICHIER):
+def _lire(chemin):
     if chemin not in _MEMO:
-        d = json.load(open(chemin, encoding="utf-8"))
-        _MEMO[chemin] = {k: v["valeur"] for k, v in d["seuils"].items()}
+        _MEMO[chemin] = json.load(open(chemin, encoding="utf-8"))
     return _MEMO[chemin]
 
 
+def charger_seuils(chemin=FICHIER):
+    return {k: v["valeur"] for k, v in _lire(chemin)["seuils"].items()}
+
+
+def charger_reglages(chemin=FICHIER):
+    """Les reglages MESURES, par controle.
+
+    Sans ce chemin de retour, la grille choisirait un capteur et le code continuerait d'en
+    utiliser un autre: le duel A/B ne servirait qu'a produire un tableau. Un reglage absent
+    laisse la valeur de spike, et l'origine du seuil dit alors qu'il n'est pas mesure.
+    """
+    return {k: dict(v.get("reglage_mesure") or {})
+            for k, v in _lire(chemin)["seuils"].items()}
+
+
 def brut(chemin=FICHIER):
-    return json.load(open(chemin, encoding="utf-8"))
+    return _lire(chemin)

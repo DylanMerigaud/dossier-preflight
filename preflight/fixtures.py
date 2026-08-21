@@ -118,11 +118,35 @@ def _echapper(t):
     return t.replace("\\", r"\\").replace("(", r"\(").replace(")", r"\)")
 
 
-def _trace_texte(x0, y0, x1, y1, valeur):
-    """Le texte pose a la position DECLAREE par le champ, comme une imprimante le poserait."""
+LARGEUR_GLYPHE = 0.6      # largeur moyenne d'un caractere Helvetica, en em
+
+
+def _trace_texte(x0, y0, x1, y1, valeur, peigne=0):
+    """Le texte pose a la position DECLAREE par le champ, comme une imprimante le poserait.
+
+    UN CHAMP PEIGNE S'IMPRIME UNE CASE A LA FOIS, et le formulaire le declare lui-meme
+    (drapeau /Ff bit 25). Le W-9 peigne son numero fiscal, le I-9 son numero de securite
+    sociale, le Cerfa cinq champs dont le numero de carte. Poser la chaine en continu par
+    dessus les separateurs produit un champ qu'aucun OCR ne lit: mesure le 2026-08-21, le
+    numero de carte du Cerfa rendait 0 caractere lisible pleine page et "| | | | | | | |" en
+    OCR de zone, c'est-a-dire les separateurs seuls. La grille aurait mesure cette faute
+    d'impression et conclu, faux, que le controle des champs requis ne tient pas.
+    """
     if not valeur:
         return ""
     haut = y1 - y0
+    if peigne:
+        case = (x1 - x0) / peigne
+        corps = max(5.0, min(haut * 0.58, case * 1.25))
+        base = y0 + (haut - corps) / 2 + corps * 0.22
+        ops = []
+        for i, c in enumerate(valeur[:peigne]):
+            if c == " ":
+                continue
+            centre = x0 + case * (i + 0.5) - corps * LARGEUR_GLYPHE / 2
+            ops.append(f"BT /F1 {corps:.1f} Tf 1 0 0 1 {centre:.1f} {base:.1f} Tm "
+                       f"({_echapper(c)}) Tj ET")
+        return "\n".join(ops) + "\n"
     corps = max(6.0, min(11.0, haut * 0.58))
     base = y0 + (haut - corps) / 2 + corps * 0.22
     return (f"BT /F1 {corps:.1f} Tf 1 0 0 1 {x0 + 3:.1f} {base:.1f} Tm "
@@ -154,11 +178,26 @@ def _trace_signature(x0, y0, x1, y1, graine=11):
     return "\n".join(ops) + "\n"
 
 
+DRAPEAU_PEIGNE = 1 << 24
+
+
 def _maxlen(pdf, page):
     out = {}
     for an in PdfReader(pdf).pages[page - 1].get("/Annots", []) or []:
         o = an.get_object()
         if o.get("/T") is not None and o.get("/MaxLen") is not None:
+            out[str(o["/T"])] = int(o["/MaxLen"])
+    return out
+
+
+def _peignes(pdf, page):
+    """Les champs qui se remplissent UNE CASE PAR CARACTERE, tels que le PDF les declare."""
+    out = {}
+    for an in PdfReader(pdf).pages[page - 1].get("/Annots", []) or []:
+        o = an.get_object()
+        if o.get("/T") is None or o.get("/MaxLen") is None:
+            continue
+        if int(o.get("/Ff", 0) or 0) & DRAPEAU_PEIGNE:
             out[str(o["/T"])] = int(o["/MaxLen"])
     return out
 
@@ -259,7 +298,9 @@ def construire(ref, variante, dest, reutiliser=True):
         w.set_need_appearances_writer(True)
         if cases:
             w.update_page_form_field_values(w.pages[gab.page - 1], cases, auto_regenerate=True)
-        ops = "".join(_trace_texte(*_rect_pdf(gab.pdf, champ, gab.page), valeur)
+        peignes = _peignes(gab.pdf, gab.page)
+        ops = "".join(_trace_texte(*_rect_pdf(gab.pdf, champ, gab.page), valeur,
+                                   peignes.get(champ, 0))
                       for champ, valeur in vals.items() if champ not in cases)
         if gab.signatures and not (var.piece == piece_id and var.sans_signature):
             ops += "".join(_trace_signature(*_rect_pdf(gab.pdf, champ, gab.page))

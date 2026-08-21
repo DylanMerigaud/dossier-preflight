@@ -38,6 +38,7 @@ class Lecture:
     mots: list = field(default_factory=list)        # OCR pleine page: (texte, cx, cy, conf, ajoute)
     zones_ocr: dict = field(default_factory=dict)   # OCR par zone: champ -> memes quintuplets
     cases: dict = field(default_factory=dict)       # champ -> {"part|seuil": delta}
+    encre_champs: dict = field(default_factory=dict)  # champ texte -> {"seuil": delta d'encre
     signatures: dict = field(default_factory=dict)  # champ -> {"seuil": [taux, n, aire, diag]}
 
     def dict(self):
@@ -151,6 +152,13 @@ def lire(piece, deg):
         aj = {id(m) for m in mots_ajoutes(lus, mots_vierge, RAYON_PREIMPRIME)}
         lec.zones_ocr[champ] = [(m.texte, round(m.cx), round(m.cy), round(m.conf), id(m) in aj)
                                 for m in lus]
+        # L'ENCRE sur un champ TEXTE, troisieme concurrent du duel des capteurs de texte.
+        # Le spike l'avait deja mise en cause a n=1 (un champ vide lisait +2,44% contre +4,5 a
+        # +5,1 pour un rempli, separable mais fragile); la grille rejoue le duel en grand.
+        zs = cadre.zone(z)
+        lec.encre_champs[champ] = {
+            str(sl): round(taux_encre(scan, zs, sl) - taux_encre(vierge_cadre, zs, sl), 3)
+            for sl in SEUILS_ENCRE}
 
     for champ in piece.gabarit.cases.values():
         z = zones.get(champ)

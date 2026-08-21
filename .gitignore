@@ -4,3 +4,5 @@ __pycache__/
 
 grille/mesures/
 grille/.fixtures/
+grille/lancement.log
+grille/analyse.log
