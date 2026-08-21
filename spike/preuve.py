@@ -29,7 +29,7 @@ from PIL import Image, ImageFilter
 from pypdf import PdfReader, PdfWriter
 
 ICI = os.path.dirname(os.path.abspath(__file__))
-VIERGE_PDF = os.path.join(ICI, "corpus", "fw9.pdf")
+VIERGE_PDF = os.path.normpath(os.path.join(ICI, "..", "corpus", "fw9.pdf"))
 DPI, MARGE, SEED = 200, 6, 7
 SKEW, SIGMA, FLOU, JPEG = 0.45, 6, 0.4, 55
 
