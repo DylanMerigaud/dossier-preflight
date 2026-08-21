@@ -1,0 +1,18 @@
+# Les noms de champs ne sont pas devines: ils sont DECLARES par l'AcroForm du PDF.
+#   python3 -c "from preflight.geometrie import zones_declarees as z; print(sorted(z('corpus/fw9.pdf')))"
+pdf: fw9.pdf
+page: 1
+langue: eng
+champs:
+  nom: f1_01[0]
+  adresse: f1_07[0]
+  ville: f1_08[0]
+  # Le formulaire declare MaxLen=3 sur f1_11: le numero est SPLIT sur trois cases,
+  # comme le formulaire le prevoit. La liste dit le decoupage, on ne tronque rien.
+  numero_fiscal: ["f1_11[0]", "f1_12[0]", "f1_13[0]"]
+cases:
+  statut: c1_1[0]
+signatures: {}
+requis: [nom, adresse, ville, numero_fiscal]
+cases_requises: [statut]
+format_date: us

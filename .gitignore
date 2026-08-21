@@ -1,3 +1,6 @@
 .travail/
 __pycache__/
 *.pyc
+
+grille/mesures/
+grille/.fixtures/

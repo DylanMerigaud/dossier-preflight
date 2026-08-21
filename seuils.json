@@ -1,0 +1,51 @@
+{
+  "_": "Chaque seuil porte son ORIGINE. 'spike' = valeur de mise au point choisie a la main sur un exemple. 'grille' = point de fonctionnement LU sur une courbe precision/rappel, avec le taux de faux positifs tenu. Tant qu'une ligne dit 'spike', ce controle n'est pas mesure.",
+  "sens": "Le score est oriente: plus haut = plus de raison de refuser. Le controle se declenche quand score > valeur.",
+  "seuils": {
+    "champ_requis": {
+      "valeur": -1.0,
+      "origine": "provisoire",
+      "lecture": "se declenche si moins de 1 caractere alphanumerique ajoute est lu dans la zone"
+    },
+    "case_obligatoire": {
+      "valeur": -8.0,
+      "origine": "spike",
+      "lecture": "se declenche si le delta d'encre du disque central est sous +8"
+    },
+    "signature": {
+      "valeur": -80.0,
+      "origine": "provisoire",
+      "lecture": "se declenche si la plus grande composante ajoutee fait moins de 80 px de diagonale"
+    },
+    "validite": {
+      "valeur": 0.0,
+      "origine": "definition",
+      "lecture": "se declenche des que la date lue est depassee a l'horloge choisie"
+    },
+    "coherence": {
+      "valeur": 0.35,
+      "origine": "provisoire",
+      "lecture": "se declenche si le recouvrement de jetons entre les deux pieces tombe sous 0,65"
+    },
+    "valeur_interdite": {
+      "valeur": 0.85,
+      "origine": "provisoire",
+      "lecture": "se declenche si une suite de mots ajoutes ressemble a plus de 0,85 a une valeur interdite"
+    },
+    "resolution": {
+      "valeur": -150.0,
+      "origine": "provisoire",
+      "lecture": "se declenche sous 150 dpi estimes"
+    },
+    "page_coupee": {
+      "valeur": 0.05,
+      "origine": "provisoire",
+      "lecture": "se declenche si plus de 5% de l'encre du vierge sort du cadre du scan"
+    },
+    "page_tournee": {
+      "valeur": 0.1,
+      "origine": "provisoire",
+      "lecture": "se declenche si un quart de tour bat le quart d'origine de plus de 0,10 de correlation"
+    }
+  }
+}
