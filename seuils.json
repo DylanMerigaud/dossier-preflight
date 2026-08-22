@@ -5,7 +5,7 @@
     "champ_requis": {
       "valeur": -0.345,
       "origine": "grille",
-      "lecture": "se declenche si moins de 1 caractere alphanumerique ajoute est lu dans la zone",
+      "lecture": "se declenche si la zone porte moins de 0.345% d'encre AJOUTEE par rapport au vierge (seuil d'encre 128)",
       "reglage": "capteur_texte=encre, seuil_encre=128",
       "reglage_mesure": {
         "capteur_texte": "encre",
@@ -21,7 +21,7 @@
     "case_obligatoire": {
       "valeur": -14.375,
       "origine": "grille",
-      "lecture": "se declenche si le delta d'encre du disque central est sous +8",
+      "lecture": "se declenche si le delta d'encre du disque central (rayon 0.3 du cote, seuil d'encre 128) est sous +14.38",
       "reglage": "part_disque=0.3, seuil_encre=128",
       "reglage_mesure": {
         "part_disque": 0.3,
@@ -37,7 +37,7 @@
     "signature": {
       "valeur": -342.05,
       "origine": "grille",
-      "lecture": "se declenche si la plus grande composante ajoutee fait moins de 80 px de diagonale",
+      "lecture": "se declenche si la plus grande composante ajoutee fait moins de 342 px de diagonale canonique",
       "reglage": "seuil_encre=128, capteur_signature=composantes",
       "reglage_mesure": {
         "seuil_encre": 128,
@@ -54,12 +54,23 @@
       "valeur": 0.0,
       "origine": "definition",
       "lecture": "se declenche des que la date lue est depassee a l'horloge choisie",
-      "pourquoi_fige": "Ce seuil encode le SENS du mot perime, il n'est pas un parametre. Laisse libre, la grille l'avait porte a -207,5 jours parce que la piece saine du referentiel expire en 2027 et que tout seuil entre -497 et -110 separe alors parfaitement les donnees. L'outil aurait declare une piece perimee sept mois avant qu'elle le soit."
+      "pourquoi_fige": "Ce seuil encode le SENS du mot perime, il n'est pas un parametre. Laisse libre, la grille l'avait porte a -207,5 jours parce que la piece saine du referentiel expire en 2027 et que tout seuil entre -497 et -110 separe alors parfaitement les donnees. L'outil aurait declare une piece perimee sept mois avant qu'elle le soit.",
+      "rappel": 1.0,
+      "faux_positifs": 0.0,
+      "mesure_sur": "graine 37, jamais utilisee pour choisir le seuil",
+      "reglage": "conf_min=0.0, capteur_texte=page",
+      "reglage_mesure": {
+        "conf_min": 0.0,
+        "capteur_texte": "page"
+      },
+      "courbe": "grille/resultats/pr_validite.csv",
+      "cellules_hors_domaine": "0/288",
+      "domaine_nominal_dpi": 150
     },
     "coherence": {
       "valeur": 0.3939,
       "origine": "grille",
-      "lecture": "se declenche si le recouvrement de jetons entre les deux pieces tombe sous 0,65",
+      "lecture": "se declenche si le pire jeton de la plus petite lecture ressemble a moins de 0.606 au meilleur jeton de l'autre piece",
       "reglage": "conf_min=0.0, capteur_texte=zone",
       "reglage_mesure": {
         "conf_min": 0.0,
@@ -75,7 +86,7 @@
     "valeur_interdite": {
       "valeur": 0.7214,
       "origine": "grille",
-      "lecture": "se declenche si une suite de mots ajoutes ressemble a plus de 0,85 a une valeur interdite",
+      "lecture": "se declenche si une suite de mots ajoutes ressemble a plus de 0.721 a une valeur interdite",
       "reglage": "conf_min=0.0, capteur_texte=page",
       "reglage_mesure": {
         "conf_min": 0.0,
@@ -89,9 +100,9 @@
       "domaine_nominal_dpi": 150
     },
     "resolution": {
-      "valeur": -150.0,
+      "valeur": -148.5,
       "origine": "grille",
-      "lecture": "se declenche sous 150 dpi estimes, plancher lu sur le rappel des controles qui dependent de l'OCR et non sur la courbe de ce controle",
+      "lecture": "se declenche sous 148.5 dpi estimes, soit le plancher de 150 dpi moins une marge de 1.0%; le plancher est lu sur le rappel des controles qui dependent de l'OCR et non sur la courbe de ce controle, et la marge couvre dix fois l'erreur maximale mesuree de l'estimateur (0.0133%)",
       "reglage": "aucun reglage",
       "reglage_mesure": {},
       "rappel": 1.0,
@@ -127,7 +138,7 @@
     "page_coupee": {
       "valeur": 0.0879,
       "origine": "grille",
-      "lecture": "se declenche si plus de 5% de l'encre du vierge sort du cadre du scan",
+      "lecture": "se declenche si plus de 8.79% de l'encre du vierge sort du cadre du scan",
       "reglage": "aucun reglage",
       "reglage_mesure": {},
       "rappel": 1.0,
@@ -140,7 +151,7 @@
     "page_tournee": {
       "valeur": 0.3585,
       "origine": "grille",
-      "lecture": "se declenche si un quart de tour bat le quart d'origine de plus de 0,10 de correlation",
+      "lecture": "se declenche si un quart de tour bat le quart d'origine de plus de 0.359 de correlation",
       "reglage": "aucun reglage",
       "reglage_mesure": {},
       "rappel": 1.0,

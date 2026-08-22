@@ -4,11 +4,11 @@ C'est le motif de refus le plus injuste au guichet: la piece etait valable quand
 ete monte, elle ne l'est plus le jour du depot. Un outil qui n'a qu'une horloge implicite,
 celle du jour ou il tourne, ne peut pas poser la question.
 """
-from preflight.controles import Reglages, evaluer
+from preflight.controles import evaluer
 
 
 def crie_validite(lectures, referentiel, nom, horloge):
-    cons = evaluer(lectures[nom], referentiel, horloge, Reglages())
+    cons = evaluer(lectures[nom], referentiel, horloge)
     return any(c.declenche for c in cons if c.controle == "validite")
 
 

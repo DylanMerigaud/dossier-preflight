@@ -54,6 +54,33 @@ Une cellule est declaree HORS DOMAINE quand le rappel y passe sous 95%.
   cote (voir le duel).
 - La precision depend de la prevalence. Les courbes la donnent a 10% de dossiers fautifs, valeur SUPPOSEE et non mesuree.
 
+## Diaphonie: qui crie sur le defaut du voisin
+
+Chaque case donne la part des dossiers ou le controle de la LIGNE se declenche
+alors que le defaut injecte appartient a la COLONNE. La diagonale est vide par
+construction. Toutes les cases ne sont pas des fautes: une page rognee emporte de
+vrais champs, donc le controle des champs requis a raison d'y crier. Ce tableau
+sert a separer la consequence physique de la contamination.
+
+Une LIGNE UNIFORME n'est pas de la diaphonie: c'est le taux de fond du controle
+qui reapparait. Les variantes partagent les pieces qu'elles n'abiment pas, donc
+un controle qui se declenche a x% sur un dossier sain se declenche a x% sur
+toutes les colonnes. Ce qui se lit ici, ce sont les cases qui DEPASSENT la ligne.
+
+| controle \ defaut | champ_requis_v | case_non_coche | signature_abse | date_perimee | adresse_diverg | valeur_interdi | resolution_bas | page_coupee | page_tournee |
+|---|---|---|---|---|---|---|---|---|---|
+| case_obligatoire | . | . | . | . | . | . | 0.021 | . | . |
+| champ_requis | . | . | . | . | . | . | . | . | . |
+| coherence | . | . | . | . | . | . | . | . | . |
+| page_coupee | . | . | . | . | . | . | . | . | . |
+| page_tournee | . | . | . | . | . | . | . | . | . |
+| resolution | . | . | . | . | . | . | . | . | . |
+| signature | . | . | . | . | . | . | . | . | . |
+| valeur_interdite | 0.005 | 0.005 | 0.005 | 0.005 | 0.005 | . | 0.005 | 0.005 | 0.005 |
+| validite | . | . | . | . | . | . | . | . | . |
+
+Un point vaut zero declenchement sur 864 dossiers.
+
 ## case_obligatoire
 
 Reglage retenu: part_disque=0.3, seuil_encre=128. Seuil -14.38.
@@ -70,7 +97,12 @@ la gate reste credible.
 
 Cellules sous le plancher: 0 sur 288.
 
-Hors domaine (dpi < 150), au meme seuil: rappel 1.000 [0.987, 1.000], declenchements sur dossier sain 0.0000 sur 864 cibles.
+Hors domaine (dpi < 150), CAPTEURS BRUTS, c'est-a-dire ce que l'outil ferait
+s'il n'avait pas la regle d'abstention: rappel 1.000 [0.987, 1.000], declenchements sur dossier sain 0.0000 sur 864 cibles.
+Ces chiffres-la ne decrivent donc pas le produit, ils justifient la regle: en
+production, un controle qui LIT s'abstient sous le plancher au lieu de produire
+ce qu'on lit ici. Ils sont mesures capteurs bruts a dessein, parce qu'une mesure
+ne peut pas dependre du comportement qu'elle sert a regler.
 
 Aucune cellule du domaine explore ne passe sous le plancher.
 
@@ -97,7 +129,12 @@ la gate reste credible.
 
 Cellules sous le plancher: 0 sur 288.
 
-Hors domaine (dpi < 150), au meme seuil: rappel 1.000 [0.987, 1.000], declenchements sur dossier sain 0.0000 sur 5760 cibles.
+Hors domaine (dpi < 150), CAPTEURS BRUTS, c'est-a-dire ce que l'outil ferait
+s'il n'avait pas la regle d'abstention: rappel 1.000 [0.987, 1.000], declenchements sur dossier sain 0.0000 sur 5760 cibles.
+Ces chiffres-la ne decrivent donc pas le produit, ils justifient la regle: en
+production, un controle qui LIT s'abstient sous le plancher au lieu de produire
+ce qu'on lit ici. Ils sont mesures capteurs bruts a dessein, parce qu'une mesure
+ne peut pas dependre du comportement qu'elle sert a regler.
 
 Aucune cellule du domaine explore ne passe sous le plancher.
 
@@ -124,7 +161,12 @@ la gate reste credible.
 
 Cellules sous le plancher: 0 sur 288.
 
-Hors domaine (dpi < 150), au meme seuil: rappel 0.958 [0.929, 0.976], declenchements sur dossier sain 0.8403 sur 288 cibles.
+Hors domaine (dpi < 150), CAPTEURS BRUTS, c'est-a-dire ce que l'outil ferait
+s'il n'avait pas la regle d'abstention: rappel 0.958 [0.929, 0.976], declenchements sur dossier sain 0.8403 sur 288 cibles.
+Ces chiffres-la ne decrivent donc pas le produit, ils justifient la regle: en
+production, un controle qui LIT s'abstient sous le plancher au lieu de produire
+ce qu'on lit ici. Ils sont mesures capteurs bruts a dessein, parce qu'une mesure
+ne peut pas dependre du comportement qu'elle sert a regler.
 
 Aucune cellule du domaine explore ne passe sous le plancher.
 
@@ -151,7 +193,12 @@ la gate reste credible.
 
 Cellules sous le plancher: 0 sur 288.
 
-Hors domaine (dpi < 150), au meme seuil: rappel 1.000 [0.987, 1.000], declenchements sur dossier sain 0.0000 sur 864 cibles.
+Hors domaine (dpi < 150), CAPTEURS BRUTS, c'est-a-dire ce que l'outil ferait
+s'il n'avait pas la regle d'abstention: rappel 1.000 [0.987, 1.000], declenchements sur dossier sain 0.0000 sur 864 cibles.
+Ces chiffres-la ne decrivent donc pas le produit, ils justifient la regle: en
+production, un controle qui LIT s'abstient sous le plancher au lieu de produire
+ce qu'on lit ici. Ils sont mesures capteurs bruts a dessein, parce qu'une mesure
+ne peut pas dependre du comportement qu'elle sert a regler.
 
 Aucune cellule du domaine explore ne passe sous le plancher.
 
@@ -178,7 +225,12 @@ la gate reste credible.
 
 Cellules sous le plancher: 0 sur 288.
 
-Hors domaine (dpi < 150), au meme seuil: rappel 1.000 [0.987, 1.000], declenchements sur dossier sain 0.0000 sur 864 cibles.
+Hors domaine (dpi < 150), CAPTEURS BRUTS, c'est-a-dire ce que l'outil ferait
+s'il n'avait pas la regle d'abstention: rappel 1.000 [0.987, 1.000], declenchements sur dossier sain 0.0000 sur 864 cibles.
+Ces chiffres-la ne decrivent donc pas le produit, ils justifient la regle: en
+production, un controle qui LIT s'abstient sous le plancher au lieu de produire
+ce qu'on lit ici. Ils sont mesures capteurs bruts a dessein, parce qu'une mesure
+ne peut pas dependre du comportement qu'elle sert a regler.
 
 Aucune cellule du domaine explore ne passe sous le plancher.
 
@@ -191,7 +243,7 @@ Rappel par facteur, au seuil retenu:
 
 ## resolution
 
-Reglage retenu: aucun reglage. Seuil -150.
+Reglage retenu: aucun reglage. Seuil -148.5.
 
 | jeu | rappel | IC 95% | faux positifs par cible | IC 95% | par dossier sain | positifs |
 |---|---|---|---|---|---|---|
@@ -205,7 +257,12 @@ la gate reste credible.
 
 Cellules sous le plancher: 0 sur 288.
 
-Hors domaine (dpi < 150), au meme seuil: rappel 1.000 [0.987, 1.000], declenchements sur dossier sain 1.0000 sur 864 cibles.
+Hors domaine (dpi < 150), CAPTEURS BRUTS, c'est-a-dire ce que l'outil ferait
+s'il n'avait pas la regle d'abstention: rappel 1.000 [0.987, 1.000], declenchements sur dossier sain 1.0000 sur 864 cibles.
+Ces chiffres-la ne decrivent donc pas le produit, ils justifient la regle: en
+production, un controle qui LIT s'abstient sous le plancher au lieu de produire
+ce qu'on lit ici. Ils sont mesures capteurs bruts a dessein, parce qu'une mesure
+ne peut pas dependre du comportement qu'elle sert a regler.
 
 Pour CE controle, ces declenchements hors domaine ne sont pas des faux
 positifs: c'est exactement son travail. Il est la pour dire qu'une page
@@ -236,7 +293,12 @@ la gate reste credible.
 
 Cellules sous le plancher: 0 sur 288.
 
-Hors domaine (dpi < 150), au meme seuil: rappel 1.000 [0.987, 1.000], declenchements sur dossier sain 0.0000 sur 288 cibles.
+Hors domaine (dpi < 150), CAPTEURS BRUTS, c'est-a-dire ce que l'outil ferait
+s'il n'avait pas la regle d'abstention: rappel 1.000 [0.987, 1.000], declenchements sur dossier sain 0.0000 sur 288 cibles.
+Ces chiffres-la ne decrivent donc pas le produit, ils justifient la regle: en
+production, un controle qui LIT s'abstient sous le plancher au lieu de produire
+ce qu'on lit ici. Ils sont mesures capteurs bruts a dessein, parce qu'une mesure
+ne peut pas dependre du comportement qu'elle sert a regler.
 
 Aucune cellule du domaine explore ne passe sous le plancher.
 
@@ -263,11 +325,25 @@ la gate reste credible.
 
 Cellules sous le plancher: 6 sur 288.
 
+Pires CROISEMENTS de deux facteurs. Une lecture axe par axe peut mentir par
+omission: trois valeurs marginales toutes au-dessus du plancher peuvent se
+croiser en une cellule qui passe dessous.
+
+- dpi x sigma = [300, 12.0]: rappel 0.931 [0.848, 0.970] sur 72 positifs
+- angle x jpeg = [1.0, 95]: rappel 0.944 [0.819, 0.985] sur 36 positifs
+- angle x sigma = [2.0, 12.0]: rappel 0.944 [0.819, 0.985] sur 36 positifs
+- dpi x jpeg = [300, 95]: rappel 0.944 [0.866, 0.978] sur 72 positifs
+
 Cibles saines qui se declenchent AU SEUIL RETENU, celles qui coutent la credibilite:
 
 - identite / A COMPLETER: 4 fois sur 864
 
-Hors domaine (dpi < 150), au meme seuil: rappel 0.042 [0.024, 0.071], declenchements sur dossier sain 0.0000 sur 1728 cibles.
+Hors domaine (dpi < 150), CAPTEURS BRUTS, c'est-a-dire ce que l'outil ferait
+s'il n'avait pas la regle d'abstention: rappel 0.042 [0.024, 0.071], declenchements sur dossier sain 0.0000 sur 1728 cibles.
+Ces chiffres-la ne decrivent donc pas le produit, ils justifient la regle: en
+production, un controle qui LIT s'abstient sous le plancher au lieu de produire
+ce qu'on lit ici. Ils sont mesures capteurs bruts a dessein, parce qu'une mesure
+ne peut pas dependre du comportement qu'elle sert a regler.
 
 Frontiere par facteur, nombre de cellules tombees sur le total:
 
@@ -294,7 +370,7 @@ Rappel par facteur, au seuil retenu:
 
 ## validite
 
-Reglage retenu: conf_min=0.0, capteur_texte=page. Seuil -207.5.
+Reglage retenu: conf_min=0.0, capteur_texte=page. Seuil 0.
 
 | jeu | rappel | IC 95% | faux positifs par cible | IC 95% | par dossier sain | positifs |
 |---|---|---|---|---|---|---|
@@ -308,7 +384,12 @@ la gate reste credible.
 
 Cellules sous le plancher: 0 sur 288.
 
-Hors domaine (dpi < 150), au meme seuil: rappel 1.000 [0.566, 1.000], declenchements sur dossier sain 0.0000 sur 2 cibles.
+Hors domaine (dpi < 150), CAPTEURS BRUTS, c'est-a-dire ce que l'outil ferait
+s'il n'avait pas la regle d'abstention: rappel 1.000 [0.566, 1.000], declenchements sur dossier sain 0.0000 sur 2 cibles.
+Ces chiffres-la ne decrivent donc pas le produit, ils justifient la regle: en
+production, un controle qui LIT s'abstient sous le plancher au lieu de produire
+ce qu'on lit ici. Ils sont mesures capteurs bruts a dessein, parce qu'une mesure
+ne peut pas dependre du comportement qu'elle sert a regler.
 
 Aucune cellule du domaine explore ne passe sous le plancher.
 

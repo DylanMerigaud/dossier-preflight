@@ -21,3 +21,19 @@ def test_un_seuil_mesure_cite_sa_courbe():
         if s["origine"] == "grille":
             assert s.get("courbe"), f"{nom}: origine grille sans reference de courbe"
             assert "faux_positifs" in s, f"{nom}: origine grille sans taux de faux positifs tenu"
+
+
+def test_un_seuil_de_definition_ne_se_fitte_pas():
+    """Le piege central de "lire le seuil sur la courbe", et il a ete paye.
+
+    "Perime" veut dire que la date est passee: ce seuil vaut zero jour, il encode du sens, il
+    n'est pas un parametre. Laisse libre, l'optimiseur l'avait porte a -207,5 jours parce que
+    la piece saine du referentiel expire en 2027 et que tout seuil entre -497 et -110 separe
+    alors parfaitement les donnees. L'outil aurait declare une piece perimee sept mois avant
+    qu'elle le soit, avec un rappel de 1,000 a l'appui. Une courbe ne connait que les donnees
+    qu'on lui a donnees.
+    """
+    v = brut()["seuils"]["validite"]
+    assert v["origine"] == "definition"
+    assert v["valeur"] == 0.0, "un jour de plus ou de moins ici change le sens du mot perime"
+    assert v.get("pourquoi_fige"), "un seuil fige sans raison ecrite se fera refitter"

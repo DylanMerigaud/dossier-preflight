@@ -123,7 +123,7 @@ def dossiers_complets(index):
     return out
 
 
-def scores_cibles(lectures, ref, controle, reg, horloge="guichet"):
+def scores_cibles(lectures, ref, controle, reg, horloge="guichet", abstention=False):
     """Le score de CHAQUE cible du controle: un champ, une case, une valeur interdite.
 
     C'est la bonne unite de mesure, et le choisir change le resultat. Roule au niveau du
@@ -134,7 +134,8 @@ def scores_cibles(lectures, ref, controle, reg, horloge="guichet"):
     peut dire QUEL champ n'est pas certifiable au lieu de condamner le controle entier.
     """
     return {(c.piece, str(c.cible)): c.score
-            for c in evaluer(lectures, ref, horloge, reg, controles=[controle])
+            for c in evaluer(lectures, ref, horloge, reg, controles=[controle],
+                             abstention=abstention)
             if c.score is not None}
 
 
@@ -207,6 +208,15 @@ def courbe(pos, neg):
                     "precision_grille": prec_grille, "precision_prevalence": prec_reelle,
                     "tp": tp, "fp": fp, "n_pos": len(pos), "n_neg": len(neg)})
     return pts
+
+
+def precisions(rappel, fpr):
+    """Precision a la composition de la grille (un fautif pour un sain) et a la prevalence
+    supposee. La seconde est celle qui compte, et elle est plus severe."""
+    num = PREVALENCE * rappel
+    return {"precision_grille": rappel / (rappel + fpr) if (rappel + fpr) else 1.0,
+            "precision_prevalence": num / (num + (1 - PREVALENCE) * fpr)
+            if (num + (1 - PREVALENCE) * fpr) else 1.0}
 
 
 def point_retenu(pts, budget=BUDGET_FP):
@@ -407,6 +417,37 @@ def plancher(par_cellule, seuil, minimum=RAPPEL_PLANCHER):
     return tombees, len(groupes)
 
 
+AXES = ("angle", "dpi", "jpeg", "sigma")
+
+
+def pires_conjonctions(par_cellule, seuil, combien=3):
+    """Les pires CROISEMENTS de deux facteurs, pas seulement les pires valeurs de chacun.
+
+    Une lecture marginale peut mentir par omission. Sur les valeurs interdites, le rappel dit
+    0,979 a 300 dpi, 0,981 en JPEG 95 et 0,977 a sigma 12: aucune de ces trois valeurs ne
+    franchit le plancher, et on conclut que le controle va bien partout. Croisees, ces trois
+    valeurs font une cellule a 0,833 dont la borne HAUTE de l'intervalle est sous le plancher.
+    Le signe est a l'envers de l'intuition, et c'est ce qui le rend interessant: le rappel
+    baisse quand la qualite MONTE, parce qu'une compression forte efface le grain du capteur
+    alors qu'une compression legere le garde, et qu'a haute resolution ce grain est assez fin
+    pour se faire lire comme de la structure de caractere.
+    """
+    out = {}
+    for i, a in enumerate(AXES):
+        for b in AXES[i + 1:]:
+            ia, ib = AXES.index(a), AXES.index(b)
+            groupes = collections.defaultdict(lambda: [0, 0])
+            for cle, v in par_cellule.items():
+                g = groupes[(cle[ia], cle[ib])]
+                g[0] += sum(1 for x in v["pos"].values() if x > seuil)
+                g[1] += len(v["pos"])
+            classe = sorted(((k, g[0] / max(1, g[1]), g[1], wilson(g[0], g[1]))
+                             for k, g in groupes.items()), key=lambda t: t[1])
+            out[f"{a} x {b}"] = [{"valeurs": list(k), "rappel": r, "n": n, "ic": list(ic)}
+                                 for k, r, n, ic in classe[:combien]]
+    return out
+
+
 def frontiere(tombees, toutes):
     """La frontiere lisible: par facteur, la valeur a partir de laquelle ca tombe."""
     axes = ["angle", "dpi", "jpeg", "sigma"]
@@ -463,7 +504,69 @@ def tracer(resultats, chemin):
 DEPENDANTS_OCR = ("champ_requis", "validite", "coherence", "valeur_interdite")
 
 
-def plancher_operationnel(resultats, domaine):
+def diaphonie(dossiers, ref, resultats):
+    """Le controle c se declenche-t-il quand le defaut appartient a un AUTRE controle.
+
+    Les tests posaient deja cette exigence, mais sur une seule cellule. La grille la mesure
+    partout, parce que c'est la moitie qui compte: un controle qui crie sur le defaut du
+    voisin fait douter du voisin, et une regle qui crie au loup fait survoler celles d'a cote.
+
+    Le tableau n'est pas fait que de fautes. Une page ROGNEE emporte de vrais champs avec
+    elle: le controle des champs requis a raison de crier. Ce que le tableau donne, c'est de
+    quoi separer ce qui est une consequence physique de ce qui est une contamination.
+    """
+    out = {}
+    for controle, r in resultats.items():
+        reg, seuil = r["reglage"], r["seuil"]
+        lignes = {}
+        for v in VARIANTES:
+            if not v.controle or v.controle == controle:
+                continue
+            n = tire = 0
+            for d in dossiers.values():
+                # ICI l'abstention est BRANCHEE: la diaphonie mesure le comportement du
+                # PRODUIT, pas la capacite brute des capteurs.
+                scores = scores_cibles(d[v.nom], ref, controle, reg, abstention=True)
+                n += 1
+                tire += any(x > seuil for x in scores.values())
+            lignes[v.nom] = {"taux": tire / max(1, n), "n": n, "ic": wilson(tire, n)}
+        out[controle] = lignes
+    return out
+
+
+def erreur_estimateur_dpi(dossiers):
+    """L'erreur relative maximale de l'estimateur de dpi, mesuree sur les dossiers sains."""
+    pire = 0.0
+    for (_, dpi, _, _, _), d in dossiers.items():
+        for lec in d["sain"].values():
+            pire = max(pire, abs(lec.dpi_source - dpi) / dpi)
+    return pire
+
+
+def remesurer(r, seuil):
+    """Tout recalculer AU SEUIL QU'ON PUBLIE. Sinon on publie un rappel mesure ailleurs.
+
+    Le seuil du controle de resolution n'est pas celui de sa courbe: il est porte au plancher
+    des autres. Sans ce recalcul, seuils.json annoncait "faux positifs 0,0000" a cote d'une
+    valeur a laquelle c'etait faux (33% des cibles saines a 150 dpi). Meme famille de faute
+    que la phrase de lecture survivant a son capteur: un nombre mesure sous une configuration,
+    publie a cote d'une autre.
+    """
+    pc = r["_par_cellule"]
+    cal, val = separer(pc)
+    tombees, n_cel = plancher(pc, seuil)
+    r.update({"seuil": seuil,
+              "calibration": mesurer(cal, seuil), "validation": mesurer(val, seuil),
+              "ensemble": mesurer(pc, seuil),
+              "facteurs": par_facteur(pc, seuil),
+              "conjonctions": pires_conjonctions(pc, seuil),
+              "tombees": tombees, "n_cellules": n_cel,
+              "frontiere": frontiere(tombees, {c[:4] for c in pc}),
+              "cibles_fautives": cibles_fautives(pc, seuil)})
+    return r
+
+
+def plancher_operationnel(resultats, domaine, dossiers):
     """Le seuil du controle de resolution ne se lit pas sur SA courbe. Et c'est le sujet.
 
     Sa courbe le placerait entre 72 dpi (la variante fautive) et 96 dpi (le plus bas dpi de la
@@ -479,14 +582,23 @@ def plancher_operationnel(resultats, domaine):
     une page qu'on ne sait pas lire. La confondre avec un faux positif reviendrait a se taire
     exactement quand on ne sait pas.
     """
+    # Le seuil se pose SOUS le plancher, pas dessus. Un scan a exactement 150 dpi s'estime a
+    # 149,98: seuil pose pile sur 150, il declenchait sur les 288 dossiers sains numerises au
+    # plancher meme. La marge vaut dix fois la pire erreur mesuree de l'estimateur, au minimum
+    # 1%, ce qui reste quarante fois plus fin que l'ecart entre deux dpi de la grille.
+    erreur = erreur_estimateur_dpi(dossiers)
+    marge = max(0.01, 10 * erreur)
     plancher_dpi = domaine
+    seuil_dpi = domaine * (1 - marge)
     dpis = sorted(resultats["resolution"]["facteurs"]["dpi"])
     detail = {c: {d: round(resultats[c]["facteurs"]["dpi"][d]["rappel"], 3) for d in dpis}
               for c in DEPENDANTS_OCR if c in resultats}
     pr = resultats["resolution"]["point"]
-    return {"seuil": -float(plancher_dpi),
-            "point": dict(pr or {}, seuil=-float(plancher_dpi)),
+    return {"seuil": -float(seuil_dpi),
+            "point": dict(pr or {}, seuil=-float(seuil_dpi)),
             "plancher_dpi": plancher_dpi,
+            "marge_estimateur": marge,
+            "erreur_max_estimateur": erreur,
             "seuil_courbe_propre": (pr or {}).get("seuil"),
             "rappel_par_dpi_des_dependants": detail}
 
@@ -549,7 +661,8 @@ def analyser_controle(par_reglage, controle, sortie=None):
             m = mesurer(separer(c[1])[0], impose)
             return (m["rappel"], -m["fpr"])
         reg, par_cellule, pts, pt = max(classement, key=note)
-        pt = dict(mesurer(separer(par_cellule)[0], impose), seuil=impose)
+        m = mesurer(separer(par_cellule)[0], impose)
+        pt = dict(m, seuil=impose, **precisions(m["rappel"], m["fpr"]))
     gardees, exclues = certifiabilite(par_cellule)
     seuil = pt["seuil"] if pt else max(p["seuil"] for p in pts)
     cal, val = separer(par_cellule)
@@ -578,6 +691,8 @@ def analyser_controle(par_reglage, controle, sortie=None):
                        for r, pc, _, q in sorted(
                            classement, key=lambda c: -((c[3] or {}).get("rappel", -1)))],
         "_classement": classement,
+        "_par_cellule": par_cellule,
+        "conjonctions": pires_conjonctions(par_cellule, seuil),
     }
 
 
@@ -621,6 +736,48 @@ def choisir_domaine(balayages, controles):
     if not valides:
         return DOMAINES[0], essais
     return max(valides, key=lambda x: x[1])[0], essais
+
+
+PHRASES = {
+    "champ_requis": lambda r, v: (
+        f"se declenche si la zone porte moins de {-v:.3f}% d'encre AJOUTEE par rapport au "
+        f"vierge (seuil d'encre {r.seuil_encre})" if r.capteur_texte == "encre" else
+        f"se declenche si moins de {-v:.0f} caractere(s) alphanumerique(s) ajoute(s) sont lus "
+        f"dans la zone par le capteur {r.capteur_texte} au-dessus de {r.conf_min:.0f} de "
+        f"confiance"),
+    "case_obligatoire": lambda r, v: (
+        f"se declenche si le delta d'encre du disque central (rayon {r.part_disque} du cote, "
+        f"seuil d'encre {r.seuil_encre}) est sous {-v:+.2f}"),
+    "signature": lambda r, v: (
+        f"se declenche si la plus grande composante ajoutee fait moins de {-v:.0f} px de "
+        f"diagonale canonique" if r.capteur_signature == "composantes" else
+        f"se declenche si la zone porte moins de {-v:.2f}% d'encre ajoutee"),
+    "validite": lambda r, v: "se declenche des que la date lue est depassee a l'horloge choisie",
+    "coherence": lambda r, v: (
+        f"se declenche si le pire jeton de la plus petite lecture ressemble a moins de "
+        f"{1 - v:.3f} au meilleur jeton de l'autre piece"),
+    "valeur_interdite": lambda r, v: (
+        f"se declenche si une suite de mots ajoutes ressemble a plus de {v:.3f} a une valeur "
+        f"interdite"),
+    "page_coupee": lambda r, v: (
+        f"se declenche si plus de {v:.2%} de l'encre du vierge sort du cadre du scan"),
+    "page_tournee": lambda r, v: (
+        f"se declenche si un quart de tour bat le quart d'origine de plus de {v:.3f} de "
+        f"correlation"),
+}
+
+
+def phrase_lecture(controle, reg, valeur, defaut=""):
+    """La phrase se REGENERE a chaque publication, depuis le capteur reellement retenu.
+
+    Une phrase reconduite telle quelle survit au capteur qu'elle decrit. C'est arrive ici:
+    apres que la grille eut retenu l'encre pour les champs requis, seuils.json continuait de
+    dire "moins de 1 caractere alphanumerique", et un lecteur pouvait croire que -0,345 etait
+    un nombre de caracteres alors que c'est un pourcentage d'encre. Une unite fausse dans une
+    phrase juste est plus dangereuse qu'une phrase absente.
+    """
+    f = PHRASES.get(controle)
+    return f(reg, valeur) if f else defaut
 
 
 def _reglage_utile(reg, controle):
@@ -705,23 +862,29 @@ def main():
               f"hors domaine {len(r['tombees'])}/{r['n_cellules']}")
 
     if "resolution" in resultats:
-        resultats["resolution"].update(plancher_operationnel(resultats, domaine))
-        r = resultats["resolution"]
-        print(f"  {'resolution':17s} seuil porte au plancher operationnel {r['seuil']:.4g} "
-              f"(sa propre courbe disait {r['seuil_courbe_propre']:.4g}): ce controle repond "
-              f"\"je ne sais pas lire\", pas \"c'est du 72 dpi\"")
+        resultats["resolution"].update(plancher_operationnel(resultats, domaine, retenus))
+        r = remesurer(resultats["resolution"], resultats["resolution"]["seuil"])
+        r["point"] = dict(r["validation"], seuil=r["seuil"],
+                          **precisions(r["validation"]["rappel"], r["validation"]["fpr"]))
+        print(f"  {'resolution':17s} seuil porte a {r['seuil']:.4g} = plancher "
+              f"{r['plancher_dpi']} dpi moins {r['marge_estimateur']:.1%} de marge "
+              f"(erreur max mesuree de l'estimateur {r['erreur_max_estimateur']:.4%})")
+    t = time.perf_counter()
+    croise = diaphonie(retenus, ref, resultats)
+    print(f"  diaphonie mesuree sur toute la grille en {time.perf_counter() - t:.0f}s")
     if not resultats:
         print("aucun controle exploitable, rien a tracer")
         return 1
     tracer(resultats, os.path.join(a.sortie, "courbes.png"))
     json.dump({c: {k: _jsonable(v) for k, v in r.items()
-                   if k not in ("courbes", "reglage", "_classement")}
+                   if k not in ("courbes", "reglage", "_classement", "_par_cellule")}
                for c, r in resultats.items()},
               open(os.path.join(a.sortie, "resume.json"), "w"), indent=2, default=str)
     ecrire_duels(resultats, os.path.join(a.sortie, "duels.md"))
+    json.dump(_jsonable(croise), open(os.path.join(a.sortie, "diaphonie.json"), "w"), indent=2)
     racine = RACINE if a.publier else a.sortie
     ecrire_limites(resultats, os.path.join(racine, "LIMITES.md"), len(dossiers),
-                   domaine, len(retenus), essais)
+                   domaine, len(retenus), essais, croise)
     if a.publier:
         ecrire_seuils(resultats, os.path.join(RACINE, "seuils.json"))
     print(f"-> {a.sortie}/courbes.png, {racine}/LIMITES.md, {a.sortie}/duels.md"
@@ -800,7 +963,7 @@ def ecrire_duels(resultats, chemin):
     open(chemin, "w", encoding="utf-8").write("\n".join(lignes) + "\n")
 
 
-def ecrire_limites(resultats, chemin, n_couples, domaine, n_retenus, essais):
+def ecrire_limites(resultats, chemin, n_couples, domaine, n_retenus, essais, croise=None):
     l = ["# Limites: ou cet outil cesse de marcher", "",
          "Un outil qui ne dit pas ou il cesse de marcher n'est pas mesure, il est raconte.",
          "",
@@ -859,6 +1022,31 @@ def ecrire_limites(resultats, chemin, n_couples, domaine, n_retenus, essais):
          "- La precision depend de la prevalence. Les courbes la donnent a "
          f"{PREVALENCE:.0%} de dossiers fautifs, valeur SUPPOSEE et non mesuree.",
          ""]
+    if croise:
+        noms = [v.nom for v in VARIANTES if v.controle]
+        l += ["## Diaphonie: qui crie sur le defaut du voisin", "",
+              "Chaque case donne la part des dossiers ou le controle de la LIGNE se declenche",
+              "alors que le defaut injecte appartient a la COLONNE. La diagonale est vide par",
+              "construction. Toutes les cases ne sont pas des fautes: une page rognee emporte de",
+              "vrais champs, donc le controle des champs requis a raison d'y crier. Ce tableau",
+              "sert a separer la consequence physique de la contamination.", "",
+              "Une LIGNE UNIFORME n'est pas de la diaphonie: c'est le taux de fond du controle",
+              "qui reapparait. Les variantes partagent les pieces qu'elles n'abiment pas, donc",
+              "un controle qui se declenche a x% sur un dossier sain se declenche a x% sur",
+              "toutes les colonnes. Ce qui se lit ici, ce sont les cases qui DEPASSENT la ligne.",
+              "",
+              "| controle \\ defaut | " + " | ".join(n[:14] for n in noms) + " |",
+              "|---|" + "---|" * len(noms)]
+        for controle in sorted(croise):
+            cases = []
+            for n in noms:
+                d = croise[controle].get(n)
+                cases.append("." if d is None else
+                             ("." if d["taux"] == 0 else f"{d['taux']:.3f}"))
+            l.append(f"| {controle} | " + " | ".join(cases) + " |")
+        l += ["", "Un point vaut zero declenchement sur "
+              f"{next(iter(next(iter(croise.values())).values()))['n']} dossiers.", ""]
+
     for controle in sorted(resultats):
         r = resultats[controle]
         pt = r["point"]
@@ -902,6 +1090,20 @@ def ecrire_limites(resultats, chemin, n_couples, domaine, n_retenus, essais):
                   f"a ce controle que les {rr['cibles_gardees']} cibles sur "
                   f"{rr['cibles_totales']} qu'il sait certifier, il tient un rappel de "
                   f"{rr['rappel']:.3f} a {rr['fpr']:.4f} de faux positifs par cible.", ""]
+        conj = r.get("conjonctions") or {}
+        pires = sorted(((k, c[0]) for k, c in conj.items() if c), key=lambda t: t[1]["rappel"])
+        if pires and pires[0][1]["rappel"] < 1.0:
+            l += ["Pires CROISEMENTS de deux facteurs. Une lecture axe par axe peut mentir par",
+                  "omission: trois valeurs marginales toutes au-dessus du plancher peuvent se",
+                  "croiser en une cellule qui passe dessous.", ""]
+            for nom, c in pires[:4]:
+                if c["rappel"] >= 1.0:
+                    continue
+                l.append(f"- {nom} = {c['valeurs']}: rappel {c['rappel']:.3f} "
+                         f"[{c['ic'][0]:.3f}, {c['ic'][1]:.3f}] sur {c['n']} positifs"
+                         + ("  <- borne haute sous le plancher"
+                            if c["ic"][1] < RAPPEL_PLANCHER else ""))
+            l.append("")
         cf = r.get("cibles_fautives") or []
         if cf:
             l += ["Cibles saines qui se declenchent AU SEUIL RETENU, celles qui coutent la "
@@ -911,9 +1113,18 @@ def ecrire_limites(resultats, chemin, n_couples, domaine, n_retenus, essais):
             l.append("")
         h = r.get("hors_domaine")
         if h and h["n_pos"]:
-            l += [f"Hors domaine (dpi < {r['domaine']}), au meme seuil: rappel "
+            l += [f"Hors domaine (dpi < {r['domaine']}), CAPTEURS BRUTS, c'est-a-dire ce que "
+                  "l'outil ferait",
+                  "s'il n'avait pas la regle d'abstention: rappel "
                   f"{h['rappel']:.3f} [{h['ic_rappel'][0]:.3f}, {h['ic_rappel'][1]:.3f}], "
-                  f"declenchements sur dossier sain {h['fpr']:.4f} sur {h['n_neg']} cibles.", ""]
+                  f"declenchements sur dossier sain {h['fpr']:.4f} sur {h['n_neg']} cibles.",
+                  "Ces chiffres-la ne decrivent donc pas le produit, ils justifient la regle: "
+                  "en",
+                  "production, un controle qui LIT s'abstient sous le plancher au lieu de "
+                  "produire",
+                  "ce qu'on lit ici. Ils sont mesures capteurs bruts a dessein, parce qu'une "
+                  "mesure",
+                  "ne peut pas dependre du comportement qu'elle sert a regler.", ""]
             if controle == "resolution":
                 l += ["Pour CE controle, ces declenchements hors domaine ne sont pas des faux",
                       "positifs: c'est exactement son travail. Il est la pour dire qu'une page",
@@ -958,11 +1169,15 @@ def ecrire_seuils(resultats, chemin):
         }
         if r.get("seuil_fige_par_definition"):
             d["seuils"][controle].update(mesures)
+            d["seuils"][controle]["lecture"] = phrase_lecture(
+                controle, r["reglage"], float(r["seuil"]),
+                d["seuils"][controle].get("lecture", ""))
             continue
         d["seuils"][controle] = {
             "valeur": round(float(r["seuil"]), 4),
             "origine": "grille",
-            "lecture": d["seuils"].get(controle, {}).get("lecture", ""),
+            "lecture": phrase_lecture(controle, r["reglage"], float(r["seuil"]),
+                                      d["seuils"].get(controle, {}).get("lecture", "")),
             "reglage": r["reglage_texte"],
             "reglage_mesure": _reglage_utile(r["reglage"], controle),
             "rappel": round(r["validation"]["rappel"], 4),
@@ -975,9 +1190,12 @@ def ecrire_seuils(resultats, chemin):
         if "plancher_dpi" in r:
             d["seuils"][controle].update({
                 "valeur": round(float(r["seuil"]), 4),
-                "lecture": f"se declenche sous {r['plancher_dpi']} dpi estimes, plancher lu sur "
-                           "le rappel des controles qui dependent de l'OCR et non sur la "
-                           "courbe de ce controle",
+                "lecture": f"se declenche sous {-r['seuil']:.1f} dpi estimes, soit le plancher "
+                           f"de {r['plancher_dpi']} dpi moins une marge de "
+                           f"{r['marge_estimateur']:.1%}; le plancher est lu sur le rappel des "
+                           "controles qui dependent de l'OCR et non sur la courbe de ce "
+                           "controle, et la marge couvre dix fois l'erreur maximale mesuree de "
+                           f"l'estimateur ({r['erreur_max_estimateur']:.4%})",
                 "seuil_de_sa_propre_courbe": r["seuil_courbe_propre"],
                 "rappel_par_dpi_des_dependants": r["rappel_par_dpi_des_dependants"]})
     d["mesure_le"] = "2026-08-21"

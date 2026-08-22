@@ -163,12 +163,21 @@ def reglages_mesures():
             for c in CONTROLES}
 
 
-def evaluer(lectures, ref, horloge="guichet", reg=None, seuils=None, controles=None):
+def evaluer(lectures, ref, horloge="guichet", reg=None, seuils=None, controles=None,
+            abstention=True):
     """Tous les constats d'un dossier, a une horloge et un jeu de seuils donnes.
 
     `controles` restreint le calcul: l'analyse de la grille appelle ce meme code un controle
     a la fois, pour qu'il n'existe jamais deux implementations d'un controle, celle qui
     tourne et celle qui est mesuree.
+
+    `abstention=False` DEBRANCHE le refus de juger une piece sous le plancher, et la grille
+    s'en sert pour choisir ce plancher justement. Sans ce debranchement il y a une boucle:
+    l'abstention lit le seuil de resolution, la recherche de domaine mesure des controles qui
+    s'abstiennent donc ne manquent plus rien, le domaine s'elargit jusqu'au dpi le plus bas,
+    et le seuil de resolution le suit. Mesure au 2026-08-21: le domaine tombait de 150 a 96
+    dpi d'une publication a l'autre, et serait remonte a la suivante. Une mesure ne peut pas
+    dependre du comportement qu'elle sert a regler.
     """
     from .seuils import charger_seuils
     seuils = seuils or charger_seuils()
@@ -176,6 +185,7 @@ def evaluer(lectures, ref, horloge="guichet", reg=None, seuils=None, controles=N
     # reg=None veut dire "prends ce que la grille a mesure", et c'est le mode normal. La grille
     # elle-meme passe un reglage explicite, puisque c'est justement ce qu'elle balaie.
     par_controle = {c: reg for c in CONTROLES} if reg is not None else reglages_mesures()
+    plancher = -seuils["resolution"]
     date_ref = ref.horloge(horloge)
     out = []
     for piece_id, nom_gab in ref.pieces:
@@ -184,13 +194,25 @@ def evaluer(lectures, ref, horloge="guichet", reg=None, seuils=None, controles=N
             continue
         gab = ref.gabarits[nom_gab]
         Z = zones(gab)
+        # UNE PIECE SOUS LE PLANCHER NE SE JUGE PAS, ELLE SE SIGNALE. Les controles qui
+        # LISENT s'abstiennent, avec un score None qui vaut "indecidable" et non "conforme".
+        # Mesure du 2026-08-21 sans cette regle: la coherence se declenchait sur 52,8% des
+        # dossiers portant une piece a 72 dpi, en comparant des jetons qu'elle n'avait pas su
+        # lire. Ce n'etait pas une erreur de seuil, c'etait une reponse a une question qu'il
+        # ne fallait pas poser. Le controle de resolution, lui, crie: c'est son travail.
+        illisible = abstention and lec.dpi_source < plancher
 
         # C1 champ requis jamais rempli. Capteur: POSITIONS DE MOTS, pas l'encre. Le spike a
         # mesure qu'un champ texte VIDE lit encore +2,44% d'encre contre +4,5 pour un rempli.
+        lit_le_texte = par_controle["champ_requis"].capteur_texte != "encre"
         for role in (gab.requis if "champ_requis" in actifs else ()):
             for champ in gab.champ(role):
                 z = Z.get(champ)
                 if z is None:
+                    continue
+                if illisible and lit_le_texte:
+                    out.append(Constat("champ_requis", piece_id, champ, None, False,
+                                       "piece sous le plancher de resolution"))
                     continue
                 r = par_controle["champ_requis"]
                 if r.capteur_texte == "encre":
@@ -238,6 +260,10 @@ def evaluer(lectures, ref, horloge="guichet", reg=None, seuils=None, controles=N
             if genre != "expiration":
                 continue
             for champ in gab.champ(role):
+                if illisible:
+                    out.append(Constat("validite", piece_id, champ, None, False,
+                                       "piece sous le plancher de resolution"))
+                    continue
                 date, brut = _lire_date(lec, gab, champ, par_controle["validite"])
                 if date is None:
                     out.append(Constat("validite", piece_id, champ, None, False,
@@ -268,8 +294,12 @@ def evaluer(lectures, ref, horloge="guichet", reg=None, seuils=None, controles=N
         # C6 valeur interdite qui reapparait. Comparaison sur la forme NUE (sans separateurs):
         # un numero interdit reste interdit qu'il soit imprime 999-99-9999 ou 999999999.
         mots_ajoutes = (lec.tous_mots(par_controle["valeur_interdite"].conf_min)
-                        if "valeur_interdite" in actifs else [])
+                        if "valeur_interdite" in actifs and not illisible else [])
         for val in (ref.valeurs_interdites if "valeur_interdite" in actifs else ()):
+            if illisible:
+                out.append(Constat("valeur_interdite", piece_id, val, None, False,
+                                   "piece sous le plancher de resolution"))
+                continue
             s = _meilleur_ngram(mots_ajoutes, val)
             out.append(Constat("valeur_interdite", piece_id, val, s,
                                s > seuils["valeur_interdite"], f"ressemblance {s:.2f}"))
@@ -279,9 +309,13 @@ def evaluer(lectures, ref, horloge="guichet", reg=None, seuils=None, controles=N
     # n'est celle qu'on attendait.
     for coh in (ref.coherences if "coherence" in actifs else ()):
         lus = []
+        illisibles = []
         for l in coh["lectures"]:
             lec = lectures.get(l["piece"])
             if lec is None:
+                continue
+            if abstention and lec.dpi_source < plancher:
+                illisibles.append(l["piece"])
                 continue
             gab = ref.gabarits[dict(ref.pieces)[l["piece"]]]
             for champ in gab.champ(l["champ"]):
@@ -290,6 +324,10 @@ def evaluer(lectures, ref, horloge="guichet", reg=None, seuils=None, controles=N
                     rc = par_controle["coherence"]
                     lus.append((l["piece"], _jetons(
                         m[0] for m in lec.mots_zone(z, rc.conf_min, capteur=rc.capteur_texte))))
+        if illisibles:
+            out.append(Constat("coherence", "+".join(illisibles), coh["donnee"], None, False,
+                               "piece sous le plancher de resolution"))
+            continue
         for i in range(len(lus)):
             for j in range(i + 1, len(lus)):
                 (pa, a), (pb, b) = lus[i], lus[j]
