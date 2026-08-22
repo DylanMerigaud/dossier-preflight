@@ -119,7 +119,7 @@ canoniques, 0,35% vaut une
 tache de 9 x 8 px a 200 dpi, c'est-a-dire une poussiere sur la vitre du scanner. Un trait de
 stylo qui deborde a peine du champ voisin ajoute deja 0,61%.
 
-Le seuil et le capteur n'ont PAS ete changes, et c'est deliberé: cette sonde porte sur un
+Le seuil et le capteur n'ont PAS ete changes, et c'est delibere: cette sonde porte sur un
 seul champ, deux cellules et trois formes de parasite dessinees a la main, n=151. Elle suffit
 a montrer qu'un choix de conception a ete tranche sur un terrain biaise; elle ne suffit pas a
 fixer un seuil. Le faire demanderait de rejouer la grille entiere avec l'encre parasite en

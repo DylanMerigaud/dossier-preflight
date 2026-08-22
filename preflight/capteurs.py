@@ -1,6 +1,6 @@
 """Les capteurs bruts. Chacun rend une MESURE CONTINUE, jamais un verdict.
 
-C'est deliberé et c'est ce qui rend la grille lisible: un capteur qui rend deja un booleen a
+C'est delibere et c'est ce qui rend la grille lisible: un capteur qui rend deja un booleen a
 enferme son seuil dans son code, et un seuil enferme ne se lit pas sur une courbe. Ici la
 grille enregistre les mesures, et l'analyse balaie les seuils apres coup, sans recalculer une
 seule image.

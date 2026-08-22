@@ -118,7 +118,7 @@ def vierge(gabarit):
 def lire(piece, deg):
     """Rend, degrade, redresse, recale, mesure. Retour: Lecture.
 
-    Rien ici ne compare a un referentiel et rien ne franchit un seuil: c'est deliberé.
+    Rien ici ne compare a un referentiel et rien ne franchit un seuil: c'est delibere.
     """
     img_vierge, mots_vierge, zones, _ = vierge(piece.gabarit)
     brut = rendre(piece.pdf, dpi=deg.dpi, page=piece.gabarit.page)

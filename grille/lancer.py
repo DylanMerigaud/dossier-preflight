@@ -6,7 +6,7 @@
 
 Soit 384 cellules. Pour chaque cellule et chaque graine on lit le dossier SAIN (trois pieces)
 et les neuf variantes a defaut unique (une piece modifiee chacune): douze lectures, et une
-ligne JSONL par lecture. Rien n'est compare a un seuil ici, c'est deliberé: l'analyse balaie
+ligne JSONL par lecture. Rien n'est compare a un seuil ici, c'est delibere: l'analyse balaie
 ensuite des milliers de points de fonctionnement sur ces mesures sans retoucher une image.
 
     python3 grille/lancer.py                 # grille complete, reprend ou elle s'est arretee
