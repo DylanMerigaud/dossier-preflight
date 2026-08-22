@@ -1,4 +1,4 @@
-"""Le reference FICTIONAL: ce que le dossier est cense dire, et selon quelle clock."""
+"""The FICTIONAL reference: what the dossier is supposed to say, and against which clock."""
 import datetime as dt
 import os
 from dataclasses import dataclass
@@ -14,7 +14,7 @@ def _date(s):
             return dt.datetime.strptime(str(s), f).date()
         except ValueError:
             pass
-    raise ValueError(f"date illisible: {s!r}")
+    raise ValueError(f"unreadable date: {s!r}")
 
 
 @dataclass(frozen=True)
@@ -29,7 +29,7 @@ class Reference:
     templates: dict
 
     def value(self, role):
-        """La value attendue pour un role, address aplatie comprise."""
+        """The expected value for a role, flattened address included."""
         p = self.person
         if role in p:
             return p[role]
@@ -39,17 +39,17 @@ class Reference:
         return self.clocks[name]
 
 
-def load_reference(chemin=None, racine=ROOT):
-    """`dossier`, `clocks` et `pieces` sont required, le reste ne l'est pas.
+def load_reference(path=None, root=ROOT):
+    """`dossier`, `clocks` and `pieces` are required, the rest is not.
 
-    `person` et `expiry` ne servent qu'a REMPLIR des fixtures, jamais a evaluate: aucun
-    check ne les lit. Les exiger obligerait quelqu'un qui veut juger ses propres scans a
-    inventer une identity pour satisfaire le chargeur, ce qui est exactement l'inverse de ce
-    que ce depot promet. `forbidden_values` et `consistencies`, eux, sont lus par les checks
-    mais un dossier peut legitimement n'en declarer aucun.
+    `person` and `expiry` only ever serve to FILL fixtures, never to evaluate: no check reads
+    them. Requiring them would force anyone who just wants to judge their own scans to invent
+    an identity to satisfy the loader, which is the exact opposite of what this repo promises.
+    `forbidden_values` and `consistencies` are read by checks, but a dossier can legitimately
+    declare none of either.
     """
-    chemin = chemin or os.path.join(racine, "fixtures", "reference.yaml")
-    d = yaml.safe_load(open(chemin, encoding="utf-8"))
+    path = path or os.path.join(root, "fixtures", "reference.yaml")
+    d = yaml.safe_load(open(path, encoding="utf-8"))
     pieces = tuple((p["id"], p["template"]) for p in d["pieces"])
     return Reference(
         dossier=d["dossier"],
@@ -59,5 +59,5 @@ def load_reference(chemin=None, racine=ROOT):
         expiry={k: _date(v) for k, v in (d.get("expiry") or {}).items()},
         pieces=pieces,
         consistencies=tuple(d.get("consistencies") or ()),
-        templates={g: load(g, racine) for _, g in pieces},
+        templates={t: load(t, root) for _, t in pieces},
     )

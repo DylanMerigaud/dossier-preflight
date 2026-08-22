@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""La grid de degradation. Elle produit les MESURES, elle ne decide rien.
+"""La grid de degradation. Elle produced les MESURES, elle ne decide rien.
 
     angle (0, 0.25, 0.5, 1, 2, 4 deg)  x  dpi (96, 150, 200, 300)
       x  qualite JPEG (30, 55, 75, 95)  x  bruit sigma (0, 3, 6, 12)   x  N graines
 
 Soit 384 cellules. Pour chaque cell et chaque seed on lit le dossier SAIN (trois pieces)
 et les neuf variantes a defaut unique (une piece modifiee chacune): douze readings, et une
-ligne JSONL par reading. Rien n'est compare a un seuil ici, c'est delibere: l'analyse balaie
+ligne JSONL par reading. Rien n'est compare a un threshold ici, c'est delibere: l'analyse balaie
 ensuite des milliers de points de fonctionnement sur ces mesures sans retoucher une image.
 
     python3 grid/run.py                 # grid complete, reprend ou elle s'est arretee
@@ -91,10 +91,10 @@ def key(l):
     return (l["angle"], l["dpi"], l["jpeg"], l["sigma"], l["seed"], l["variant"], l["piece"])
 
 
-def already_done(chemin):
+def already_done(path):
     faites = set()
-    if os.path.exists(chemin):
-        with open(chemin, encoding="utf-8") as f:
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
             for ligne in f:
                 try:
                     faites.add(key(json.loads(ligne)))

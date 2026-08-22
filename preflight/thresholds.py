@@ -1,9 +1,9 @@
-"""Les thresholds vivent dans UN seul fichier, et chacun porte son origine.
+"""Thresholds live in ONE file, and each one carries where it came from.
 
-Un seuil "spike" est une value de mise au point, pas une mesure: il a ete choisi a la main
-sur un seul exemple. Un seuil "grid" a ete LU sur une curve precision/rappel, et la ligne
-le dit avec le taux de faux positifs qu'il tient. Tant que la colonne origine dit "spike",
-l'outil n'est pas mesure, et le README ne doit pas pretendre le contraire.
+A "spike" threshold is a tuning value, not a measurement: it was picked by hand on a single
+example. A "grid" threshold was READ off a precision/recall curve, and its row says so along
+with the false positive rate it holds. As long as the origin column says "spike", the tool is
+not measured, and the README must not pretend otherwise.
 """
 import json
 import os
@@ -14,26 +14,32 @@ FILE = os.path.join(ROOT, "thresholds.json")
 _MEMO = {}
 
 
-def _read(chemin):
-    if chemin not in _MEMO:
-        _MEMO[chemin] = json.load(open(chemin, encoding="utf-8"))
-    return _MEMO[chemin]
+def _read(path):
+    if path not in _MEMO:
+        _MEMO[path] = json.load(open(path, encoding="utf-8"))
+    return _MEMO[path]
 
 
-def load_thresholds(chemin=FILE):
-    return {k: v["value"] for k, v in _read(chemin)["thresholds"].items()}
+def load_thresholds(path=FILE):
+    return {k: v["value"] for k, v in _read(path)["thresholds"].items()}
 
 
-def load_settings(chemin=FILE):
-    """Les reglages MESURES, par check.
+def load_settings(path=FILE):
+    """The MEASURED settings, per check.
 
-    Sans ce chemin de retour, la grid choisirait un capteur et le code continuerait d'en
-    utiliser un autre: le duel A/B ne servirait qu'a produire un tableau. Un reglage absent
-    laisse la value de spike, et l'origine du seuil dit alors qu'il n'est pas mesure.
+    Without this return path the grid would pick a sensor and the code would keep using a
+    different one: the A/B duel would only ever produce a table. A missing setting leaves the
+    spike value in place, and the threshold's origin then says it is not measured.
+
+    This is not hypothetical. It is exactly how the crosstalk bug of 2026-08-21 happened: the
+    fixture test passed an explicit Settings(), which forced the spike defaults on all nine
+    checks, while thresholds.json carried a threshold read under a different sensor. A
+    threshold and its sensor are one pair, and reading one without the other compares an ink
+    percentage against a character count.
     """
-    return {k: dict(v.get("reglage_mesure") or {})
-            for k, v in _read(chemin)["thresholds"].items()}
+    return {k: dict(v.get("measured_settings") or {})
+            for k, v in _read(path)["thresholds"].items()}
 
 
-def raw(chemin=FILE):
-    return _read(chemin)
+def raw(path=FILE):
+    return _read(path)

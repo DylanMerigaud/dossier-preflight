@@ -1,146 +1,146 @@
 {
   "required_field": {
-    "reglage_texte": "text_sensor=ink, ink_threshold=128",
+    "settings_text": "text_sensor=ink, ink_threshold=128",
     "point": {
-      "seuil": -0.345,
-      "rappel": 1.0,
+      "threshold": -0.345,
+      "recall": 1.0,
       "fpr": 0.0,
-      "precision_grille": 1.0,
-      "precision_prevalence": 1.0,
+      "grid_precision": 1.0,
+      "prevalence_precision": 1.0,
       "tp": 576,
       "fp": 0,
       "n_pos": 576,
       "n_neg": 11520
     },
-    "seuil": -0.345,
-    "n_cellules": 288,
+    "threshold": -0.345,
+    "n_cells": 288,
     "calibration": {
-      "seuil": -0.345,
-      "rappel": 1.0,
+      "threshold": -0.345,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 576,
       "fp": 0,
       "n_pos": 576,
       "n_neg": 11520,
       "n_dossiers": 576,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9933747423434263,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.0003333610555702189
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.006625257656573795
       ]
     },
     "validation": {
-      "seuil": -0.345,
-      "rappel": 1.0,
+      "threshold": -0.345,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 288,
       "fp": 0,
       "n_pos": 288,
       "n_neg": 5760,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9868366949742601,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.0006664999260215617
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ]
     },
-    "ensemble": {
-      "seuil": -0.345,
-      "rappel": 1.0,
+    "overall": {
+      "threshold": -0.345,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 864,
       "fp": 0,
       "n_pos": 864,
       "n_neg": 17280,
       "n_dossiers": 864,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9955733857422827,
         0.9999999999999999
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         1.3552527156068805e-20,
         0.00022226540192314649
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ]
     },
-    "facteurs": {
+    "factors": {
       "angle": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.25": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.5": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "1.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "2.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "4.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
@@ -148,31 +148,31 @@
       },
       "dpi": {
         "150": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "200": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "300": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
@@ -180,41 +180,41 @@
       },
       "jpeg": {
         "30": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "55": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "75": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "95": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
@@ -222,48 +222,48 @@
       },
       "sigma": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "3.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "6.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "12.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         }
       }
     },
-    "tombees": {},
+    "fallen_cells": {},
     "frontier": {
       "angle": {
         "0.0": [
@@ -343,171 +343,171 @@
       }
     },
     "noisy_targets": [],
-    "seuil_fige_par_definition": false,
-    "cibles_non_certifiables": [],
-    "restreint": null,
-    "classement": [
+    "threshold_frozen_by_definition": false,
+    "uncertifiable_targets": [],
+    "restricted": null,
+    "ranking": [
       {
-        "reglage": "text_sensor=union, min_conf=0.0",
-        "rappel": 1.0,
+        "settings": "text_sensor=union, min_conf=0.0",
+        "recall": 1.0,
         "fpr": 0.00026041666666666666,
-        "seuil": -1.0
+        "threshold": -1.0
       },
       {
-        "reglage": "text_sensor=ink, ink_threshold=128",
-        "rappel": 1.0,
+        "settings": "text_sensor=ink, ink_threshold=128",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -0.345
+        "threshold": -0.345
       },
       {
-        "reglage": "text_sensor=ink, ink_threshold=160",
-        "rappel": 1.0,
+        "settings": "text_sensor=ink, ink_threshold=160",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -0.59
+        "threshold": -0.59
       },
       {
-        "reglage": "text_sensor=ink, ink_threshold=190",
-        "rappel": 1.0,
+        "settings": "text_sensor=ink, ink_threshold=190",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -0.5895
+        "threshold": -0.5895
       },
       {
-        "reglage": "text_sensor=page, min_conf=0.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=page, min_conf=0.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=page, min_conf=10.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=page, min_conf=10.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=page, min_conf=20.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=page, min_conf=20.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=page, min_conf=40.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=page, min_conf=40.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=page, min_conf=60.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=page, min_conf=60.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=page, min_conf=80.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=page, min_conf=80.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=zone, min_conf=0.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=zone, min_conf=0.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=zone, min_conf=10.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=zone, min_conf=10.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=zone, min_conf=20.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=zone, min_conf=20.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=zone, min_conf=40.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=zone, min_conf=40.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=zone, min_conf=60.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=zone, min_conf=60.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=zone, min_conf=80.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=zone, min_conf=80.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=union, min_conf=10.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=union, min_conf=10.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=union, min_conf=20.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=union, min_conf=20.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=union, min_conf=40.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=union, min_conf=40.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=union, min_conf=60.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=union, min_conf=60.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       },
       {
-        "reglage": "text_sensor=union, min_conf=80.0",
-        "rappel": 0.0,
+        "settings": "text_sensor=union, min_conf=80.0",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.0
+        "threshold": 1.0
       }
     ],
-    "conjonctions": {
+    "conjunctions": {
       "angle x dpi": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             150
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             200
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             300
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
@@ -515,37 +515,37 @@
       ],
       "angle x jpeg": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -553,37 +553,37 @@
       ],
       "angle x sigma": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -591,37 +591,37 @@
       ],
       "dpi x jpeg": [
         {
-          "valeurs": [
+          "values": [
             150,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -629,37 +629,37 @@
       ],
       "dpi x sigma": [
         {
-          "valeurs": [
+          "values": [
             150,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -667,210 +667,210 @@
       ],
       "jpeg x sigma": [
         {
-          "valeurs": [
+          "values": [
             30,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         }
       ]
     },
-    "domaine": 150,
-    "hors_domaine": {
-      "seuil": -0.345,
-      "rappel": 1.0,
+    "domain": 150,
+    "outside_domain": {
+      "threshold": -0.345,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 288,
       "fp": 0,
       "n_pos": 288,
       "n_neg": 5760,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9868366949742601,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.0006664999260215617
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ]
     }
   },
   "required_checkbox": {
-    "reglage_texte": "disc_ratio=0.3, ink_threshold=128",
+    "settings_text": "disc_ratio=0.3, ink_threshold=128",
     "point": {
-      "seuil": -14.375,
-      "rappel": 1.0,
+      "threshold": -14.375,
+      "recall": 1.0,
       "fpr": 0.0,
-      "precision_grille": 1.0,
-      "precision_prevalence": 1.0,
+      "grid_precision": 1.0,
+      "prevalence_precision": 1.0,
       "tp": 576,
       "fp": 0,
       "n_pos": 576,
       "n_neg": 1728
     },
-    "seuil": -14.375,
-    "n_cellules": 288,
+    "threshold": -14.375,
+    "n_cells": 288,
     "calibration": {
-      "seuil": -14.375,
-      "rappel": 1.0,
+      "threshold": -14.375,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 576,
       "fp": 0,
       "n_pos": 576,
       "n_neg": 1728,
       "n_dossiers": 576,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9933747423434263,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         2.168404344971009e-19,
         0.0022182167237465595
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.006625257656573795
       ]
     },
     "validation": {
-      "seuil": -14.375,
-      "rappel": 1.0,
+      "threshold": -14.375,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 288,
       "fp": 0,
       "n_pos": 288,
       "n_neg": 864,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9868366949742601,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ]
     },
-    "ensemble": {
-      "seuil": -14.375,
-      "rappel": 1.0,
+    "overall": {
+      "threshold": -14.375,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 864,
       "fp": 0,
       "n_pos": 864,
       "n_neg": 2592,
       "n_dossiers": 864,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9955733857422827,
         0.9999999999999999
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.0014799053994665932
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ]
     },
-    "facteurs": {
+    "factors": {
       "angle": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.25": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.5": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "1.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "2.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "4.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
@@ -878,31 +878,31 @@
       },
       "dpi": {
         "150": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "200": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "300": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
@@ -910,41 +910,41 @@
       },
       "jpeg": {
         "30": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "55": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "75": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "95": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
@@ -952,48 +952,48 @@
       },
       "sigma": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "3.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "6.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "12.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         }
       }
     },
-    "tombees": {},
+    "fallen_cells": {},
     "frontier": {
       "angle": {
         "0.0": [
@@ -1073,117 +1073,117 @@
       }
     },
     "noisy_targets": [],
-    "seuil_fige_par_definition": false,
-    "cibles_non_certifiables": [],
-    "restreint": null,
-    "classement": [
+    "threshold_frozen_by_definition": false,
+    "uncertifiable_targets": [],
+    "restricted": null,
+    "ranking": [
       {
-        "reglage": "disc_ratio=0.3, ink_threshold=128",
-        "rappel": 1.0,
+        "settings": "disc_ratio=0.3, ink_threshold=128",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -14.375
+        "threshold": -14.375
       },
       {
-        "reglage": "disc_ratio=0.3, ink_threshold=160",
-        "rappel": 1.0,
+        "settings": "disc_ratio=0.3, ink_threshold=160",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -15.422
+        "threshold": -15.422
       },
       {
-        "reglage": "disc_ratio=0.3, ink_threshold=190",
-        "rappel": 1.0,
+        "settings": "disc_ratio=0.3, ink_threshold=190",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -16.883
+        "threshold": -16.883
       },
       {
-        "reglage": "disc_ratio=0.42, ink_threshold=128",
-        "rappel": 1.0,
+        "settings": "disc_ratio=0.42, ink_threshold=128",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -7.622
+        "threshold": -7.622
       },
       {
-        "reglage": "disc_ratio=0.42, ink_threshold=160",
-        "rappel": 1.0,
+        "settings": "disc_ratio=0.42, ink_threshold=160",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -10.958
+        "threshold": -10.958
       },
       {
-        "reglage": "disc_ratio=0.42, ink_threshold=190",
-        "rappel": 1.0,
+        "settings": "disc_ratio=0.42, ink_threshold=190",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -11.862499999999999
+        "threshold": -11.862499999999999
       },
       {
-        "reglage": "disc_ratio=0.55, ink_threshold=128",
-        "rappel": 1.0,
+        "settings": "disc_ratio=0.55, ink_threshold=128",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -7.651
+        "threshold": -7.651
       },
       {
-        "reglage": "disc_ratio=0.7, ink_threshold=128",
-        "rappel": 1.0,
+        "settings": "disc_ratio=0.7, ink_threshold=128",
+        "recall": 1.0,
         "fpr": 0.0011574074074074073,
-        "seuil": -6.5385
+        "threshold": -6.5385
       },
       {
-        "reglage": "disc_ratio=0.55, ink_threshold=160",
-        "rappel": 0.8350694444444444,
+        "settings": "disc_ratio=0.55, ink_threshold=160",
+        "recall": 0.8350694444444444,
         "fpr": 0.0,
-        "seuil": -5.797000000000001
+        "threshold": -5.797000000000001
       },
       {
-        "reglage": "disc_ratio=0.55, ink_threshold=190",
-        "rappel": 0.8194444444444444,
+        "settings": "disc_ratio=0.55, ink_threshold=190",
+        "recall": 0.8194444444444444,
         "fpr": 0.0005787037037037037,
-        "seuil": -5.4115
+        "threshold": -5.4115
       },
       {
-        "reglage": "disc_ratio=0.7, ink_threshold=160",
-        "rappel": 0.6111111111111112,
+        "settings": "disc_ratio=0.7, ink_threshold=160",
+        "recall": 0.6111111111111112,
         "fpr": 0.0,
-        "seuil": 0.7475
+        "threshold": 0.7475
       },
       {
-        "reglage": "disc_ratio=0.7, ink_threshold=190",
-        "rappel": 0.15625,
+        "settings": "disc_ratio=0.7, ink_threshold=190",
+        "recall": 0.15625,
         "fpr": 0.0005787037037037037,
-        "seuil": 5.057
+        "threshold": 5.057
       }
     ],
-    "conjonctions": {
+    "conjunctions": {
       "angle x dpi": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             150
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             200
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             300
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
@@ -1191,37 +1191,37 @@
       ],
       "angle x jpeg": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -1229,37 +1229,37 @@
       ],
       "angle x sigma": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -1267,37 +1267,37 @@
       ],
       "dpi x jpeg": [
         {
-          "valeurs": [
+          "values": [
             150,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -1305,37 +1305,37 @@
       ],
       "dpi x sigma": [
         {
-          "valeurs": [
+          "values": [
             150,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -1343,210 +1343,210 @@
       ],
       "jpeg x sigma": [
         {
-          "valeurs": [
+          "values": [
             30,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         }
       ]
     },
-    "domaine": 150,
-    "hors_domaine": {
-      "seuil": -14.375,
-      "rappel": 1.0,
+    "domain": 150,
+    "outside_domain": {
+      "threshold": -14.375,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 288,
       "fp": 0,
       "n_pos": 288,
       "n_neg": 864,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9868366949742601,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ]
     }
   },
   "signature": {
-    "reglage_texte": "ink_threshold=128, signature_sensor=components",
+    "settings_text": "ink_threshold=128, signature_sensor=components",
     "point": {
-      "seuil": -342.05,
-      "rappel": 1.0,
+      "threshold": -342.05,
+      "recall": 1.0,
       "fpr": 0.0,
-      "precision_grille": 1.0,
-      "precision_prevalence": 1.0,
+      "grid_precision": 1.0,
+      "prevalence_precision": 1.0,
       "tp": 576,
       "fp": 0,
       "n_pos": 576,
       "n_neg": 576
     },
-    "seuil": -342.05,
-    "n_cellules": 288,
+    "threshold": -342.05,
+    "n_cells": 288,
     "calibration": {
-      "seuil": -342.05,
-      "rappel": 1.0,
+      "threshold": -342.05,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 576,
       "fp": 0,
       "n_pos": 576,
       "n_neg": 576,
       "n_dossiers": 576,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9933747423434263,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.006625257656573795
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.006625257656573795
       ]
     },
     "validation": {
-      "seuil": -342.05,
-      "rappel": 1.0,
+      "threshold": -342.05,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 288,
       "fp": 0,
       "n_pos": 288,
       "n_neg": 288,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9868366949742601,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.01316330502573999
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ]
     },
-    "ensemble": {
-      "seuil": -342.05,
-      "rappel": 1.0,
+    "overall": {
+      "threshold": -342.05,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 864,
       "fp": 0,
       "n_pos": 864,
       "n_neg": 864,
       "n_dossiers": 864,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9955733857422827,
         0.9999999999999999
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ]
     },
-    "facteurs": {
+    "factors": {
       "angle": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.25": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.5": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "1.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "2.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "4.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
@@ -1554,31 +1554,31 @@
       },
       "dpi": {
         "150": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "200": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "300": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
@@ -1586,41 +1586,41 @@
       },
       "jpeg": {
         "30": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "55": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "75": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "95": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
@@ -1628,48 +1628,48 @@
       },
       "sigma": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "3.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "6.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "12.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         }
       }
     },
-    "tombees": {},
+    "fallen_cells": {},
     "frontier": {
       "angle": {
         "0.0": [
@@ -1749,81 +1749,81 @@
       }
     },
     "noisy_targets": [],
-    "seuil_fige_par_definition": false,
-    "cibles_non_certifiables": [],
-    "restreint": null,
-    "classement": [
+    "threshold_frozen_by_definition": false,
+    "uncertifiable_targets": [],
+    "restricted": null,
+    "ranking": [
       {
-        "reglage": "ink_threshold=128, signature_sensor=components",
-        "rappel": 1.0,
+        "settings": "ink_threshold=128, signature_sensor=components",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -342.05
+        "threshold": -342.05
       },
       {
-        "reglage": "ink_threshold=128, signature_sensor=ink",
-        "rappel": 1.0,
+        "settings": "ink_threshold=128, signature_sensor=ink",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -3.822
+        "threshold": -3.822
       },
       {
-        "reglage": "ink_threshold=160, signature_sensor=components",
-        "rappel": 1.0,
+        "settings": "ink_threshold=160, signature_sensor=components",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -342.05
+        "threshold": -342.05
       },
       {
-        "reglage": "ink_threshold=160, signature_sensor=ink",
-        "rappel": 1.0,
+        "settings": "ink_threshold=160, signature_sensor=ink",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -4.0425
+        "threshold": -4.0425
       },
       {
-        "reglage": "ink_threshold=190, signature_sensor=components",
-        "rappel": 1.0,
+        "settings": "ink_threshold=190, signature_sensor=components",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -342.7
+        "threshold": -342.7
       },
       {
-        "reglage": "ink_threshold=190, signature_sensor=ink",
-        "rappel": 1.0,
+        "settings": "ink_threshold=190, signature_sensor=ink",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -4.226
+        "threshold": -4.226
       }
     ],
-    "conjonctions": {
+    "conjunctions": {
       "angle x dpi": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             150
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             200
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             300
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
@@ -1831,37 +1831,37 @@
       ],
       "angle x jpeg": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -1869,37 +1869,37 @@
       ],
       "angle x sigma": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -1907,37 +1907,37 @@
       ],
       "dpi x jpeg": [
         {
-          "valeurs": [
+          "values": [
             150,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -1945,37 +1945,37 @@
       ],
       "dpi x sigma": [
         {
-          "valeurs": [
+          "values": [
             150,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -1983,224 +1983,224 @@
       ],
       "jpeg x sigma": [
         {
-          "valeurs": [
+          "values": [
             30,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         }
       ]
     },
-    "domaine": 150,
-    "hors_domaine": {
-      "seuil": -342.05,
-      "rappel": 1.0,
+    "domain": 150,
+    "outside_domain": {
+      "threshold": -342.05,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 288,
       "fp": 0,
       "n_pos": 288,
       "n_neg": 288,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9868366949742601,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.01316330502573999
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ]
     }
   },
   "expiry": {
-    "reglage_texte": "min_conf=0.0, text_sensor=page",
+    "settings_text": "min_conf=0.0, text_sensor=page",
     "point": {
-      "seuil": 0.0,
-      "rappel": 1.0,
+      "threshold": 0.0,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 576,
       "fp": 0,
       "n_pos": 576,
       "n_neg": 575,
       "n_dossiers": 576,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9933747423434263,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.006636703374463755
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.006625257656573795
       ],
-      "precision_grille": 1.0,
-      "precision_prevalence": 1.0
+      "grid_precision": 1.0,
+      "prevalence_precision": 1.0
     },
-    "seuil": 0.0,
-    "n_cellules": 288,
+    "threshold": 0.0,
+    "n_cells": 288,
     "calibration": {
-      "seuil": 0.0,
-      "rappel": 1.0,
+      "threshold": 0.0,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 576,
       "fp": 0,
       "n_pos": 576,
       "n_neg": 575,
       "n_dossiers": 576,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9933747423434263,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.006636703374463755
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.006625257656573795
       ]
     },
     "validation": {
-      "seuil": 0.0,
-      "rappel": 1.0,
+      "threshold": 0.0,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 288,
       "fp": 0,
       "n_pos": 288,
       "n_neg": 288,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9868366949742601,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.01316330502573999
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ]
     },
-    "ensemble": {
-      "seuil": 0.0,
-      "rappel": 1.0,
+    "overall": {
+      "threshold": 0.0,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 864,
       "fp": 0,
       "n_pos": 864,
       "n_neg": 863,
       "n_dossiers": 864,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9955733857422827,
         0.9999999999999999
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.004431720858805115
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ]
     },
-    "facteurs": {
+    "factors": {
       "angle": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.25": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.5": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "1.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "2.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "4.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
@@ -2208,31 +2208,31 @@
       },
       "dpi": {
         "150": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "200": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "300": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
@@ -2240,41 +2240,41 @@
       },
       "jpeg": {
         "30": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "55": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "75": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "95": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
@@ -2282,48 +2282,48 @@
       },
       "sigma": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "3.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "6.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "12.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         }
       }
     },
-    "tombees": {},
+    "fallen_cells": {},
     "frontier": {
       "angle": {
         "0.0": [
@@ -2403,153 +2403,153 @@
       }
     },
     "noisy_targets": [],
-    "seuil_fige_par_definition": true,
-    "cibles_non_certifiables": [],
-    "restreint": null,
-    "classement": [
+    "threshold_frozen_by_definition": true,
+    "uncertifiable_targets": [],
+    "restricted": null,
+    "ranking": [
       {
-        "reglage": "min_conf=0.0, text_sensor=page",
-        "rappel": 1.0,
+        "settings": "min_conf=0.0, text_sensor=page",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=0.0, text_sensor=zone",
-        "rappel": 1.0,
+        "settings": "min_conf=0.0, text_sensor=zone",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=0.0, text_sensor=union",
-        "rappel": 1.0,
+        "settings": "min_conf=0.0, text_sensor=union",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=10.0, text_sensor=page",
-        "rappel": 1.0,
+        "settings": "min_conf=10.0, text_sensor=page",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=10.0, text_sensor=zone",
-        "rappel": 1.0,
+        "settings": "min_conf=10.0, text_sensor=zone",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=10.0, text_sensor=union",
-        "rappel": 1.0,
+        "settings": "min_conf=10.0, text_sensor=union",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=20.0, text_sensor=page",
-        "rappel": 1.0,
+        "settings": "min_conf=20.0, text_sensor=page",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=20.0, text_sensor=zone",
-        "rappel": 1.0,
+        "settings": "min_conf=20.0, text_sensor=zone",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=20.0, text_sensor=union",
-        "rappel": 1.0,
+        "settings": "min_conf=20.0, text_sensor=union",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=40.0, text_sensor=page",
-        "rappel": 1.0,
+        "settings": "min_conf=40.0, text_sensor=page",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=40.0, text_sensor=zone",
-        "rappel": 1.0,
+        "settings": "min_conf=40.0, text_sensor=zone",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=40.0, text_sensor=union",
-        "rappel": 1.0,
+        "settings": "min_conf=40.0, text_sensor=union",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=60.0, text_sensor=page",
-        "rappel": 1.0,
+        "settings": "min_conf=60.0, text_sensor=page",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=60.0, text_sensor=zone",
-        "rappel": 1.0,
+        "settings": "min_conf=60.0, text_sensor=zone",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=60.0, text_sensor=union",
-        "rappel": 1.0,
+        "settings": "min_conf=60.0, text_sensor=union",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=80.0, text_sensor=page",
-        "rappel": 1.0,
+        "settings": "min_conf=80.0, text_sensor=page",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=80.0, text_sensor=zone",
-        "rappel": 1.0,
+        "settings": "min_conf=80.0, text_sensor=zone",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       },
       {
-        "reglage": "min_conf=80.0, text_sensor=union",
-        "rappel": 1.0,
+        "settings": "min_conf=80.0, text_sensor=union",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -207.5
+        "threshold": -207.5
       }
     ],
-    "conjonctions": {
+    "conjunctions": {
       "angle x dpi": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             150
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             200
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             300
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
@@ -2557,37 +2557,37 @@
       ],
       "angle x jpeg": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -2595,37 +2595,37 @@
       ],
       "angle x sigma": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -2633,37 +2633,37 @@
       ],
       "dpi x jpeg": [
         {
-          "valeurs": [
+          "values": [
             150,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -2671,37 +2671,37 @@
       ],
       "dpi x sigma": [
         {
-          "valeurs": [
+          "values": [
             150,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -2709,210 +2709,210 @@
       ],
       "jpeg x sigma": [
         {
-          "valeurs": [
+          "values": [
             30,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         }
       ]
     },
-    "domaine": 150,
-    "hors_domaine": {
-      "seuil": 0.0,
-      "rappel": 1.0,
+    "domain": 150,
+    "outside_domain": {
+      "threshold": 0.0,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 5,
       "fp": 0,
       "n_pos": 5,
       "n_neg": 2,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.5655085052479191,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.6576280471103807
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ]
     }
   },
   "consistency": {
-    "reglage_texte": "min_conf=0.0, text_sensor=zone",
+    "settings_text": "min_conf=0.0, text_sensor=zone",
     "point": {
-      "seuil": 0.393939393939394,
-      "rappel": 1.0,
+      "threshold": 0.393939393939394,
+      "recall": 1.0,
       "fpr": 0.0,
-      "precision_grille": 1.0,
-      "precision_prevalence": 1.0,
+      "grid_precision": 1.0,
+      "prevalence_precision": 1.0,
       "tp": 576,
       "fp": 0,
       "n_pos": 576,
       "n_neg": 576
     },
-    "seuil": 0.393939393939394,
-    "n_cellules": 288,
+    "threshold": 0.393939393939394,
+    "n_cells": 288,
     "calibration": {
-      "seuil": 0.393939393939394,
-      "rappel": 1.0,
+      "threshold": 0.393939393939394,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 576,
       "fp": 0,
       "n_pos": 576,
       "n_neg": 576,
       "n_dossiers": 576,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9933747423434263,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.006625257656573795
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.006625257656573795
       ]
     },
     "validation": {
-      "seuil": 0.393939393939394,
-      "rappel": 1.0,
+      "threshold": 0.393939393939394,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 288,
       "fp": 0,
       "n_pos": 288,
       "n_neg": 288,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9868366949742601,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.01316330502573999
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ]
     },
-    "ensemble": {
-      "seuil": 0.393939393939394,
-      "rappel": 1.0,
+    "overall": {
+      "threshold": 0.393939393939394,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 864,
       "fp": 0,
       "n_pos": 864,
       "n_neg": 864,
       "n_dossiers": 864,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9955733857422827,
         0.9999999999999999
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ]
     },
-    "facteurs": {
+    "factors": {
       "angle": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.25": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.5": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "1.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "2.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "4.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
@@ -2920,31 +2920,31 @@
       },
       "dpi": {
         "150": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "200": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "300": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
@@ -2952,41 +2952,41 @@
       },
       "jpeg": {
         "30": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "55": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "75": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "95": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
@@ -2994,48 +2994,48 @@
       },
       "sigma": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "3.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "6.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "12.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         }
       }
     },
-    "tombees": {},
+    "fallen_cells": {},
     "frontier": {
       "angle": {
         "0.0": [
@@ -3115,153 +3115,153 @@
       }
     },
     "noisy_targets": [],
-    "seuil_fige_par_definition": false,
-    "cibles_non_certifiables": [],
-    "restreint": null,
-    "classement": [
+    "threshold_frozen_by_definition": false,
+    "uncertifiable_targets": [],
+    "restricted": null,
+    "ranking": [
       {
-        "reglage": "min_conf=0.0, text_sensor=zone",
-        "rappel": 1.0,
+        "settings": "min_conf=0.0, text_sensor=zone",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": 0.393939393939394
+        "threshold": 0.393939393939394
       },
       {
-        "reglage": "min_conf=0.0, text_sensor=union",
-        "rappel": 1.0,
+        "settings": "min_conf=0.0, text_sensor=union",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": 0.4415584415584416
+        "threshold": 0.4415584415584416
       },
       {
-        "reglage": "min_conf=10.0, text_sensor=zone",
-        "rappel": 1.0,
+        "settings": "min_conf=10.0, text_sensor=zone",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": 0.393939393939394
+        "threshold": 0.393939393939394
       },
       {
-        "reglage": "min_conf=10.0, text_sensor=union",
-        "rappel": 1.0,
+        "settings": "min_conf=10.0, text_sensor=union",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": 0.4415584415584416
+        "threshold": 0.4415584415584416
       },
       {
-        "reglage": "min_conf=20.0, text_sensor=zone",
-        "rappel": 1.0,
+        "settings": "min_conf=20.0, text_sensor=zone",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": 0.393939393939394
+        "threshold": 0.393939393939394
       },
       {
-        "reglage": "min_conf=20.0, text_sensor=union",
-        "rappel": 1.0,
+        "settings": "min_conf=20.0, text_sensor=union",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": 0.393939393939394
+        "threshold": 0.393939393939394
       },
       {
-        "reglage": "min_conf=40.0, text_sensor=union",
-        "rappel": 1.0,
+        "settings": "min_conf=40.0, text_sensor=union",
+        "recall": 1.0,
         "fpr": 0.001736111111111111,
-        "seuil": 0.48484848484848486
+        "threshold": 0.48484848484848486
       },
       {
-        "reglage": "min_conf=0.0, text_sensor=page",
-        "rappel": 0.0,
+        "settings": "min_conf=0.0, text_sensor=page",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 2.0
+        "threshold": 2.0
       },
       {
-        "reglage": "min_conf=10.0, text_sensor=page",
-        "rappel": 0.0,
+        "settings": "min_conf=10.0, text_sensor=page",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 2.0
+        "threshold": 2.0
       },
       {
-        "reglage": "min_conf=20.0, text_sensor=page",
-        "rappel": 0.0,
+        "settings": "min_conf=20.0, text_sensor=page",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 2.0
+        "threshold": 2.0
       },
       {
-        "reglage": "min_conf=40.0, text_sensor=page",
-        "rappel": 0.0,
+        "settings": "min_conf=40.0, text_sensor=page",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 2.0
+        "threshold": 2.0
       },
       {
-        "reglage": "min_conf=40.0, text_sensor=zone",
-        "rappel": 0.0,
+        "settings": "min_conf=40.0, text_sensor=zone",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 2.0
+        "threshold": 2.0
       },
       {
-        "reglage": "min_conf=60.0, text_sensor=page",
-        "rappel": 0.0,
+        "settings": "min_conf=60.0, text_sensor=page",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 2.0
+        "threshold": 2.0
       },
       {
-        "reglage": "min_conf=60.0, text_sensor=zone",
-        "rappel": 0.0,
+        "settings": "min_conf=60.0, text_sensor=zone",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 2.0
+        "threshold": 2.0
       },
       {
-        "reglage": "min_conf=60.0, text_sensor=union",
-        "rappel": 0.0,
+        "settings": "min_conf=60.0, text_sensor=union",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 2.0
+        "threshold": 2.0
       },
       {
-        "reglage": "min_conf=80.0, text_sensor=page",
-        "rappel": 0.0,
+        "settings": "min_conf=80.0, text_sensor=page",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 2.0
+        "threshold": 2.0
       },
       {
-        "reglage": "min_conf=80.0, text_sensor=zone",
-        "rappel": 0.0,
+        "settings": "min_conf=80.0, text_sensor=zone",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 2.0
+        "threshold": 2.0
       },
       {
-        "reglage": "min_conf=80.0, text_sensor=union",
-        "rappel": 0.0,
+        "settings": "min_conf=80.0, text_sensor=union",
+        "recall": 0.0,
         "fpr": 0.0,
-        "seuil": 1.8
+        "threshold": 1.8
       }
     ],
-    "conjonctions": {
+    "conjunctions": {
       "angle x dpi": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             150
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             200
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             300
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
@@ -3269,37 +3269,37 @@
       ],
       "angle x jpeg": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -3307,37 +3307,37 @@
       ],
       "angle x sigma": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -3345,37 +3345,37 @@
       ],
       "dpi x jpeg": [
         {
-          "valeurs": [
+          "values": [
             150,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -3383,37 +3383,37 @@
       ],
       "dpi x sigma": [
         {
-          "valeurs": [
+          "values": [
             150,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -3421,210 +3421,210 @@
       ],
       "jpeg x sigma": [
         {
-          "valeurs": [
+          "values": [
             30,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         }
       ]
     },
-    "domaine": 150,
-    "hors_domaine": {
-      "seuil": 0.393939393939394,
-      "rappel": 0.9583333333333334,
+    "domain": 150,
+    "outside_domain": {
+      "threshold": 0.393939393939394,
+      "recall": 0.9583333333333334,
       "fpr": 0.8402777777777778,
       "tp": 276,
       "fp": 242,
       "n_pos": 288,
       "n_neg": 288,
       "n_dossiers": 288,
-      "fpr_dossier": 0.8402777777777778,
-      "ic_rappel": [
+      "dossier_fpr": 0.8402777777777778,
+      "recall_ci": [
         0.9285932465131456,
         0.9760070572132596
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.7935289414243666,
         0.8780682537664494
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.7935289414243666,
         0.8780682537664494
       ]
     }
   },
   "forbidden_value": {
-    "reglage_texte": "min_conf=0.0, text_sensor=page",
+    "settings_text": "min_conf=0.0, text_sensor=page",
     "point": {
-      "seuil": 0.7213622291021672,
-      "rappel": 0.9913194444444444,
+      "threshold": 0.7213622291021672,
+      "recall": 0.9913194444444444,
       "fpr": 0.0008680555555555555,
-      "precision_grille": 0.9947735191637631,
-      "precision_prevalence": 0.9921807124239792,
+      "grid_precision": 0.9947735191637631,
+      "prevalence_precision": 0.9921807124239792,
       "tp": 571,
       "fp": 3,
       "n_pos": 576,
       "n_neg": 3456
     },
-    "seuil": 0.7213622291021672,
-    "n_cellules": 288,
+    "threshold": 0.7213622291021672,
+    "n_cells": 288,
     "calibration": {
-      "seuil": 0.7213622291021672,
-      "rappel": 0.9913194444444444,
+      "threshold": 0.7213622291021672,
+      "recall": 0.9913194444444444,
       "fpr": 0.0008680555555555555,
       "tp": 571,
       "fp": 3,
       "n_pos": 576,
       "n_neg": 3456,
       "n_dossiers": 576,
-      "fpr_dossier": 0.005208333333333333,
-      "ic_rappel": [
+      "dossier_fpr": 0.005208333333333333,
+      "recall_ci": [
         0.9798419495618019,
         0.9962867035048287
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.00029525481176600056,
         0.002549268475080426
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0017728191639145123,
         0.015200092058736639
       ]
     },
     "validation": {
-      "seuil": 0.7213622291021672,
-      "rappel": 0.9965277777777778,
+      "threshold": 0.7213622291021672,
+      "recall": 0.9965277777777778,
       "fpr": 0.0005787037037037037,
       "tp": 287,
       "fp": 1,
       "n_pos": 288,
       "n_neg": 1728,
       "n_dossiers": 288,
-      "fpr_dossier": 0.003472222222222222,
-      "ic_rappel": [
+      "dossier_fpr": 0.003472222222222222,
+      "recall_ci": [
         0.9805968422560195,
         0.999386820114253
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.00010216009099450144,
         0.0032708966596921665
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0006131798857472621,
         0.01940315774398065
       ]
     },
-    "ensemble": {
-      "seuil": 0.7213622291021672,
-      "rappel": 0.9930555555555556,
+    "overall": {
+      "threshold": 0.7213622291021672,
+      "recall": 0.9930555555555556,
       "fpr": 0.0007716049382716049,
       "tp": 858,
       "fp": 4,
       "n_pos": 864,
       "n_neg": 5184,
       "n_dossiers": 864,
-      "fpr_dossier": 0.004629629629629629,
-      "ic_rappel": [
+      "dossier_fpr": 0.004629629629629629,
+      "recall_ci": [
         0.9849324080593068,
         0.9968135695476666
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.000300096867445608,
         0.0019824708963812596
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0018017720972496364,
         0.011843114250673761
       ]
     },
-    "facteurs": {
+    "factors": {
       "angle": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.25": {
-          "rappel": 0.9930555555555556,
+          "recall": 0.9930555555555556,
           "n": 144,
           "fpr": 0.003472222222222222,
-          "fpr_dossier": 0.020833333333333332,
-          "ic": [
+          "dossier_fpr": 0.020833333333333332,
+          "ci": [
             0.9617143276425165,
             0.9987731129695979
           ]
         },
         "0.5": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "1.0": {
-          "rappel": 0.9861111111111112,
+          "recall": 0.9861111111111112,
           "n": 144,
           "fpr": 0.0011574074074074073,
-          "fpr_dossier": 0.006944444444444444,
-          "ic": [
+          "dossier_fpr": 0.006944444444444444,
+          "ci": [
             0.9507765031823722,
             0.9961829453084451
           ]
         },
         "2.0": {
-          "rappel": 0.9861111111111112,
+          "recall": 0.9861111111111112,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9507765031823722,
             0.9961829453084451
           ]
         },
         "4.0": {
-          "rappel": 0.9930555555555556,
+          "recall": 0.9930555555555556,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9617143276425165,
             0.9987731129695979
           ]
@@ -3632,31 +3632,31 @@
       },
       "dpi": {
         "150": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "200": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0023148148148148147,
-          "fpr_dossier": 0.013888888888888888,
-          "ic": [
+          "dossier_fpr": 0.013888888888888888,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "300": {
-          "rappel": 0.9791666666666666,
+          "recall": 0.9791666666666666,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9553006110478205,
             0.990417888302512
           ]
@@ -3664,41 +3664,41 @@
       },
       "jpeg": {
         "30": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "55": {
-          "rappel": 0.9953703703703703,
+          "recall": 0.9953703703703703,
           "n": 216,
           "fpr": 0.0023148148148148147,
-          "fpr_dossier": 0.013888888888888888,
-          "ic": [
+          "dossier_fpr": 0.013888888888888888,
+          "ci": [
             0.9742458312701834,
             0.9991823097186012
           ]
         },
         "75": {
-          "rappel": 0.9953703703703703,
+          "recall": 0.9953703703703703,
           "n": 216,
           "fpr": 0.0007716049382716049,
-          "fpr_dossier": 0.004629629629629629,
-          "ic": [
+          "dossier_fpr": 0.004629629629629629,
+          "ci": [
             0.9742458312701834,
             0.9991823097186012
           ]
         },
         "95": {
-          "rappel": 0.9814814814814815,
+          "recall": 0.9814814814814815,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9533601149657861,
             0.9927756482382665
           ]
@@ -3706,48 +3706,48 @@
       },
       "sigma": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0023148148148148147,
-          "fpr_dossier": 0.013888888888888888,
-          "ic": [
+          "dossier_fpr": 0.013888888888888888,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "3.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "6.0": {
-          "rappel": 0.9953703703703703,
+          "recall": 0.9953703703703703,
           "n": 216,
           "fpr": 0.0007716049382716049,
-          "fpr_dossier": 0.004629629629629629,
-          "ic": [
+          "dossier_fpr": 0.004629629629629629,
+          "ci": [
             0.9742458312701834,
             0.9991823097186012
           ]
         },
         "12.0": {
-          "rappel": 0.9768518518518519,
+          "recall": 0.9768518518518519,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9469652554392134,
             0.9900730485032616
           ]
         }
       }
     },
-    "tombees": {
+    "fallen_cells": {
       "(0.25, 300, 55, 12.0)": [
         0.6666666666666666,
         3
@@ -3861,153 +3861,153 @@
         864
       ]
     ],
-    "seuil_fige_par_definition": false,
-    "cibles_non_certifiables": [],
-    "restreint": null,
-    "classement": [
+    "threshold_frozen_by_definition": false,
+    "uncertifiable_targets": [],
+    "restricted": null,
+    "ranking": [
       {
-        "reglage": "min_conf=0.0, text_sensor=page",
-        "rappel": 0.9913194444444444,
+        "settings": "min_conf=0.0, text_sensor=page",
+        "recall": 0.9913194444444444,
         "fpr": 0.0008680555555555555,
-        "seuil": 0.7213622291021672
+        "threshold": 0.7213622291021672
       },
       {
-        "reglage": "min_conf=0.0, text_sensor=zone",
-        "rappel": 0.9913194444444444,
+        "settings": "min_conf=0.0, text_sensor=zone",
+        "recall": 0.9913194444444444,
         "fpr": 0.0008680555555555555,
-        "seuil": 0.7213622291021672
+        "threshold": 0.7213622291021672
       },
       {
-        "reglage": "min_conf=0.0, text_sensor=union",
-        "rappel": 0.9913194444444444,
+        "settings": "min_conf=0.0, text_sensor=union",
+        "recall": 0.9913194444444444,
         "fpr": 0.0008680555555555555,
-        "seuil": 0.7213622291021672
+        "threshold": 0.7213622291021672
       },
       {
-        "reglage": "min_conf=10.0, text_sensor=page",
-        "rappel": 0.9166666666666666,
+        "settings": "min_conf=10.0, text_sensor=page",
+        "recall": 0.9166666666666666,
         "fpr": 0.0008680555555555555,
-        "seuil": 0.743421052631579
+        "threshold": 0.743421052631579
       },
       {
-        "reglage": "min_conf=10.0, text_sensor=zone",
-        "rappel": 0.9166666666666666,
+        "settings": "min_conf=10.0, text_sensor=zone",
+        "recall": 0.9166666666666666,
         "fpr": 0.0008680555555555555,
-        "seuil": 0.743421052631579
+        "threshold": 0.743421052631579
       },
       {
-        "reglage": "min_conf=10.0, text_sensor=union",
-        "rappel": 0.9166666666666666,
+        "settings": "min_conf=10.0, text_sensor=union",
+        "recall": 0.9166666666666666,
         "fpr": 0.0008680555555555555,
-        "seuil": 0.743421052631579
+        "threshold": 0.743421052631579
       },
       {
-        "reglage": "min_conf=20.0, text_sensor=page",
-        "rappel": 0.9079861111111112,
+        "settings": "min_conf=20.0, text_sensor=page",
+        "recall": 0.9079861111111112,
         "fpr": 0.0,
-        "seuil": 0.8486842105263157
+        "threshold": 0.8486842105263157
       },
       {
-        "reglage": "min_conf=20.0, text_sensor=zone",
-        "rappel": 0.9079861111111112,
+        "settings": "min_conf=20.0, text_sensor=zone",
+        "recall": 0.9079861111111112,
         "fpr": 0.0,
-        "seuil": 0.8486842105263157
+        "threshold": 0.8486842105263157
       },
       {
-        "reglage": "min_conf=20.0, text_sensor=union",
-        "rappel": 0.9079861111111112,
+        "settings": "min_conf=20.0, text_sensor=union",
+        "recall": 0.9079861111111112,
         "fpr": 0.0,
-        "seuil": 0.8486842105263157
+        "threshold": 0.8486842105263157
       },
       {
-        "reglage": "min_conf=40.0, text_sensor=page",
-        "rappel": 0.9045138888888888,
+        "settings": "min_conf=40.0, text_sensor=page",
+        "recall": 0.9045138888888888,
         "fpr": 0.0,
-        "seuil": 0.8236842105263158
+        "threshold": 0.8236842105263158
       },
       {
-        "reglage": "min_conf=40.0, text_sensor=zone",
-        "rappel": 0.9045138888888888,
+        "settings": "min_conf=40.0, text_sensor=zone",
+        "recall": 0.9045138888888888,
         "fpr": 0.0,
-        "seuil": 0.8236842105263158
+        "threshold": 0.8236842105263158
       },
       {
-        "reglage": "min_conf=40.0, text_sensor=union",
-        "rappel": 0.9045138888888888,
+        "settings": "min_conf=40.0, text_sensor=union",
+        "recall": 0.9045138888888888,
         "fpr": 0.0,
-        "seuil": 0.8236842105263158
+        "threshold": 0.8236842105263158
       },
       {
-        "reglage": "min_conf=60.0, text_sensor=page",
-        "rappel": 0.9027777777777778,
+        "settings": "min_conf=60.0, text_sensor=page",
+        "recall": 0.9027777777777778,
         "fpr": 0.0,
-        "seuil": 0.8236842105263158
+        "threshold": 0.8236842105263158
       },
       {
-        "reglage": "min_conf=60.0, text_sensor=zone",
-        "rappel": 0.9027777777777778,
+        "settings": "min_conf=60.0, text_sensor=zone",
+        "recall": 0.9027777777777778,
         "fpr": 0.0,
-        "seuil": 0.8236842105263158
+        "threshold": 0.8236842105263158
       },
       {
-        "reglage": "min_conf=60.0, text_sensor=union",
-        "rappel": 0.9027777777777778,
+        "settings": "min_conf=60.0, text_sensor=union",
+        "recall": 0.9027777777777778,
         "fpr": 0.0,
-        "seuil": 0.8236842105263158
+        "threshold": 0.8236842105263158
       },
       {
-        "reglage": "min_conf=80.0, text_sensor=page",
-        "rappel": 0.6857638888888888,
+        "settings": "min_conf=80.0, text_sensor=page",
+        "recall": 0.6857638888888888,
         "fpr": 0.0,
-        "seuil": 0.8236842105263158
+        "threshold": 0.8236842105263158
       },
       {
-        "reglage": "min_conf=80.0, text_sensor=zone",
-        "rappel": 0.6857638888888888,
+        "settings": "min_conf=80.0, text_sensor=zone",
+        "recall": 0.6857638888888888,
         "fpr": 0.0,
-        "seuil": 0.8236842105263158
+        "threshold": 0.8236842105263158
       },
       {
-        "reglage": "min_conf=80.0, text_sensor=union",
-        "rappel": 0.6857638888888888,
+        "settings": "min_conf=80.0, text_sensor=union",
+        "recall": 0.6857638888888888,
         "fpr": 0.0,
-        "seuil": 0.8236842105263158
+        "threshold": 0.8236842105263158
       }
     ],
-    "conjonctions": {
+    "conjunctions": {
       "angle x dpi": [
         {
-          "valeurs": [
+          "values": [
             1.0,
             300
           ],
-          "rappel": 0.9583333333333334,
+          "recall": 0.9583333333333334,
           "n": 48,
-          "ic": [
+          "ci": [
             0.8602408885222853,
             0.9884983479210344
           ]
         },
         {
-          "valeurs": [
+          "values": [
             2.0,
             300
           ],
-          "rappel": 0.9583333333333334,
+          "recall": 0.9583333333333334,
           "n": 48,
-          "ic": [
+          "ci": [
             0.8602408885222853,
             0.9884983479210344
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.25,
             300
           ],
-          "rappel": 0.9791666666666666,
+          "recall": 0.9791666666666666,
           "n": 48,
-          "ic": [
+          "ci": [
             0.8910053086246883,
             0.9963129840206002
           ]
@@ -4015,37 +4015,37 @@
       ],
       "angle x jpeg": [
         {
-          "valeurs": [
+          "values": [
             1.0,
             95
           ],
-          "rappel": 0.9444444444444444,
+          "recall": 0.9444444444444444,
           "n": 36,
-          "ic": [
+          "ci": [
             0.8185502589238878,
             0.9846303362329332
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.25,
             55
           ],
-          "rappel": 0.9722222222222222,
+          "recall": 0.9722222222222222,
           "n": 36,
-          "ic": [
+          "ci": [
             0.8582996626496918,
             0.9950797197044302
           ]
         },
         {
-          "valeurs": [
+          "values": [
             2.0,
             75
           ],
-          "rappel": 0.9722222222222222,
+          "recall": 0.9722222222222222,
           "n": 36,
-          "ic": [
+          "ci": [
             0.8582996626496918,
             0.9950797197044302
           ]
@@ -4053,37 +4053,37 @@
       ],
       "angle x sigma": [
         {
-          "valeurs": [
+          "values": [
             2.0,
             12.0
           ],
-          "rappel": 0.9444444444444444,
+          "recall": 0.9444444444444444,
           "n": 36,
-          "ic": [
+          "ci": [
             0.8185502589238878,
             0.9846303362329332
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.25,
             12.0
           ],
-          "rappel": 0.9722222222222222,
+          "recall": 0.9722222222222222,
           "n": 36,
-          "ic": [
+          "ci": [
             0.8582996626496918,
             0.9950797197044302
           ]
         },
         {
-          "valeurs": [
+          "values": [
             1.0,
             6.0
           ],
-          "rappel": 0.9722222222222222,
+          "recall": 0.9722222222222222,
           "n": 36,
-          "ic": [
+          "ci": [
             0.8582996626496918,
             0.9950797197044302
           ]
@@ -4091,37 +4091,37 @@
       ],
       "dpi x jpeg": [
         {
-          "valeurs": [
+          "values": [
             300,
             95
           ],
-          "rappel": 0.9444444444444444,
+          "recall": 0.9444444444444444,
           "n": 72,
-          "ic": [
+          "ci": [
             0.865677916427906,
             0.9781861370730749
           ]
         },
         {
-          "valeurs": [
+          "values": [
             300,
             55
           ],
-          "rappel": 0.9861111111111112,
+          "recall": 0.9861111111111112,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9254321971571302,
             0.9975441113595678
           ]
         },
         {
-          "valeurs": [
+          "values": [
             300,
             75
           ],
-          "rappel": 0.9861111111111112,
+          "recall": 0.9861111111111112,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9254321971571302,
             0.9975441113595678
           ]
@@ -4129,37 +4129,37 @@
       ],
       "dpi x sigma": [
         {
-          "valeurs": [
+          "values": [
             300,
             12.0
           ],
-          "rappel": 0.9305555555555556,
+          "recall": 0.9305555555555556,
           "n": 72,
-          "ic": [
+          "ci": [
             0.847518240672898,
             0.9699750611561773
           ]
         },
         {
-          "valeurs": [
+          "values": [
             300,
             6.0
           ],
-          "rappel": 0.9861111111111112,
+          "recall": 0.9861111111111112,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9254321971571302,
             0.9975441113595678
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -4167,224 +4167,224 @@
       ],
       "jpeg x sigma": [
         {
-          "valeurs": [
+          "values": [
             95,
             12.0
           ],
-          "rappel": 0.9444444444444444,
+          "recall": 0.9444444444444444,
           "n": 54,
-          "ic": [
+          "ci": [
             0.8489254853651705,
             0.980927077496161
           ]
         },
         {
-          "valeurs": [
+          "values": [
             55,
             12.0
           ],
-          "rappel": 0.9814814814814815,
+          "recall": 0.9814814814814815,
           "n": 54,
-          "ic": [
+          "ci": [
             0.902283346415128,
             0.996723596684648
           ]
         },
         {
-          "valeurs": [
+          "values": [
             75,
             12.0
           ],
-          "rappel": 0.9814814814814815,
+          "recall": 0.9814814814814815,
           "n": 54,
-          "ic": [
+          "ci": [
             0.902283346415128,
             0.996723596684648
           ]
         }
       ]
     },
-    "domaine": 150,
-    "hors_domaine": {
-      "seuil": 0.7213622291021672,
-      "rappel": 0.041666666666666664,
+    "domain": 150,
+    "outside_domain": {
+      "threshold": 0.7213622291021672,
+      "recall": 0.041666666666666664,
       "fpr": 0.0,
       "tp": 12,
       "fp": 0,
       "n_pos": 288,
       "n_neg": 1728,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.023992942786740433,
         0.07140675348685457
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         2.168404344971009e-19,
         0.0022182167237465595
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ]
     }
   },
   "resolution": {
-    "reglage_texte": "aucun reglage",
+    "settings_text": "aucun settings",
     "point": {
-      "seuil": -148.5,
-      "rappel": 1.0,
+      "threshold": -148.5,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 288,
       "fp": 0,
       "n_pos": 288,
       "n_neg": 864,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9868366949742601,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ],
-      "precision_grille": 1.0,
-      "precision_prevalence": 1.0
+      "grid_precision": 1.0,
+      "prevalence_precision": 1.0
     },
-    "seuil": -148.5,
-    "n_cellules": 288,
+    "threshold": -148.5,
+    "n_cells": 288,
     "calibration": {
-      "seuil": -148.5,
-      "rappel": 1.0,
+      "threshold": -148.5,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 576,
       "fp": 0,
       "n_pos": 576,
       "n_neg": 1728,
       "n_dossiers": 576,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9933747423434263,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         2.168404344971009e-19,
         0.0022182167237465595
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.006625257656573795
       ]
     },
     "validation": {
-      "seuil": -148.5,
-      "rappel": 1.0,
+      "threshold": -148.5,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 288,
       "fp": 0,
       "n_pos": 288,
       "n_neg": 864,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9868366949742601,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ]
     },
-    "ensemble": {
-      "seuil": -148.5,
-      "rappel": 1.0,
+    "overall": {
+      "threshold": -148.5,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 864,
       "fp": 0,
       "n_pos": 864,
       "n_neg": 2592,
       "n_dossiers": 864,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9955733857422827,
         0.9999999999999999
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.0014799053994665932
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ]
     },
-    "facteurs": {
+    "factors": {
       "angle": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.25": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.5": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "1.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "2.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "4.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
@@ -4392,31 +4392,31 @@
       },
       "dpi": {
         "150": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "200": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "300": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
@@ -4424,41 +4424,41 @@
       },
       "jpeg": {
         "30": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "55": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "75": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "95": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
@@ -4466,48 +4466,48 @@
       },
       "sigma": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "3.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "6.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "12.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         }
       }
     },
-    "tombees": {},
+    "fallen_cells": {},
     "frontier": {
       "angle": {
         "0.0": [
@@ -4587,51 +4587,51 @@
       }
     },
     "noisy_targets": [],
-    "seuil_fige_par_definition": false,
-    "cibles_non_certifiables": [],
-    "restreint": null,
-    "classement": [
+    "threshold_frozen_by_definition": false,
+    "uncertifiable_targets": [],
+    "restricted": null,
+    "ranking": [
       {
-        "reglage": "aucun reglage",
-        "rappel": 1.0,
+        "settings": "aucun settings",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": -110.99
+        "threshold": -110.99
       }
     ],
-    "conjonctions": {
+    "conjunctions": {
       "angle x dpi": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             150
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             200
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             300
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
@@ -4639,37 +4639,37 @@
       ],
       "angle x jpeg": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -4677,37 +4677,37 @@
       ],
       "angle x sigma": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -4715,37 +4715,37 @@
       ],
       "dpi x jpeg": [
         {
-          "valeurs": [
+          "values": [
             150,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -4753,37 +4753,37 @@
       ],
       "dpi x sigma": [
         {
-          "valeurs": [
+          "values": [
             150,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -4791,72 +4791,72 @@
       ],
       "jpeg x sigma": [
         {
-          "valeurs": [
+          "values": [
             30,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         }
       ]
     },
-    "domaine": 150,
-    "hors_domaine": {
-      "seuil": -110.99,
-      "rappel": 1.0,
+    "domain": 150,
+    "outside_domain": {
+      "threshold": -110.99,
+      "recall": 1.0,
       "fpr": 1.0,
       "tp": 288,
       "fp": 864,
       "n_pos": 288,
       "n_neg": 864,
       "n_dossiers": 288,
-      "fpr_dossier": 1.0,
-      "ic_rappel": [
+      "dossier_fpr": 1.0,
+      "recall_ci": [
         0.9868366949742601,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.9955733857422827,
         0.9999999999999999
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.9868366949742601,
         1.0
       ]
     },
-    "plancher_dpi": 150,
-    "marge_estimateur": 0.01,
-    "erreur_max_estimateur": 0.00013333333333340154,
-    "seuil_courbe_propre": -110.99,
-    "rappel_par_dpi_des_dependants": {
+    "floor_dpi": 150,
+    "estimator_margin": 0.01,
+    "max_estimator_error": 0.00013333333333340154,
+    "own_curve_threshold": -110.99,
+    "dependent_recall_by_dpi": {
       "required_field": {
         "150": 1.0,
         "200": 1.0,
@@ -4880,147 +4880,147 @@
     }
   },
   "cropped_page": {
-    "reglage_texte": "aucun reglage",
+    "settings_text": "aucun settings",
     "point": {
-      "seuil": 0.08794999999999997,
-      "rappel": 1.0,
+      "threshold": 0.08794999999999997,
+      "recall": 1.0,
       "fpr": 0.0,
-      "precision_grille": 1.0,
-      "precision_prevalence": 1.0,
+      "grid_precision": 1.0,
+      "prevalence_precision": 1.0,
       "tp": 576,
       "fp": 0,
       "n_pos": 576,
       "n_neg": 1728
     },
-    "seuil": 0.08794999999999997,
-    "n_cellules": 288,
+    "threshold": 0.08794999999999997,
+    "n_cells": 288,
     "calibration": {
-      "seuil": 0.08794999999999997,
-      "rappel": 1.0,
+      "threshold": 0.08794999999999997,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 576,
       "fp": 0,
       "n_pos": 576,
       "n_neg": 1728,
       "n_dossiers": 576,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9933747423434263,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         2.168404344971009e-19,
         0.0022182167237465595
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.006625257656573795
       ]
     },
     "validation": {
-      "seuil": 0.08794999999999997,
-      "rappel": 1.0,
+      "threshold": 0.08794999999999997,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 288,
       "fp": 0,
       "n_pos": 288,
       "n_neg": 864,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9868366949742601,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ]
     },
-    "ensemble": {
-      "seuil": 0.08794999999999997,
-      "rappel": 1.0,
+    "overall": {
+      "threshold": 0.08794999999999997,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 864,
       "fp": 0,
       "n_pos": 864,
       "n_neg": 2592,
       "n_dossiers": 864,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9955733857422827,
         0.9999999999999999
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.0014799053994665932
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ]
     },
-    "facteurs": {
+    "factors": {
       "angle": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.25": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.5": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "1.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "2.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "4.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
@@ -5028,31 +5028,31 @@
       },
       "dpi": {
         "150": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "200": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "300": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
@@ -5060,41 +5060,41 @@
       },
       "jpeg": {
         "30": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "55": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "75": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "95": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
@@ -5102,48 +5102,48 @@
       },
       "sigma": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "3.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "6.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "12.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         }
       }
     },
-    "tombees": {},
+    "fallen_cells": {},
     "frontier": {
       "angle": {
         "0.0": [
@@ -5223,51 +5223,51 @@
       }
     },
     "noisy_targets": [],
-    "seuil_fige_par_definition": false,
-    "cibles_non_certifiables": [],
-    "restreint": null,
-    "classement": [
+    "threshold_frozen_by_definition": false,
+    "uncertifiable_targets": [],
+    "restricted": null,
+    "ranking": [
       {
-        "reglage": "aucun reglage",
-        "rappel": 1.0,
+        "settings": "aucun settings",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": 0.08794999999999997
+        "threshold": 0.08794999999999997
       }
     ],
-    "conjonctions": {
+    "conjunctions": {
       "angle x dpi": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             150
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             200
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             300
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
@@ -5275,37 +5275,37 @@
       ],
       "angle x jpeg": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -5313,37 +5313,37 @@
       ],
       "angle x sigma": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -5351,37 +5351,37 @@
       ],
       "dpi x jpeg": [
         {
-          "valeurs": [
+          "values": [
             150,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -5389,37 +5389,37 @@
       ],
       "dpi x sigma": [
         {
-          "valeurs": [
+          "values": [
             150,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -5427,210 +5427,210 @@
       ],
       "jpeg x sigma": [
         {
-          "valeurs": [
+          "values": [
             30,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         }
       ]
     },
-    "domaine": 150,
-    "hors_domaine": {
-      "seuil": 0.08794999999999997,
-      "rappel": 1.0,
+    "domain": 150,
+    "outside_domain": {
+      "threshold": 0.08794999999999997,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 288,
       "fp": 0,
       "n_pos": 288,
       "n_neg": 864,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9868366949742601,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ]
     }
   },
   "rotated_page": {
-    "reglage_texte": "aucun reglage",
+    "settings_text": "aucun settings",
     "point": {
-      "seuil": 0.35855,
-      "rappel": 1.0,
+      "threshold": 0.35855,
+      "recall": 1.0,
       "fpr": 0.0,
-      "precision_grille": 1.0,
-      "precision_prevalence": 1.0,
+      "grid_precision": 1.0,
+      "prevalence_precision": 1.0,
       "tp": 576,
       "fp": 0,
       "n_pos": 576,
       "n_neg": 1728
     },
-    "seuil": 0.35855,
-    "n_cellules": 288,
+    "threshold": 0.35855,
+    "n_cells": 288,
     "calibration": {
-      "seuil": 0.35855,
-      "rappel": 1.0,
+      "threshold": 0.35855,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 576,
       "fp": 0,
       "n_pos": 576,
       "n_neg": 1728,
       "n_dossiers": 576,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9933747423434263,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         2.168404344971009e-19,
         0.0022182167237465595
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.006625257656573795
       ]
     },
     "validation": {
-      "seuil": 0.35855,
-      "rappel": 1.0,
+      "threshold": 0.35855,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 288,
       "fp": 0,
       "n_pos": 288,
       "n_neg": 864,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9868366949742601,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ]
     },
-    "ensemble": {
-      "seuil": 0.35855,
-      "rappel": 1.0,
+    "overall": {
+      "threshold": 0.35855,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 864,
       "fp": 0,
       "n_pos": 864,
       "n_neg": 2592,
       "n_dossiers": 864,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9955733857422827,
         0.9999999999999999
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         0.0,
         0.0014799053994665932
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ]
     },
-    "facteurs": {
+    "factors": {
       "angle": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.25": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "0.5": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "1.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "2.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
         },
         "4.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 144,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.974015432733412,
             0.9999999999999999
           ]
@@ -5638,31 +5638,31 @@
       },
       "dpi": {
         "150": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "200": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
         },
         "300": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 288,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9868366949742601,
             1.0
           ]
@@ -5670,41 +5670,41 @@
       },
       "jpeg": {
         "30": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "55": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "75": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "95": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
@@ -5712,48 +5712,48 @@
       },
       "sigma": {
         "0.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "3.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "6.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         },
         "12.0": {
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 216,
           "fpr": 0.0,
-          "fpr_dossier": 0.0,
-          "ic": [
+          "dossier_fpr": 0.0,
+          "ci": [
             0.9825256002503623,
             1.0
           ]
         }
       }
     },
-    "tombees": {},
+    "fallen_cells": {},
     "frontier": {
       "angle": {
         "0.0": [
@@ -5833,51 +5833,51 @@
       }
     },
     "noisy_targets": [],
-    "seuil_fige_par_definition": false,
-    "cibles_non_certifiables": [],
-    "restreint": null,
-    "classement": [
+    "threshold_frozen_by_definition": false,
+    "uncertifiable_targets": [],
+    "restricted": null,
+    "ranking": [
       {
-        "reglage": "aucun reglage",
-        "rappel": 1.0,
+        "settings": "aucun settings",
+        "recall": 1.0,
         "fpr": 0.0,
-        "seuil": 0.35855
+        "threshold": 0.35855
       }
     ],
-    "conjonctions": {
+    "conjunctions": {
       "angle x dpi": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             150
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             200
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             300
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 48,
-          "ic": [
+          "ci": [
             0.9258973488472576,
             0.9999999999999999
           ]
@@ -5885,37 +5885,37 @@
       ],
       "angle x jpeg": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -5923,37 +5923,37 @@
       ],
       "angle x sigma": [
         {
-          "valeurs": [
+          "values": [
             0.0,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             0.0,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 36,
-          "ic": [
+          "ci": [
             0.9035781695514236,
             1.0
           ]
@@ -5961,37 +5961,37 @@
       ],
       "dpi x jpeg": [
         {
-          "valeurs": [
+          "values": [
             150,
             30
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             55
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             75
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -5999,37 +5999,37 @@
       ],
       "dpi x sigma": [
         {
-          "valeurs": [
+          "values": [
             150,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             150,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 72,
-          "ic": [
+          "ci": [
             0.9493470601886036,
             1.0
           ]
@@ -6037,63 +6037,63 @@
       ],
       "jpeg x sigma": [
         {
-          "valeurs": [
+          "values": [
             30,
             3.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             0.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         },
         {
-          "valeurs": [
+          "values": [
             30,
             6.0
           ],
-          "rappel": 1.0,
+          "recall": 1.0,
           "n": 54,
-          "ic": [
+          "ci": [
             0.9335841332189981,
             1.0
           ]
         }
       ]
     },
-    "domaine": 150,
-    "hors_domaine": {
-      "seuil": 0.35855,
-      "rappel": 1.0,
+    "domain": 150,
+    "outside_domain": {
+      "threshold": 0.35855,
+      "recall": 1.0,
       "fpr": 0.0,
       "tp": 288,
       "fp": 0,
       "n_pos": 288,
       "n_neg": 864,
       "n_dossiers": 288,
-      "fpr_dossier": 0.0,
-      "ic_rappel": [
+      "dossier_fpr": 0.0,
+      "recall_ci": [
         0.9868366949742601,
         1.0
       ],
-      "ic_fpr": [
+      "fpr_ci": [
         4.336808689942018e-19,
         0.004426614257717076
       ],
-      "ic_fpr_dossier": [
+      "dossier_fpr_ci": [
         0.0,
         0.01316330502573999
       ]

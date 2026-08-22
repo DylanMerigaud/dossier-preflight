@@ -48,9 +48,9 @@ def fichiers_pdf_du_corpus():
     return {f for f in os.listdir(CORPUS_DIR) if f.lower().endswith(".pdf")}
 
 
-def sha256_fichier(chemin):
+def sha256_fichier(path):
     h = hashlib.sha256()
-    with open(chemin, "rb") as f:
+    with open(path, "rb") as f:
         for bloc in iter(lambda: f.read(65536), b""):
             h.update(bloc)
     return h.hexdigest()
@@ -76,10 +76,10 @@ def test_aucune_ligne_du_manifeste_ne_pointe_vers_un_fichier_absent():
 def test_le_sha256_du_manifeste_correspond_au_fichier_reel():
     incoherences = []
     for l in lire_manifeste():
-        chemin = os.path.join(CORPUS_DIR, l["fichier"])
-        if not os.path.isfile(chemin):
+        path = os.path.join(CORPUS_DIR, l["fichier"])
+        if not os.path.isfile(path):
             continue  # couvert par le test precedent, pas de double-echec ici
-        reel = sha256_fichier(chemin)
+        reel = sha256_fichier(path)
         attendu = l["sha256"]
         if reel != attendu:
             incoherences.append(f"{l['fichier']}: manifeste={attendu} reel={reel}")

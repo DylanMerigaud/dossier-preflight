@@ -1,12 +1,12 @@
-"""Le point d'entree rend TROIS verdicts, et il ne doit jamais en ecraser deux dans un.
+"""The entry point returns THREE verdicts, and it must never collapse two into one.
 
-Un defaut de dossier et une page illisible appellent des gestes opposes au filing: refaire
-le dossier, ou refaire le scan. Un code de sortie binaire dirait "ton dossier a un defaut" a
-quelqu'un dont le dossier est peut-etre parfait et le scan mauvais.
+A dossier defect and an unreadable page call for opposite actions at the counter: redo the
+dossier, or redo the scan. A binary exit code would tell someone whose dossier may be perfect
+and whose scan is bad that their dossier has a defect.
 
-Le test des deux clocks est ici en BOUT DE CHAINE, et pas seulement au niveau des checks:
-c'est la seule propriete de ce depot que rien d'autre n'outille, et elle ne sert a rien si la
-ligne de commande la perd en route.
+The two-clock test lives here at the END OF THE CHAIN, and not only at check level: it is the
+one property this repo tools and nothing else does, and it is worth nothing if the command
+line loses it on the way.
 """
 import pytest
 
@@ -17,83 +17,83 @@ from preflight.templates import ROOT
 
 @pytest.fixture(scope="module")
 def dossiers(reference, tmp_path_factory):
-    """Les PDF sur disque, comme un utilisateur les aurait: des fichiers, pas des objets."""
+    """The PDFs on disk, as a user would have them: files, not objects."""
     dest = str(tmp_path_factory.mktemp("cli"))
     return {name: {p.id: p.pdf for p in build(reference, name, dest).pieces}
             for name in ("clean", "expired_date")}
 
 
 def run(dossiers, variant, clock, pieces=None, extra=()):
-    chemins = dossiers[variant]
+    paths = dossiers[variant]
     args = [f"{ROOT}/fixtures/reference.yaml", "--clock", clock]
-    for pid in (pieces or chemins):
-        args += ["--piece", f"{pid}={chemins[pid]}"]
+    for pid in (pieces or paths):
+        args += ["--piece", f"{pid}={paths[pid]}"]
     return main(args + list(extra))
 
 
-def test_une_piece_perimee_au_guichet_est_un_defaut_de_dossier(dossiers, capsys):
+def test_an_expired_piece_at_filing_is_a_dossier_defect(dossiers, capsys):
     assert run(dossiers, "expired_date", "filing") == 1
-    sortie = capsys.readouterr().out
-    assert "DEFAUTS DE DOSSIER" in sortie
-    assert "expiry" in sortie
+    out = capsys.readouterr().out
+    assert "DOSSIER DEFECTS" in out
+    assert "expiry" in out
 
 
-def test_la_meme_piece_passe_a_l_autre_horloge(dossiers, capsys):
-    """LE test des deux clocks, de bout en bout. Meme dossier, meme instant, meme fichier:
-    seule l'clock change, et le verdict bascule. Si ce test tombe en meme temps que le
-    precedent, la CLI a perdu l'clock; s'il tombe seul, c'est le check de expiry."""
+def test_the_same_piece_passes_at_the_other_clock(dossiers, capsys):
+    """THE two-clock test, end to end. Same dossier, same instant, same file: only the clock
+    changes and the verdict flips. If this falls at the same time as the previous one, the CLI
+    lost the clock; if it falls alone, it is the expiry check."""
     assert run(dossiers, "expired_date", "admissibility") == 0
-    assert "Aucun check ne se fires" in capsys.readouterr().out
+    assert "No check fires" in capsys.readouterr().out
 
 
-def test_une_page_illisible_n_est_pas_un_defaut_de_dossier(dossiers, capsys):
-    """Sortie 2 et pas 1: le dossier est clean, c'est le scan qui ne se lit pas. Et le mot
-    "conforme" ne doit jamais apparaitre a la place de "indecidable"."""
+def test_an_unreadable_page_is_not_a_dossier_defect(dossiers, capsys):
+    """Exit 2 and not 1: the dossier is clean, it is the scan that cannot be read. And the
+    word "compliant" must never appear where "undecidable" belongs."""
     assert run(dossiers, "clean", "filing", pieces=["identity"], extra=["--dpi", "96"]) == 2
-    sortie = capsys.readouterr().out
-    assert "NE SAIT PAS LIRE" in sortie and "ABSTENTIONS" in sortie
-    assert "DEFAUTS DE DOSSIER" not in sortie
+    out = capsys.readouterr().out
+    assert "CANNOT READ" in out and "ABSTENTIONS" in out
+    assert "DOSSIER DEFECTS" not in out
 
 
-def test_une_piece_non_fournie_est_dite_non_jugee(dossiers, capsys):
-    """Se taire sur une piece absente serait la declarer conforme."""
+def test_a_piece_not_supplied_is_reported_as_not_judged(dossiers, capsys):
+    """Staying silent about an absent piece would amount to declaring it compliant."""
     assert run(dossiers, "clean", "filing", pieces=["tax"]) == 0
-    sortie = capsys.readouterr().out
-    assert "NON FOURNIES" in sortie and "employment" in sortie and "identity" in sortie
+    out = capsys.readouterr().out
+    assert "NOT SUPPLIED" in out and "employment" in out and "identity" in out
 
 
-# Les cas ci-dessous ne lisent aucun PDF: ils coutent zero seconde d'OCR.
+# The cases below read no PDF at all: they cost zero seconds of OCR.
 
-def test_l_horloge_est_obligatoire():
-    """Sans elle l'outil prendrait une date implicite et jetterait la propriete en silence.
-    Le code est 64 (EX_USAGE) et pas 2, qui veut dire "je ne sais pas read_piece"."""
+def test_the_clock_is_mandatory():
+    """Without it the tool would take an implicit date and throw the property away in
+    silence. The code is 64 (EX_USAGE) and not 2, which means "I cannot read"."""
     with pytest.raises(SystemExit) as e:
         main([f"{ROOT}/fixtures/reference.yaml", "--piece", "tax=/dev/null"])
     assert e.value.code == 64
 
 
-def test_une_horloge_inconnue_nomme_celles_qui_existent():
+def test_an_unknown_clock_names_the_ones_that_exist():
     with pytest.raises(SystemExit) as e:
-        main([f"{ROOT}/fixtures/reference.yaml", "--clock", "demain",
+        main([f"{ROOT}/fixtures/reference.yaml", "--clock", "tomorrow",
               "--piece", "tax=/dev/null"])
     assert "filing" in str(e.value.code) and "admissibility" in str(e.value.code)
 
 
-def test_une_date_iso_tient_lieu_d_horloge(dossiers):
-    """Toutes les clocks utiles ne sont pas declarees d'avance."""
+def test_an_iso_date_can_stand_in_for_a_clock(dossiers):
+    """Not every useful clock is declared in advance."""
     assert run(dossiers, "expired_date", "2026-01-01", pieces=["employment"]) == 0
     assert run(dossiers, "expired_date", "2026-12-31", pieces=["employment"]) == 1
 
 
-def test_une_piece_non_declaree_est_refusee():
+def test_an_undeclared_piece_is_refused():
     with pytest.raises(SystemExit) as e:
         main([f"{ROOT}/fixtures/reference.yaml", "--clock", "filing",
-              "--piece", "passeport=/dev/null"])
-    assert "non declaree" in str(e.value.code)
+              "--piece", "passport=/dev/null"])
+    assert "not declared" in str(e.value.code)
 
 
-def test_sans_piece_il_ne_fabrique_pas_de_fixture():
-    """Un point d'entree qui generait son propre dossier aurait l'air de marcher sur un vrai."""
+def test_without_a_piece_it_does_not_manufacture_a_fixture():
+    """An entry point that generated its own dossier would look like it works on a real one."""
     with pytest.raises(SystemExit) as e:
         main([f"{ROOT}/fixtures/reference.yaml", "--clock", "filing"])
-    assert "aucune piece fournie" in str(e.value.code)
+    assert "no piece supplied" in str(e.value.code)

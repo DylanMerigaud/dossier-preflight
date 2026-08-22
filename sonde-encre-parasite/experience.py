@@ -6,7 +6,7 @@ et les quatre sensors concurrents y resistent-ils pareil.
 
 Le parasite est pose sur le render PROPRE, avant degradation, donc il subit ensuite la meme
 rotation, le meme bruit, le meme blur et la meme compression que le reste de la page: c'est ce
-que ferait un tampon ou une ombre de pliure sur une feuille qu'on numerise ensuite.
+que ferait un buffer ou une ombre de pliure sur une feuille qu'on numerise ensuite.
 
     python3 experience.py --procs 13
 """
@@ -73,10 +73,10 @@ def _patch(shape, intensity, seed):
     """Injecte le parasite entre le render propre et la degradation."""
     z, f = _ETAT["zone"], parasite.FORMES.get(shape)
 
-    def apply(gris, deg):
+    def apply(grey, deg):
         if f is not None and intensity > 0:
-            gris = f(gris.copy(), z, deg.dpi, intensity, np.random.default_rng(seed))
-        return _APPLIQUER(gris, deg)
+            grey = f(grey.copy(), z, deg.dpi, intensity, np.random.default_rng(seed))
+        return _APPLIQUER(grey, deg)
     PL.apply = apply
 
 
@@ -98,8 +98,8 @@ def task(tache):
                                    checks=["required_field"]) if c.target == CHAMP]
         if not cons:
             continue
-        seuil = _ETAT["ink_threshold"] if SEUILS[name] is None else SEUILS[name]
-        ligne[name] = {"score": cons[0].score, "fires": cons[0].score > seuil,
+        threshold = _ETAT["ink_threshold"] if SEUILS[name] is None else SEUILS[name]
+        ligne[name] = {"score": cons[0].score, "fires": cons[0].score > threshold,
                       "detail": cons[0].detail[:30]}
     return ligne
 

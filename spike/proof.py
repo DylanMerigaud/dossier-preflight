@@ -65,9 +65,9 @@ def remplir(dest):
     w.write(dest)
 
 
-def render(pdf, prefixe):
-    subprocess.run(["pdftoppm", "-r", str(DPI), "-png", "-f", "1", "-l", "1", pdf, prefixe], check=True)
-    return prefixe + "-1.png"
+def render(pdf, prefix):
+    subprocess.run(["pdftoppm", "-r", str(DPI), "-png", "-f", "1", "-l", "1", pdf, prefix], check=True)
+    return prefix + "-1.png"
 
 
 def degrader(png, dest):
@@ -132,7 +132,7 @@ def main():
     words = ocr_words(redresse)
     preimprime = {t.lower() for t, _, _ in ocr_words(png_vierge)}
     echecs = []
-    print(f"deskew: {angle:+.2f} deg (injecte {-SKEW:+.2f})   zones declarees: {len(zones)}\n")
+    print(f"deskew: {angle:+.2f} deg (injecte {-SKEW:+.2f})   zones declared: {len(zones)}\n")
 
     # C1 field texte required: un MOT AJOUTE dont le centre tombe dans la zone
     print("=== C1 fields required (positions OCR) ===")
@@ -148,7 +148,7 @@ def main():
               f" {'rempli' if rempli_vu else 'VIDE -> REFUS'}")
 
     # C2 ce qui est declare est-il VRAIMENT imprime
-    print("\n=== C2 valeurs vraiment imprimees ===")
+    print("\n=== C2 values vraiment imprimees ===")
     lu = norm(" ".join(t for t, _, _ in words))
     for v, doit in [("MARISOL QUISPE VARGAS", True), ("128 RUE DES ACACIAS", True),
                     ("COMMENTRY", True), ("Request for Taxpayer", True), ("999-99-9999", False)]:
@@ -173,7 +173,7 @@ def main():
         for e in echecs:
             print("ECHEC:", e)
         return 1
-    print(f"VERT: {len(attendu)} fields, 5 valeurs, "
+    print(f"VERT: {len(attendu)} fields, 5 values, "
           f"{sum(1 for z in zones.values() if z[4] == '/Btn')} boxes, zero data reelle.")
     return 0
 

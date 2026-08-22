@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Lire les thresholds SUR les courbes, pas les choisir a la main.
 
-Entree: les mesures brutes de la grid. Sortie: une curve precision/rappel par check, le
+Entree: les mesures brutes de la grid. Sortie: une curve precision/recall par check, le
 point de fonctionnement retenu, le floor de panne, et les tableaux des duels A/B.
 
 L'ASYMETRIE EST DECLAREE ICI, EN CHIFFRES, parce qu'un point de fonctionnement choisi sans
@@ -13,7 +13,7 @@ elle est choisi au hasard:
   coute la CREDIBILITE de la gate, et une regle qui crie au loup fait survoler toutes celles
   d'a cote. C'est le seul cout qui detruit l'outil au lieu de le degrader.
 
-D'ou la regle: on prend le RAPPEL LE PLUS HAUT ATTEIGNABLE sous un budget de faux positifs
+D'ou la regle: on prend le RAPPEL LE PLUS HAUT ATTEIGNABLE sous un budget de wrong positifs
 tenu, et le budget est ecrit noir sur blanc (FP_BUDGET), pas suppose. Il est par check et
 par dossier: avec neuf checks, un dossier clean a environ 9 fois ce budget de chance de
 declencher une alarme pour rien, et ce chiffre-la est celui que l'utilisateur ressent.
@@ -41,20 +41,20 @@ from preflight.reference import load_reference
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(ROOT, "grid", "resultats")
 
-# Budget de faux positifs PAR CIBLE (un field, une case, une value interdite), et non par
-# dossier. Un dossier porte dix-sept fields required: le taux qu'un utilisateur RESSENT est
+# Budget de wrong positifs PAR CIBLE (un field, une case, une value interdite), et non par
+# dossier. Un dossier porte dix-sept fields required: le rate qu'un utilisateur RESSENT est
 # celui du dossier entier, environ dix-sept fois celui-ci, et il est mesure puis publie a
-# part sous le name de taux par dossier. Declarer l'un en croyant parler de l'autre est la
+# part sous le name de rate par dossier. Declarer l'un en croyant parler de l'autre est la
 # facon la plus courante d'annoncer une gate plus sure qu'elle n'est.
 FP_BUDGET = 0.002
-VALIDATION_SEED = 37     # jamais regardee pour choisir un seuil, uniquement pour le rapporter
-RECALL_FLOOR = 0.95     # sous ce rappel, la cell est declaree hors domaine
+VALIDATION_SEED = 37     # jamais regardee pour choisir un threshold, uniquement pour le rapporter
+RECALL_FLOOR = 0.95     # sous ce recall, la cell est declaree hors domain
 PREVALENCE = 0.10          # part supposee de dossiers reellement fautifs, pour la precision
 
 # Balaye jusqu'a 0. Un field PEIGNE (une case par caractere, le formulaire le declare) se lit
 # "4/1)2" avec une confiance de 38: les trois chiffres sont bien la, mais les separateurs
 # cassent le modele de mot de tesseract et effondrent sa confiance. Un floor a 40 jetterait
-# un field REMPLI, c'est-a-dire fabriquerait un faux positif sur un dossier clean, du cote qui
+# un field REMPLI, c'est-a-dire fabriquerait un wrong positif sur un dossier clean, du cote qui
 # detruit la credibilite de la gate. La confiance etant appliquee a l'ANALYSE et non a la
 # grid, l'elargir ne coute pas une seule image.
 CONF_MINS = (0.0, 10.0, 20.0, 40.0, 60.0, 80.0)
@@ -73,7 +73,7 @@ def combinations(check):
 
     Le check des fields required est le seul a croiser deux familles de sensors qui n'ont
     pas les memes boutons: la confiance OCR ne veut rien dire pour un capteur d'ink, et le
-    seuil d'ink ne veut rien dire pour un capteur de words. Les croiser quand meme
+    threshold d'ink ne veut rien dire pour un capteur de words. Les croiser quand meme
     multiplierait par six un balayage deja long sans produire un seul point de plus.
     """
     if check == "required_field":
@@ -87,10 +87,10 @@ def combinations(check):
             for v in itertools.product(*[VALEURS[n] for n in noms])]
 
 
-def load(chemin):
+def load(path):
     """index[(angle, dpi, jpeg, sigma, seed)][variant][piece] = Reading"""
     index = collections.defaultdict(lambda: collections.defaultdict(dict))
-    with open(chemin, encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         for ligne in f:
             ligne = ligne.strip()
             if not ligne:
@@ -105,7 +105,7 @@ def complete_dossiers(index):
     """Un dossier de variant = la piece modifiee, plus les deux pieces du dossier clean.
 
     Les cellules incompletes sont ecartees en silence: la grid reprend ou elle s'arrete, et
-    une cell a moitie ecrite fabriquerait un faux negatif qui n'existe pas.
+    une cell a moitie ecrite fabriquerait un wrong negatif qui n'existe pas.
     """
     attendues = {v.name for v in VARIANTS}
     out = {}
@@ -130,7 +130,7 @@ def target_scores(readings, ref, check, reg, clock="filing", abstention=False):
     dossier, le check des fields required n'a que deux points de fonctionnement possibles
     (crier des qu'un field sur dix-sept est illisible, ou ne jamais crier) parce que son score
     est le PIRE de ses fields. Par target, la curve existe vraiment, les negatifs sont
-    dix-sept fois plus nombreux donc le taux de faux positifs est mesurable, et surtout on
+    dix-sept fois plus nombreux donc le rate de wrong positifs est mesurable, et surtout on
     peut dire QUEL field n'est pas certifiable au lieu de condamner le check entier.
     """
     return {(c.piece, str(c.target)): c.score
@@ -152,16 +152,16 @@ def damaged_targets(var, ref):
     """
     if not var.check:
         return set()
-    gab = ref.templates[dict(ref.pieces)[var.piece]] if var.piece else None
+    tpl = ref.templates[dict(ref.pieces)[var.piece]] if var.piece else None
     if var.empty_fields:
-        return {(var.piece, c) for role in var.empty_fields for c in gab.field(role)}
+        return {(var.piece, c) for role in var.empty_fields for c in tpl.field_ids(role)}
     if var.uncheck:
-        return {(var.piece, gab.boxes[role]) for role in var.uncheck}
+        return {(var.piece, tpl.boxes[role]) for role in var.uncheck}
     if var.without_signature:
-        return {(var.piece, c) for c in gab.signatures.values()}
+        return {(var.piece, c) for c in tpl.signatures.values()}
     if var.expired_date:
-        return {(var.piece, c) for role, genre in gab.dates.items() if genre == "expiration"
-                for c in gab.field(role)}
+        return {(var.piece, c) for role, kind in tpl.dates.items() if kind == "expiration"
+                for c in tpl.field_ids(role)}
     if var.check == "forbidden_value":
         injectees = {str(v) for v in var.replace.values()}
         return {(var.piece, v) for v in ref.forbidden_values if v in injectees}
@@ -186,7 +186,7 @@ def wilson(succes, n, z=1.96):
 def curve(pos, neg):
     """Tous les points de fonctionnement, du plus laxiste au plus strict.
 
-    Les thresholds candidats sont les scores OBSERVES: entre deux scores voisins, aucun seuil ne
+    Les thresholds candidats sont les scores OBSERVES: entre deux scores voisins, aucun threshold ne
     change quoi que ce soit, et en inventer d'autres ne ferait qu'epaissir le fichier.
     """
     thresholds = sorted({s for s in list(pos) + list(neg) if s > MINUS_INF})
@@ -199,52 +199,52 @@ def curve(pos, neg):
     for t in marges:
         tp = sum(1 for s in pos if s > t)
         fp = sum(1 for s in neg if s > t)
-        rappel = tp / len(pos) if pos else 0.0
+        recall = tp / len(pos) if pos else 0.0
         fpr = fp / len(neg) if neg else 0.0
         prec_grille = tp / (tp + fp) if (tp + fp) else 1.0
-        num = PREVALENCE * rappel
+        num = PREVALENCE * recall
         prec_reelle = num / (num + (1 - PREVALENCE) * fpr) if (num + (1 - PREVALENCE) * fpr) else 1.0
-        pts.append({"seuil": t, "rappel": rappel, "fpr": fpr,
-                    "precision_grille": prec_grille, "precision_prevalence": prec_reelle,
+        pts.append({"threshold": t, "recall": recall, "fpr": fpr,
+                    "grid_precision": prec_grille, "prevalence_precision": prec_reelle,
                     "tp": tp, "fp": fp, "n_pos": len(pos), "n_neg": len(neg)})
     return pts
 
 
-def precisions(rappel, fpr):
+def precisions(recall, fpr):
     """Precision a la composition de la grid (un fautif pour un clean) et a la prevalence
     supposee. La seconde est celle qui compte, et elle est plus severe."""
-    num = PREVALENCE * rappel
-    return {"precision_grille": rappel / (rappel + fpr) if (rappel + fpr) else 1.0,
-            "precision_prevalence": num / (num + (1 - PREVALENCE) * fpr)
+    num = PREVALENCE * recall
+    return {"grid_precision": recall / (recall + fpr) if (recall + fpr) else 1.0,
+            "prevalence_precision": num / (num + (1 - PREVALENCE) * fpr)
             if (num + (1 - PREVALENCE) * fpr) else 1.0}
 
 
 def chosen_point(pts, budget=FP_BUDGET):
-    """Le rappel le plus haut sous le budget de faux positifs. Rien de plus, rien de moins.
+    """Le recall le plus haut sous le budget de wrong positifs. Rien de plus, rien de moins.
 
     Il existe TOUJOURS un point sous n'importe quel budget: celui qui ne fires jamais, a
-    rappel nul. Ce n'est donc jamais l'absence de point qui signale un check inutilisable,
-    c'est un rappel trop bas au point retenu, et c'est ce que LIMITES.md doit dire.
+    recall nul. Ce n'est donc jamais l'absence de point qui signale un check inutilisable,
+    c'est un recall trop bas au point retenu, et c'est ce que LIMITES.md doit dire.
     """
     if not pts:
         return None
     tenables = [p for p in pts if p["fpr"] <= budget]
     if not tenables:
         return None
-    meilleur = max(tenables, key=lambda p: (p["rappel"], -p["fpr"]))
-    # A rappel egal, on prend le seuil le plus au milieu du palier: un seuil colle contre une
+    meilleur = max(tenables, key=lambda p: (p["recall"], -p["fpr"]))
+    # A recall egal, on prend le threshold le plus au milieu du palier: un threshold colle contre une
     # value observee bascule au premier pixel de bruit d'une mesure future.
     palier = [p for p in tenables
-              if p["rappel"] == meilleur["rappel"] and p["fpr"] == meilleur["fpr"]]
+              if p["recall"] == meilleur["recall"] and p["fpr"] == meilleur["fpr"]]
     return palier[len(palier) // 2]
 
 
 def sweep(dossiers, ref, check):
-    """Pour chaque reglage, les scores par target, cell par cell.
+    """Pour chaque settings, les scores par target, cell par cell.
 
-    Retour: {reglage: {cle_cellule: {"pos": {target: score}, "neg": {target: score}}}}
+    Retour: {settings: {cle_cellule: {"pos": {target: score}, "neg": {target: score}}}}
     Les positifs sont les cibles que la variant abime; les negatifs sont TOUTES les cibles du
-    dossier clean, ce qui donne au taux de faux positifs la puissance qui lui manquait.
+    dossier clean, ce qui donne au rate de wrong positifs la puissance qui lui manquait.
     """
     var = next(v for v in VARIANTS if v.check == check)
     cibles = damaged_targets(var, ref)
@@ -269,8 +269,8 @@ def flatten(par_cellule):
 def split(par_cellule):
     """Calibration contre validation.
 
-    Choisir un seuil sur des donnees puis rapporter son rappel sur les MEMES donnees le
-    surestime toujours: le seuil s'est loge dans le bruit de ces tirages-la. Deux graines
+    Choisir un threshold sur des donnees puis rapporter son recall sur les MEMES donnees le
+    surestime toujours: le threshold s'est loge dans le bruit de ces tirages-la. Deux graines
     calibrent, la troisieme n'est jamais regardee avant d'ecrire le chiffre.
     """
     cal = {k: v for k, v in par_cellule.items() if k[4] != VALIDATION_SEED}
@@ -278,39 +278,39 @@ def split(par_cellule):
     return cal, val
 
 
-def measure(par_cellule, seuil):
-    """Deux taux de faux positifs, et il faut les deux.
+def measure(par_cellule, threshold):
+    """Deux rate de wrong positifs, et il faut les deux.
 
     Par target: la probabilite qu'UN field clean soit declare vide. C'est celui sur lequel le
-    seuil se choisit, parce que c'est la decision elementaire.
+    threshold se choisit, parce que c'est la decision elementaire.
     Par dossier: la probabilite qu'AU MOINS UNE alarme parte sur un dossier entierement clean.
     C'est celui que l'utilisateur ressent, et c'est lui qui decide s'il continue de croire la
     gate. Le second est environ le premier multiplie par le nombre de cibles.
     """
     pos, neg = flatten(par_cellule)
-    tp = sum(1 for x in pos if x > seuil)
-    fp = sum(1 for x in neg if x > seuil)
-    touches = sum(1 for v in par_cellule.values() if any(x > seuil for x in v["neg"].values()))
+    tp = sum(1 for x in pos if x > threshold)
+    fp = sum(1 for x in neg if x > threshold)
+    touches = sum(1 for v in par_cellule.values() if any(x > threshold for x in v["neg"].values()))
     n_d = len(par_cellule)
-    return {"seuil": seuil, "rappel": tp / len(pos) if pos else 0.0,
+    return {"threshold": threshold, "recall": tp / len(pos) if pos else 0.0,
             "fpr": fp / len(neg) if neg else 0.0, "tp": tp, "fp": fp,
             "n_pos": len(pos), "n_neg": len(neg), "n_dossiers": n_d,
-            "fpr_dossier": touches / n_d if n_d else 0.0,
-            "ic_rappel": wilson(tp, len(pos)), "ic_fpr": wilson(fp, len(neg)),
-            "ic_fpr_dossier": wilson(touches, n_d)}
+            "dossier_fpr": touches / n_d if n_d else 0.0,
+            "recall_ci": wilson(tp, len(pos)), "fpr_ci": wilson(fp, len(neg)),
+            "dossier_fpr_ci": wilson(touches, n_d)}
 
 
 def certifiability(par_cellule):
     """Quelles cibles l'outil peut certifier, et lesquelles il doit refuser de juger.
 
     CE CALCUL NE TOUCHE PAS AU POINT DE FONCTIONNEMENT, et il a fallu une erreur pour le
-    comprendre. En excluant les cibles genantes AVANT de choisir le seuil, on cree une boucle:
-    moins de negatifs, donc un seuil plus permissif tenable, donc un rappel de 100% affiche sur
-    la seule target survivante. Sur le check des valeurs interdites, cette boucle sortait un
-    seuil de 0,11 de ressemblance, value a laquelle n'importe quoi ressemble a n'importe quoi,
+    comprendre. En excluant les cibles genantes AVANT de choisir le threshold, on cree une boucle:
+    moins de negatifs, donc un threshold plus permissif tenable, donc un recall de 100% affiche sur
+    la seule target survivante. Sur le check des values interdites, cette boucle sortait un
+    threshold de 0,11 de ressemblance, value a laquelle n'importe quoi ressemble a n'importe quoi,
     avec cinq cibles sur six exclues et un score parfait. C'etait du maquillage.
 
-    Le seuil se choisit donc sur TOUTES les cibles. Ce calcul-ci ne sert qu'a EXPLIQUER le
+    Le threshold se choisit donc sur TOUTES les cibles. Ce calcul-ci ne sert qu'a EXPLIQUER le
     chiffre obtenu: quand un check plafonne, c'est presque toujours deux ou trois fields qui
     le plafonnent, et les nommer vaut mieux que condamner le check entier. Ce qu'un tel
     field appelle, c'est que l'outil y reponde "je ne sais pas read_piece ce field" au lieu de "ce
@@ -328,9 +328,9 @@ def certifiability(par_cellule):
             vus[target] += 1
             if score > plein:
                 compte[target] += 1
-    taux = {c: compte[c] / vus[c] for c in vus}
-    return ({c: t for c, t in taux.items() if t <= FP_BUDGET},
-            {c: t for c, t in sorted(taux.items(), key=lambda kv: -kv[1]) if t > FP_BUDGET})
+    rate = {c: compte[c] / vus[c] for c in vus}
+    return ({c: t for c, t in rate.items() if t <= FP_BUDGET},
+            {c: t for c, t in sorted(rate.items(), key=lambda kv: -kv[1]) if t > FP_BUDGET})
 
 
 def restricted_to_certifiable(par_cellule, gardees, check):
@@ -344,7 +344,7 @@ def restricted_to_certifiable(par_cellule, gardees, check):
     pt = chosen_point(curve(pos, neg))
     if pt is None:
         return None
-    m = measure(val, pt["seuil"])
+    m = measure(val, pt["threshold"])
     m["cibles_gardees"] = len(gardees)
     m["cibles_totales"] = len(next(iter(par_cellule.values()))["neg"])
     return m
@@ -356,7 +356,7 @@ def restrict(par_cellule, gardees):
             for key, v in par_cellule.items()}
 
 
-def noisy_targets(par_cellule, seuil, n=8):
+def noisy_targets(par_cellule, threshold, n=8):
     """Quelles cibles SAINES declenchent, et a quelle frequence. La liste actionnable.
 
     Un check globalement inutilisable est presque toujours un check que deux ou trois
@@ -367,7 +367,7 @@ def noisy_targets(par_cellule, seuil, n=8):
     for v in par_cellule.values():
         for target, score in v["neg"].items():
             vus[target] += 1
-            if score > seuil:
+            if score > threshold:
                 compte[target] += 1
     return [(c, compte[c], vus[c]) for c, _ in compte.most_common(n)]
 
@@ -380,65 +380,65 @@ def settings_summary(par_cellule):
     return pts, chosen_point(pts)
 
 
-def by_factor(par_cellule, seuil):
-    """Rappel et faux positifs par value de chaque facteur, au seuil retenu."""
+def by_factor(par_cellule, threshold):
+    """Rappel et wrong positifs par value de chaque facteur, au threshold retenu."""
     axes = {"angle": 0, "dpi": 1, "jpeg": 2, "sigma": 3}
     out = {}
     for name, i in axes.items():
         groupes = collections.defaultdict(lambda: [0, 0, 0, 0, 0, 0])
         for key, v in par_cellule.items():
             g = groupes[key[i]]
-            g[0] += sum(1 for x in v["pos"].values() if x > seuil)
+            g[0] += sum(1 for x in v["pos"].values() if x > threshold)
             g[1] += len(v["pos"])
-            g[2] += sum(1 for x in v["neg"].values() if x > seuil)
+            g[2] += sum(1 for x in v["neg"].values() if x > threshold)
             g[3] += len(v["neg"])
-            g[4] += any(x > seuil for x in v["neg"].values())
+            g[4] += any(x > threshold for x in v["neg"].values())
             g[5] += 1
-        out[name] = {val: {"rappel": g[0] / max(1, g[1]), "n": g[1],
+        out[name] = {val: {"recall": g[0] / max(1, g[1]), "n": g[1],
                           "fpr": g[2] / max(1, g[3]),
-                          "fpr_dossier": g[4] / max(1, g[5]),
-                          "ic": wilson(g[0], g[1])}
+                          "dossier_fpr": g[4] / max(1, g[5]),
+                          "ci": wilson(g[0], g[1])}
                     for val, g in sorted(groupes.items())}
     return out
 
 
-def floor(par_cellule, seuil, minimum=RECALL_FLOOR):
-    """Les cellules ou le rappel passe sous le floor. Une cell = 3 graines.
+def floor(par_cellule, threshold, minimum=RECALL_FLOOR):
+    """Les cellules ou le recall passe sous le floor. Une cell = 3 graines.
 
     Un outil qui ne dit pas ou il cesse de marcher n'est pas mesure, il est raconte.
     """
     groupes = collections.defaultdict(lambda: [0, 0])
     for (a, d, q, s, _), v in par_cellule.items():
         g = groupes[(a, d, q, s)]
-        g[0] += sum(1 for x in v["pos"].values() if x > seuil)
+        g[0] += sum(1 for x in v["pos"].values() if x > threshold)
         g[1] += len(v["pos"])
-    tombees = {c: (g[0] / max(1, g[1]), g[1]) for c, g in groupes.items()
+    fallen_cells = {c: (g[0] / max(1, g[1]), g[1]) for c, g in groupes.items()
                if g[0] / max(1, g[1]) < minimum}
-    return tombees, len(groupes)
+    return fallen_cells, len(groupes)
 
 
 AXES = ("angle", "dpi", "jpeg", "sigma")
 
 
-def worst_conjunctions(par_cellule, seuil, combien=3):
-    """Les pires CROISEMENTS de deux facteurs, pas seulement les pires valeurs de chacun.
+def worst_conjunctions(par_cellule, threshold, combien=3):
+    """Les pires CROISEMENTS de deux factors, pas seulement les pires values de chacun.
 
-    Une reading marginale peut mentir par omission. Sur les valeurs interdites, le rappel dit
-    0,979 a 300 dpi, 0,981 en JPEG 95 et 0,977 a sigma 12: aucune de ces trois valeurs ne
+    Une reading marginale peut mentir par omission. Sur les values interdites, le recall dit
+    0,979 a 300 dpi, 0,981 en JPEG 95 et 0,977 a sigma 12: aucune de ces trois values ne
     franchit le floor, et on conclut que le check va bien partout. Croisees, elles font
     une cell sous le floor. Le signe est a l'envers de l'intuition, et c'est ce qui le
-    rend interessant: le rappel baisse quand la qualite MONTE, parce qu'une compression forte
+    rend interessant: le recall baisse quand la qualite MONTE, parce qu'une compression forte
     efface le grain du capteur alors qu'une compression legere le garde, et qu'a haute
     resolution ce grain est assez fin pour se faire read_piece comme de la structure de caractere.
-    Cette partie du mecanisme est mesuree par temoin, voir grid/corner_followup.py.
+    Cette partie du mecanisme est mesuree par control, voir grid/corner_followup.py.
 
     CE BALAYAGE NE VOIT QUE L'OMBRE DE LA CELL, et il faut le savoir en le lisant. La shape
-    reelle de ce defaut-la est une conjonction de QUATRE facteurs (300 dpi ET JPEG 95 ET bruit
+    reelle de ce defaut-la est une conjonction de QUATRE factors (300 dpi ET JPEG 95 ET bruit
     12 ET angle superieur ou egal a 0,5 deg: 30/30 en dessous de cet angle, 50/60 au-dessus).
-    Une paire moyenne sur les deux facteurs restants, donc elle attenue toujours ce qu'elle
-    montre. Aller a trois et quatre facteurs ferait exploser le nombre de boxes et tomber n a
-    15 par case, ce qui rendrait les intervalles inutilisables. Le balayage a deux facteurs
-    sert donc a TROUVER la cell; c'est la liste des pires cellules, deja a quatre facteurs,
+    Une paire moyenne sur les deux factors restants, donc elle attenue toujours ce qu'elle
+    montre. Aller a trois et quatre factors ferait exploser le nombre de boxes et tomber n a
+    15 par case, ce qui rendrait les intervalles inutilisables. Le balayage a deux factors
+    sert donc a TROUVER la cell; c'est la liste des pires cellules, deja a quatre factors,
     qui la NOMME.
     """
     out = {}
@@ -448,27 +448,27 @@ def worst_conjunctions(par_cellule, seuil, combien=3):
             groupes = collections.defaultdict(lambda: [0, 0])
             for key, v in par_cellule.items():
                 g = groupes[(key[ia], key[ib])]
-                g[0] += sum(1 for x in v["pos"].values() if x > seuil)
+                g[0] += sum(1 for x in v["pos"].values() if x > threshold)
                 g[1] += len(v["pos"])
             classe = sorted(((k, g[0] / max(1, g[1]), g[1], wilson(g[0], g[1]))
                              for k, g in groupes.items()), key=lambda t: t[1])
-            out[f"{a} x {b}"] = [{"valeurs": list(k), "rappel": r, "n": n, "ic": list(ic)}
-                                 for k, r, n, ic in classe[:combien]]
+            out[f"{a} x {b}"] = [{"values": list(k), "recall": r, "n": n, "ci": list(ci)}
+                                 for k, r, n, ci in classe[:combien]]
     return out
 
 
-def frontier(tombees, toutes):
+def frontier(fallen_cells, toutes):
     """La frontier lisible: par facteur, la value a partir de laquelle ca tombe."""
     axes = ["angle", "dpi", "jpeg", "sigma"]
     out = {}
     for i, name in enumerate(axes):
-        compte = collections.Counter(c[i] for c in tombees)
+        compte = collections.Counter(c[i] for c in fallen_cells)
         total = collections.Counter(c[i] for c in toutes)
         out[name] = {v: (compte.get(v, 0), total[v]) for v in sorted(total)}
     return out
 
 
-def plot(resultats, chemin):
+def plot(resultats, path):
     if not resultats:
         return None
     import matplotlib
@@ -480,19 +480,19 @@ def plot(resultats, chemin):
     fig, axes = plt.subplots(lignes, cols, figsize=(4.6 * cols, 3.8 * lignes))
     for ax, (check, r) in zip(axes.ravel(), sorted(resultats.items())):
         for etiquette, pts, gras in r["courbes"]:
-            xs = [p["rappel"] for p in pts]
-            ys = [p["precision_prevalence"] for p in pts]
+            xs = [p["recall"] for p in pts]
+            ys = [p["prevalence_precision"] for p in pts]
             ax.plot(xs, ys, linewidth=2.0 if gras else 0.8,
                     alpha=1.0 if gras else 0.35, label=etiquette if gras else None)
         pt = r["point"]
         if pt:
-            ax.plot([pt["rappel"]], [pt["precision_prevalence"]], "o", color="crimson", zorder=5)
-            ax.annotate(f"seuil {pt['seuil']:.3g}\nrappel {pt['rappel']:.3f}\nfpr {pt['fpr']:.4f}",
-                        (pt["rappel"], pt["precision_prevalence"]), fontsize=7,
+            ax.plot([pt["recall"]], [pt["prevalence_precision"]], "o", color="crimson", zorder=5)
+            ax.annotate(f"threshold {pt['threshold']:.3g}\nrappel {pt['recall']:.3f}\nfpr {pt['fpr']:.4f}",
+                        (pt["recall"], pt["prevalence_precision"]), fontsize=7,
                         xytext=(-4, -34), textcoords="offset points", color="crimson")
         ax.axvline(RECALL_FLOOR, color="gray", linestyle=":", linewidth=0.8)
         ax.set_title(check, fontsize=10)
-        ax.set_xlabel("rappel")
+        ax.set_xlabel("recall")
         ax.set_ylabel(f"precision a prevalence {PREVALENCE:.0%}")
         ax.set_xlim(-0.02, 1.02)
         ax.set_ylim(-0.02, 1.02)
@@ -501,11 +501,11 @@ def plot(resultats, chemin):
             ax.legend(fontsize=7, loc="lower left")
     for ax in axes.ravel()[n:]:
         ax.axis("off")
-    fig.suptitle(f"Precision/rappel par check, {resultats[list(resultats)[0]]['n_cellules']} "
-                 f"cellules x 3 graines, budget de faux positifs {FP_BUDGET:.1%}", fontsize=11)
+    fig.suptitle(f"Precision/recall par check, {resultats[list(resultats)[0]]['n_cells']} "
+                 f"cellules x 3 graines, budget de wrong positifs {FP_BUDGET:.1%}", fontsize=11)
     fig.tight_layout()
-    fig.savefig(chemin, dpi=130)
-    return chemin
+    fig.savefig(path, dpi=130)
+    return path
 
 
 # Les checks qui dependent vraiment de ce que l'OCR arrive a read_piece. Ce sont eux qui
@@ -526,7 +526,7 @@ def crosstalk(dossiers, ref, resultats):
     """
     out = {}
     for check, r in resultats.items():
-        reg, seuil = r["reglage"], r["seuil"]
+        reg, threshold = r["settings"], r["threshold"]
         lignes = {}
         for v in VARIANTS:
             if not v.check or v.check == check:
@@ -537,8 +537,8 @@ def crosstalk(dossiers, ref, resultats):
                 # PRODUIT, pas la capacite brute des sensors.
                 scores = target_scores(d[v.name], ref, check, reg, abstention=True)
                 n += 1
-                tire += any(x > seuil for x in scores.values())
-            lignes[v.name] = {"taux": tire / max(1, n), "n": n, "ic": wilson(tire, n)}
+                tire += any(x > threshold for x in scores.values())
+            lignes[v.name] = {"rate": tire / max(1, n), "n": n, "ci": wilson(tire, n)}
         out[check] = lignes
     return out
 
@@ -552,64 +552,64 @@ def dpi_estimator_error(dossiers):
     return pire
 
 
-def remeasure(r, seuil):
-    """Tout recalculer AU SEUIL QU'ON PUBLIE. Sinon on publie un rappel mesure ailleurs.
+def remeasure(r, threshold):
+    """Tout recalculer AU SEUIL QU'ON PUBLIE. Sinon on publie un recall mesure ailleurs.
 
-    Le seuil du check de resolution n'est pas celui de sa curve: il est porte au floor
-    des autres. Sans ce recalcul, thresholds.json annoncait "faux positifs 0,0000" a cote d'une
-    value a laquelle c'etait faux (33% des cibles saines a 150 dpi). Meme famille de faute
+    Le threshold du check de resolution n'est pas celui de sa curve: il est porte au floor
+    des autres. Sans ce recalcul, thresholds.json annoncait "wrong positifs 0,0000" a cote d'une
+    value a laquelle c'etait wrong (33% des cibles saines a 150 dpi). Meme famille de faute
     que la phrase de reading survivant a son capteur: un nombre mesure sous une configuration,
     publie a cote d'une autre.
     """
     pc = r["_par_cellule"]
     cal, val = split(pc)
-    tombees, n_cel = floor(pc, seuil)
-    r.update({"seuil": seuil,
-              "calibration": measure(cal, seuil), "validation": measure(val, seuil),
-              "ensemble": measure(pc, seuil),
-              "facteurs": by_factor(pc, seuil),
-              "conjonctions": worst_conjunctions(pc, seuil),
-              "tombees": tombees, "n_cellules": n_cel,
-              "frontier": frontier(tombees, {c[:4] for c in pc}),
-              "noisy_targets": noisy_targets(pc, seuil)})
+    fallen_cells, n_cel = floor(pc, threshold)
+    r.update({"threshold": threshold,
+              "calibration": measure(cal, threshold), "validation": measure(val, threshold),
+              "overall": measure(pc, threshold),
+              "factors": by_factor(pc, threshold),
+              "conjunctions": worst_conjunctions(pc, threshold),
+              "fallen_cells": fallen_cells, "n_cells": n_cel,
+              "frontier": frontier(fallen_cells, {c[:4] for c in pc}),
+              "noisy_targets": noisy_targets(pc, threshold)})
     return r
 
 
-def operational_floor(resultats, domaine, dossiers):
-    """Le seuil du check de resolution ne se lit pas sur SA curve. Et c'est le sujet.
+def operational_floor(resultats, domain, dossiers):
+    """Le threshold du check de resolution ne se lit pas sur SA curve. Et c'est le sujet.
 
     Sa curve le placerait entre 72 dpi (la variant fautive) et 96 dpi (le plus bas dpi de la
     grid), c'est-a-dire a l'endroit qui separe le mieux ces deux populations. Mais la
     question que ce check doit poser n'est pas "cette page est-elle a 72 dpi", c'est "cette
-    page est-elle assez nette pour que les AUTRES checks tiennent". Son seuil se lit donc
+    page est-elle assez nette pour que les AUTRES checks tiennent". Son threshold se lit donc
     sur le PLANCHER DE PANNE des checks qui dependent de l'OCR: le plus bas dpi ou tous
-    gardent leur rappel au-dessus du floor.
+    gardent leur recall au-dessus du floor.
 
     Consequence assumee, et il faut la dire: si ce floor est au-dessus du plus bas dpi de
     la grid, alors des dossiers SAINS numerises trop bas declenchent ce check. Ce n'est
-    pas un faux positif, c'est le check qui fait son task: on refuse de se prononcer sur
-    une page qu'on ne sait pas read_piece. La confondre avec un faux positif reviendrait a se taire
+    pas un wrong positif, c'est le check qui fait son task: on refuse de se prononcer sur
+    une page qu'on ne sait pas read_piece. La confondre avec un wrong positif reviendrait a se taire
     exactement quand on ne sait pas.
     """
-    # Le seuil se pose SOUS le floor, pas dessus. Un scan a exactement 150 dpi s'estime a
-    # 149,98: seuil pose pile sur 150, il declenchait sur les 288 dossiers sains numerises au
-    # floor meme. La marge vaut dix fois la pire erreur mesuree de l'estimateur, au minimum
+    # Le threshold se pose SOUS le floor, pas dessus. Un scan a exactement 150 dpi s'estime a
+    # 149,98: threshold pose pile sur 150, il declenchait sur les 288 dossiers sains numerises au
+    # floor meme. La margin vaut dix fois la pire erreur mesuree de l'estimateur, au minimum
     # 1%, ce qui reste quarante fois plus fin que l'ecart entre deux dpi de la grid.
     erreur = dpi_estimator_error(dossiers)
-    marge = max(0.01, 10 * erreur)
-    plancher_dpi = domaine
-    seuil_dpi = domaine * (1 - marge)
-    dpis = sorted(resultats["resolution"]["facteurs"]["dpi"])
-    detail = {c: {d: round(resultats[c]["facteurs"]["dpi"][d]["rappel"], 3) for d in dpis}
+    margin = max(0.01, 10 * erreur)
+    floor_dpi = domain
+    seuil_dpi = domain * (1 - margin)
+    dpis = sorted(resultats["resolution"]["factors"]["dpi"])
+    detail = {c: {d: round(resultats[c]["factors"]["dpi"][d]["recall"], 3) for d in dpis}
               for c in OCR_DEPENDENT if c in resultats}
     pr = resultats["resolution"]["point"]
-    return {"seuil": -float(seuil_dpi),
-            "point": dict(pr or {}, seuil=-float(seuil_dpi)),
-            "plancher_dpi": plancher_dpi,
-            "marge_estimateur": marge,
-            "erreur_max_estimateur": erreur,
-            "seuil_courbe_propre": (pr or {}).get("seuil"),
-            "rappel_par_dpi_des_dependants": detail}
+    return {"threshold": -float(seuil_dpi),
+            "point": dict(pr or {}, threshold=-float(seuil_dpi)),
+            "floor_dpi": floor_dpi,
+            "estimator_margin": margin,
+            "max_estimator_error": erreur,
+            "own_curve_threshold": (pr or {}).get("threshold"),
+            "dependent_recall_by_dpi": detail}
 
 
 DOMAINS = (96, 150, 200, 300)
@@ -618,20 +618,20 @@ DOMAINS = (96, 150, 200, 300)
 def definition_thresholds():
     """Les thresholds qui ne se FITTENT pas, parce qu'ils ne sont pas des parametres.
 
-    "Perime" veut dire que la date est passee: le seuil vaut zero jour, point. Laisser la
+    "Perime" veut dire que la date est passee: le threshold vaut zero jour, point. Laisser la
     grid le choisir a donne -207,5 jours, et c'est le test des deux clocks qui l'a
-    attrape: la piece saine du reference expire en 2027, donc n'importe quel seuil entre
+    attrape: la piece saine du reference expire en 2027, donc n'importe quel threshold entre
     -497 et -110 separe parfaitement les donnees, et l'optimiseur a pris le milieu du palier.
-    L'outil aurait declare une piece perimee sept mois avant qu'elle le soit, avec un rappel
+    L'outil aurait declare une piece perimee sept mois avant qu'elle le soit, avec un recall
     de 1,000 a l'appui.
 
-    C'est le piege central de "read_piece le seuil sur la curve": une curve ne connait que les
-    donnees qu'on lui a donnees, et elle deplacera sans hesiter un seuil qui encode du SENS.
-    La grid reste utile sur ces checks, mais pour repondre a une autre question: le seuil
-    etant fixe par definition, quel rappel tient-il et a quel prix.
+    C'est le piege central de "read_piece le threshold sur la curve": une curve ne connait que les
+    donnees qu'on lui a donnees, et elle deplacera sans hesiter un threshold qui encode du SENS.
+    La grid reste utile sur ces checks, mais pour repondre a une autre question: le threshold
+    etant fixe par definition, quel recall tient-il et a quel prix.
     """
     from preflight.thresholds import raw
-    return {k for k, v in raw()["thresholds"].items() if v["origine"] == "definition"}
+    return {k for k, v in raw()["thresholds"].items() if v["origin"] == "definition"}
 
 
 def subgrid(par_reglage, garde):
@@ -640,23 +640,23 @@ def subgrid(par_reglage, garde):
 
 
 def analyze_check(par_reglage, check, sortie=None):
-    """Retient le meilleur reglage sous budget, mesure, cherche le floor.
+    """Retient le meilleur settings sous budget, mesure, cherche le floor.
 
-    Prend le balayage DEJA calcule: la recherche du domaine nominal essaie quatre sous-grilles
+    Prend le balayage DEJA calcule: la recherche du domain nominal essaie quatre sous-grilles
     et il n'y a aucune raison de repasser quatre fois sur les memes images, ni meme sur les
     memes scores.
     """
-    classement = []
+    ranking = []
     for reg, par_cellule in par_reglage.items():
         if not par_cellule:
             continue
         pts, pt = settings_summary(par_cellule)
-        classement.append((reg, par_cellule, pts, pt))
-    if not classement:
+        ranking.append((reg, par_cellule, pts, pt))
+    if not ranking:
         return None
-    tenables = [c for c in classement if c[3] is not None]
-    gagnant = max(tenables or classement,
-                  key=lambda c: (c[3]["rappel"] if c[3] else -1, -(c[3]["fpr"] if c[3] else 1)))
+    tenables = [c for c in ranking if c[3] is not None]
+    gagnant = max(tenables or ranking,
+                  key=lambda c: (c[3]["recall"] if c[3] else -1, -(c[3]["fpr"] if c[3] else 1)))
     reg, par_cellule, pts, pt = gagnant
     if not pts:
         return None
@@ -664,18 +664,18 @@ def analyze_check(par_reglage, check, sortie=None):
     if fige:
         from preflight.thresholds import load_thresholds
         impose = float(load_thresholds()[check])
-        # A seuil impose, le balayage ne sert plus qu'a choisir le CAPTEUR: on garde celui qui
+        # A threshold impose, le balayage ne sert plus qu'a choisir le CAPTEUR: on garde celui qui
         # rappelle le mieux A CE SEUIL-LA, pas celui qui rappellerait le mieux ailleurs.
         def note(c):
             m = measure(split(c[1])[0], impose)
-            return (m["rappel"], -m["fpr"])
-        reg, par_cellule, pts, pt = max(classement, key=note)
+            return (m["recall"], -m["fpr"])
+        reg, par_cellule, pts, pt = max(ranking, key=note)
         m = measure(split(par_cellule)[0], impose)
-        pt = dict(m, seuil=impose, **precisions(m["rappel"], m["fpr"]))
+        pt = dict(m, threshold=impose, **precisions(m["recall"], m["fpr"]))
     gardees, exclues = certifiability(par_cellule)
-    seuil = pt["seuil"] if pt else max(p["seuil"] for p in pts)
+    threshold = pt["threshold"] if pt else max(p["threshold"] for p in pts)
     cal, val = split(par_cellule)
-    tombees, n_cel = floor(par_cellule, seuil)
+    fallen_cells, n_cel = floor(par_cellule, threshold)
     if sortie:
         with open(os.path.join(sortie, f"pr_{check}.csv"), "w", newline="",
                   encoding="utf-8") as f:
@@ -683,41 +683,41 @@ def analyze_check(par_reglage, check, sortie=None):
             w.writeheader()
             w.writerows(pts)
     return {
-        "reglage": reg, "reglage_texte": settings_name(reg, check), "point": pt,
-        "seuil": seuil, "n_cellules": n_cel,
-        "calibration": measure(cal, seuil), "validation": measure(val, seuil),
-        "ensemble": measure(par_cellule, seuil),
-        "courbes": [(settings_name(r, check), p, r == reg) for r, _, p, _ in classement],
-        "facteurs": by_factor(par_cellule, seuil),
-        "tombees": tombees, "frontier": frontier(tombees, {c[:4] for c in par_cellule}),
-        "noisy_targets": noisy_targets(par_cellule, seuil),
-        "seuil_fige_par_definition": fige,
-        "cibles_non_certifiables": [(f"{a} / {b}", round(t, 4)) for (a, b), t in exclues.items()],
-        "restreint": restricted_to_certifiable(par_cellule, gardees, check),
-        "classement": [{"reglage": settings_name(r, check),
-                        "rappel": (q or {}).get("rappel"), "fpr": (q or {}).get("fpr"),
-                        "seuil": (q or {}).get("seuil")}
+        "settings": reg, "settings_text": settings_name(reg, check), "point": pt,
+        "threshold": threshold, "n_cells": n_cel,
+        "calibration": measure(cal, threshold), "validation": measure(val, threshold),
+        "overall": measure(par_cellule, threshold),
+        "courbes": [(settings_name(r, check), p, r == reg) for r, _, p, _ in ranking],
+        "factors": by_factor(par_cellule, threshold),
+        "fallen_cells": fallen_cells, "frontier": frontier(fallen_cells, {c[:4] for c in par_cellule}),
+        "noisy_targets": noisy_targets(par_cellule, threshold),
+        "threshold_frozen_by_definition": fige,
+        "uncertifiable_targets": [(f"{a} / {b}", round(t, 4)) for (a, b), t in exclues.items()],
+        "restricted": restricted_to_certifiable(par_cellule, gardees, check),
+        "ranking": [{"settings": settings_name(r, check),
+                        "recall": (q or {}).get("recall"), "fpr": (q or {}).get("fpr"),
+                        "threshold": (q or {}).get("threshold")}
                        for r, pc, _, q in sorted(
-                           classement, key=lambda c: -((c[3] or {}).get("rappel", -1)))],
-        "_classement": classement,
+                           ranking, key=lambda c: -((c[3] or {}).get("recall", -1)))],
+        "_classement": ranking,
         "_par_cellule": par_cellule,
-        "conjonctions": worst_conjunctions(par_cellule, seuil),
+        "conjunctions": worst_conjunctions(par_cellule, threshold),
     }
 
 
 def choose_domain(balayages, checks):
-    """Le domaine nominal: le plus bas dpi ou les checks qui LISENT tiennent leur floor.
+    """Le domain nominal: le plus bas dpi ou les checks qui LISENT tiennent leur floor.
 
     Sans cette etape, le point de fonctionnement de tout check de texte est decide par les
     cellules ou la page est illisible, et il recule jusqu'a ne plus rien declencher. La raison
     est mecanique: un dossier est refuse des qu'UN field required est vide, donc le score du
     dossier est celui de son pire field; a 96 dpi le Cerfa a des fields que l'OCR ne lit pas,
-    le dossier SAIN atteint alors le meme score que le fautif, et sous un budget de faux
-    positifs serre aucun seuil ne les separe plus.
+    le dossier SAIN atteint alors le meme score que le fautif, et sous un budget de wrong
+    positifs serre aucun threshold ne les separe plus.
 
     Assouplir le budget effacerait le probleme sans le resoudre. Le bon geste est de dire ou
     l'outil se declare competent, et de REFUSER DE CONCLURE en dessous: c'est le role du
-    check de resolution, dont le seuil sort precisement d'ici.
+    check de resolution, dont le threshold sort precisement d'ici.
     """
     besoins = [c for c in OCR_DEPENDENT if c in checks]
     essais = []
@@ -734,12 +734,12 @@ def choose_domain(balayages, checks):
         pire = 1.0
         for c in besoins:
             r = analyze_check(subgrid(balayages[c], lambda k: k[1] >= dpi_min), c)
-            pire = min(pire, 0.0 if r is None else r["validation"]["rappel"])
+            pire = min(pire, 0.0 if r is None else r["validation"]["recall"])
         essais.append((dpi_min, pire))
         if pire >= RECALL_FLOOR:
             return dpi_min, essais
-    # Aucun domaine ne tient le floor. On garde alors le MOINS MAUVAIS, jamais le plus
-    # etroit: se replier sur le domaine le plus etroit reviendrait a repondre "300 dpi" a une
+    # Aucun domain ne tient le floor. On garde alors le MOINS MAUVAIS, jamais le plus
+    # etroit: se replier sur le domain le plus etroit reviendrait a repondre "300 dpi" a une
     # question a laquelle la mesure a dit non partout, et a le faire sur le moins de donnees.
     valides = [(d, r) for d, r in essais if r is not None]
     if not valides:
@@ -750,13 +750,13 @@ def choose_domain(balayages, checks):
 PHRASES = {
     "required_field": lambda r, v: (
         f"se fires si la zone porte moins de {-v:.3f}% d'ink AJOUTEE par rapport au "
-        f"blank (seuil d'ink {r.ink_threshold})" if r.text_sensor == "ink" else
+        f"blank (threshold d'ink {r.ink_threshold})" if r.text_sensor == "ink" else
         f"se fires si moins de {-v:.0f} caractere(s) alphanumerique(s) ajoute(s) sont lus "
         f"dans la zone par le capteur {r.text_sensor} au-dessus de {r.min_conf:.0f} de "
         f"confiance"),
     "required_checkbox": lambda r, v: (
         f"se fires si le delta d'ink du disque central (rayon {r.disc_ratio} du cote, "
-        f"seuil d'ink {r.ink_threshold}) est sous {-v:+.2f}"),
+        f"threshold d'ink {r.ink_threshold}) est sous {-v:+.2f}"),
     "signature": lambda r, v: (
         f"se fires si la plus grande composante ajoutee fait moins de {-v:.0f} px de "
         f"diagonale canonique" if r.signature_sensor == "components" else
@@ -771,7 +771,7 @@ PHRASES = {
     "cropped_page": lambda r, v: (
         f"se fires si plus de {v:.2%} de l'ink du blank sort du frame du scan"),
     "rotated_page": lambda r, v: (
-        f"se fires si un quarter_turns de tour bat le quarter_turns d'origine de plus de {v:.3f} de "
+        f"se fires si un quarter_turns de tour bat le quarter_turns d'origin de plus de {v:.3f} de "
         f"correlation"),
 }
 
@@ -790,7 +790,7 @@ def reading_sentence(check, reg, value, defaut=""):
 
 
 def _reglage_utile(reg, check):
-    """Seulement les boutons qui agissent VRAIMENT sur le reglage retenu.
+    """Seulement les boutons qui agissent VRAIMENT sur le settings retenu.
 
     Le capteur d'ink ignore la confiance OCR: la consigner a cote de lui ferait croire
     qu'elle a ete choisie alors qu'elle n'a rien decide.
@@ -818,7 +818,7 @@ def settings_name(reg, check):
                 if reg.text_sensor == "ink"
                 else f"text_sensor={reg.text_sensor}, min_conf={reg.min_conf}")
     noms = NUISANCES[check]
-    return ", ".join(f"{n}={getattr(reg, n)}" for n in noms) or "aucun reglage"
+    return ", ".join(f"{n}={getattr(reg, n)}" for n in noms) or "aucun settings"
 
 
 def main():
@@ -827,7 +827,7 @@ def main():
     ap.add_argument("--sortie", default=RESULTS)
     ap.add_argument("--checks", nargs="*", default=list(CHECKS))
     ap.add_argument("--publier", action="store_true",
-                    help="ecrire LIMITES.md et thresholds.json a la racine du depot")
+                    help="ecrire LIMITES.md et thresholds.json a la root du depot")
     a = ap.parse_args()
     os.makedirs(a.sortie, exist_ok=True)
 
@@ -844,40 +844,40 @@ def main():
         print(f"  balayage {check:17s} {len(balayages[check]):3d} reglages, "
               f"{time.perf_counter() - t:5.1f}s", flush=True)
 
-    domaine, essais = choose_domain(balayages, a.checks)
-    retenus = {k: v for k, v in dossiers.items() if k[1] >= domaine}
-    print(f"domaine nominal retenu: dpi >= {domaine} ({len(retenus)} couples). Essais: "
+    domain, essais = choose_domain(balayages, a.checks)
+    retenus = {k: v for k, v in dossiers.items() if k[1] >= domain}
+    print(f"domain nominal retenu: dpi >= {domain} ({len(retenus)} couples). Essais: "
           + ", ".join(f"{d} dpi -> " + ("pas de donnees" if r is None else
-                                        f"pire rappel {r:.3f}") for d, r in essais))
+                                        f"pire recall {r:.3f}") for d, r in essais))
     if all((r or 0) < RECALL_FLOOR for _, r in essais):
-        print(f"  AUCUN domaine ne tient le floor de {RECALL_FLOOR:.0%}: "
-              "le domaine retenu est le moins mauvais, pas un domaine sur.")
+        print(f"  AUCUN domain ne tient le floor de {RECALL_FLOOR:.0%}: "
+              "le domain retenu est le moins mauvais, pas un domain sur.")
 
     resultats = {}
     for check in a.checks:
-        r = analyze_check(subgrid(balayages[check], lambda k: k[1] >= domaine),
+        r = analyze_check(subgrid(balayages[check], lambda k: k[1] >= domain),
                               check, a.sortie)
         if r is None:
             print(f"  {check:17s} AUCUNE mesure exploitable")
             continue
-        r["domaine"] = domaine
-        hors = subgrid(balayages[check], lambda k: k[1] < domaine)[r["reglage"]]
-        r["hors_domaine"] = measure(hors, r["seuil"]) if hors else None
+        r["domain"] = domain
+        hors = subgrid(balayages[check], lambda k: k[1] < domain)[r["settings"]]
+        r["outside_domain"] = measure(hors, r["threshold"]) if hors else None
         resultats[check] = r
         v, c = r["validation"], r["calibration"]
-        print(f"  {check:17s} {r['reglage_texte']:42s} seuil={r['seuil']:9.4g} "
-              f"calib rappel={c['rappel']:.3f} fpr={c['fpr']:.4f} | "
-              f"VALID rappel={v['rappel']:.3f} fpr={v['fpr']:.4f} | "
-              f"hors domaine {len(r['tombees'])}/{r['n_cellules']}")
+        print(f"  {check:17s} {r['settings_text']:42s} threshold={r['threshold']:9.4g} "
+              f"calib recall={c['recall']:.3f} fpr={c['fpr']:.4f} | "
+              f"VALID recall={v['recall']:.3f} fpr={v['fpr']:.4f} | "
+              f"hors domain {len(r['fallen_cells'])}/{r['n_cells']}")
 
     if "resolution" in resultats:
-        resultats["resolution"].update(operational_floor(resultats, domaine, retenus))
-        r = remeasure(resultats["resolution"], resultats["resolution"]["seuil"])
-        r["point"] = dict(r["validation"], seuil=r["seuil"],
-                          **precisions(r["validation"]["rappel"], r["validation"]["fpr"]))
-        print(f"  {'resolution':17s} seuil porte a {r['seuil']:.4g} = floor "
-              f"{r['plancher_dpi']} dpi moins {r['marge_estimateur']:.1%} de marge "
-              f"(erreur max mesuree de l'estimateur {r['erreur_max_estimateur']:.4%})")
+        resultats["resolution"].update(operational_floor(resultats, domain, retenus))
+        r = remeasure(resultats["resolution"], resultats["resolution"]["threshold"])
+        r["point"] = dict(r["validation"], threshold=r["threshold"],
+                          **precisions(r["validation"]["recall"], r["validation"]["fpr"]))
+        print(f"  {'resolution':17s} threshold porte a {r['threshold']:.4g} = floor "
+              f"{r['floor_dpi']} dpi moins {r['estimator_margin']:.1%} de margin "
+              f"(erreur max mesuree de l'estimateur {r['max_estimator_error']:.4%})")
     t = time.perf_counter()
     croise = crosstalk(retenus, ref, resultats)
     print(f"  crosstalk mesuree sur toute la grid en {time.perf_counter() - t:.0f}s")
@@ -886,47 +886,47 @@ def main():
         return 1
     plot(resultats, os.path.join(a.sortie, "courbes.png"))
     json.dump({c: {k: _jsonable(v) for k, v in r.items()
-                   if k not in ("courbes", "reglage", "_classement", "_par_cellule")}
+                   if k not in ("courbes", "settings", "_classement", "_par_cellule")}
                for c, r in resultats.items()},
               open(os.path.join(a.sortie, "resume.json"), "w"), indent=2, default=str)
     write_duels(resultats, os.path.join(a.sortie, "duels.md"))
     json.dump(_jsonable(croise), open(os.path.join(a.sortie, "crosstalk.json"), "w"), indent=2)
-    racine = ROOT if a.publier else a.sortie
-    write_limits(resultats, os.path.join(racine, "LIMITES.md"), len(dossiers),
-                   domaine, len(retenus), essais, croise)
+    root = ROOT if a.publier else a.sortie
+    write_limits(resultats, os.path.join(root, "LIMITES.md"), len(dossiers),
+                   domain, len(retenus), essais, croise)
     if a.publier:
         write_thresholds(resultats, os.path.join(ROOT, "thresholds.json"))
-    print(f"-> {a.sortie}/courbes.png, {racine}/LIMITES.md, {a.sortie}/duels.md"
+    print(f"-> {a.sortie}/courbes.png, {root}/LIMITES.md, {a.sortie}/duels.md"
           + (", thresholds.json publie" if a.publier else ", thresholds.json NON publie (--publier)"))
     return 0
 
 
-def duel_by_dpi(classement, check):
+def duel_by_dpi(ranking, check):
     """Le gagnant change-t-il selon le dpi. C'est la seule facon honnete de trancher un duel.
 
     Chaque concurrent est juge a SON propre point de fonctionnement (celui qui tient le budget
-    de faux positifs), pas au seuil du voisin: comparer deux sensors a un seuil commun
+    de wrong positifs), pas au threshold du voisin: comparer deux sensors a un threshold commun
     compare une scale, pas un capteur.
     """
-    dpis = sorted({c[1] for _, pc, _, _ in classement for c in pc})
+    dpis = sorted({c[1] for _, pc, _, _ in ranking for c in pc})
     lignes = []
-    for reg, par_cellule, _, pt in classement:
+    for reg, par_cellule, _, pt in ranking:
         if pt is None:
             continue
-        ligne = {"reglage": settings_name(reg, check), "seuil": pt["seuil"],
-                 "global": (pt["rappel"], pt["fpr"])}
+        ligne = {"settings": settings_name(reg, check), "threshold": pt["threshold"],
+                 "global": (pt["recall"], pt["fpr"])}
         for dpi in dpis:
             sous = {k: v for k, v in par_cellule.items() if k[1] == dpi}
-            m = measure(sous, pt["seuil"])
-            ligne[dpi] = (m["rappel"], m["fpr"], m["ic_rappel"])
+            m = measure(sous, pt["threshold"])
+            ligne[dpi] = (m["recall"], m["fpr"], m["recall_ci"])
         lignes.append(ligne)
     return dpis, sorted(lignes, key=lambda l: -l["global"][0])
 
 
-def write_duels(resultats, chemin):
+def write_duels(resultats, path):
     lignes = ["# Duels entre sensors concurrents", "",
               "Chaque concurrent est juge a SON propre point de fonctionnement, celui qui tient",
-              f"le budget de faux positifs de {FP_BUDGET:.1%}. Comparer deux sensors a un seuil",
+              f"le budget de wrong positifs de {FP_BUDGET:.1%}. Comparer deux sensors a un threshold",
               "commun comparerait une scale et pas un capteur. Les intervalles sont des",
               "intervalles de Wilson a 95%: a trois graines par cell, l'intervalle normal ment.",
               ""]
@@ -938,74 +938,74 @@ def write_duels(resultats, chemin):
         if not tab:
             continue
         lignes += [f"## {check}", "",
-                   "| reglage | seuil | rappel global | fpr global | "
-                   + " | ".join(f"rappel {d} dpi" for d in dpis) + " |",
+                   "| settings | threshold | recall global | fpr global | "
+                   + " | ".join(f"recall {d} dpi" for d in dpis) + " |",
                    "|---|---|---|---|" + "---|" * len(dpis)]
         for l in tab:
             boxes = " | ".join(f"{l[d][0]:.3f} [{l[d][2][0]:.2f}, {l[d][2][1]:.2f}]" for d in dpis)
-            marque = " **(retenu)**" if l["reglage"] == r["reglage_texte"] else ""
-            lignes.append(f"| {l['reglage']}{marque} | {l['seuil']:.4g} | {l['global'][0]:.3f} "
+            marque = " **(retenu)**" if l["settings"] == r["settings_text"] else ""
+            lignes.append(f"| {l['settings']}{marque} | {l['threshold']:.4g} | {l['global'][0]:.3f} "
                           f"| {l['global'][1]:.4f} | {boxes} |")
-        # Depart a rappel egal par le taux de faux positifs, sinon le "gagnant" est
+        # Depart a recall egal par le rate de wrong positifs, sinon le "gagnant" est
         # simplement le premier de la liste, ce qui ne veut rien dire.
-        gagnants = {d: max(tab, key=lambda l: (l[d][0], -l[d][1]))["reglage"] for d in dpis}
+        gagnants = {d: max(tab, key=lambda l: (l[d][0], -l[d][1]))["settings"] for d in dpis}
         # Une egalite est un resultat, pas un vainqueur. Annoncer "capteur X gagne" quand
         # deux sensors rendent exactement les memes chiffres partout, c'est raconter une
         # mesure qui n'a pas eu lieu.
         tete = max(l["global"] for l in tab)
-        exaequo = [l["reglage"] for l in tab if l["global"] == tete]
+        exaequo = [l["settings"] for l in tab if l["global"] == tete]
         if len(exaequo) > 1:
             lignes += ["", f"EGALITE, non departage: {len(exaequo)} reglages rendent exactement "
-                       f"le meme rappel ({tete[0]:.3f}) et le meme taux de faux positifs "
-                       f"({tete[1]:.4f}) sur l'ensemble du domaine. Ce corpus et cette grid ne "
-                       "les distinguent pas. Le reglage retenu est le premier de la liste, et ce "
+                       f"le meme recall ({tete[0]:.3f}) et le meme rate de wrong positifs "
+                       f"({tete[1]:.4f}) sur l'overall du domain. Ce corpus et cette grid ne "
+                       "les distinguent pas. Le settings retenu est le premier de la liste, et ce "
                        "choix n'est appuye par aucune mesure: "
                        + ", ".join(exaequo[:4]) + "."]
         elif len(set(gagnants.values())) > 1:
             lignes += ["", "Le gagnant CHANGE selon le dpi: "
                        + ", ".join(f"{d} dpi -> {g}" for d, g in gagnants.items())
-                       + ". Le reglage retenu est celui qui tient le mieux sur l'ensemble du "
-                         "domaine, pas celui qui gagne une colonne."]
+                       + ". Le settings retenu est celui qui tient le mieux sur l'overall du "
+                         "domain, pas celui qui gagne une colonne."]
         else:
             lignes += ["", f"Meme gagnant a tous les dpi: {next(iter(gagnants.values()))}."]
         lignes.append("")
-    open(chemin, "w", encoding="utf-8").write("\n".join(lignes) + "\n")
+    open(path, "w", encoding="utf-8").write("\n".join(lignes) + "\n")
 
 
-def write_limits(resultats, chemin, n_couples, domaine, n_retenus, essais, croise=None):
+def write_limits(resultats, path, n_pairs, domain, n_retenus, essais, croise=None):
     l = ["# Limites: ou cet outil cesse de marcher", "",
          "Un outil qui ne dit pas ou il cesse de marcher n'est pas mesure, il est raconte.",
          "",
-         f"## Domaine nominal: numerisation a {domaine} dpi ou plus", "",
-         f"Les points de fonctionnement sont choisis sur les {n_retenus} couples de ce domaine,",
-         f"pas sur les {n_couples} de la grid entiere. Ce n'est pas une facon de se donner de",
+         f"## Domaine nominal: numerisation a {domain} dpi ou plus", "",
+         f"Les points de fonctionnement sont choisis sur les {n_retenus} couples de ce domain,",
+         f"pas sur les {n_pairs} de la grid entiere. Ce n'est pas une facon de se donner de",
          "beaux chiffres, c'est une consequence mecanique: un dossier est refuse des qu'UN field",
          "required est vide, donc le score du dossier est celui de son PIRE field. Sous le",
          "floor, le Cerfa a des fields que l'OCR ne lit pas, le dossier SAIN atteint alors le",
-         "meme score que le dossier fautif, et aucun seuil ne les separe plus. Le point de",
+         "meme score que le dossier fautif, et aucun threshold ne les separe plus. Le point de",
          "fonctionnement reculerait jusqu'a ne plus rien declencher du tout.",
          "",
          "Sous ce floor l'outil ne devine pas: le check de resolution se fires et dit",
          "qu'il ne sait pas read_piece la page. Chaque section ci-dessous donne aussi ce que le",
-         "check fait HORS domaine, parce que le cacher serait le mentir.",
+         "check fait HORS domain, parce que le cacher serait le mentir.",
          "",
-         "Domaines essayes, du plus large au plus etroit, avec le pire rappel des checks",
+         "Domaines essayes, du plus large au plus etroit, avec le pire recall des checks",
          "qui dependent de l'OCR: "
          + ", ".join(f"dpi >= {d} -> "
                      + ("pas de donnees" if r is None else f"{r:.3f}") for d, r in essais)
          + ".",
          "",
-         f"Mesure sur {n_couples} couples cell/seed: angle (0, 0.25, 0.5, 1, 2, 4 deg) x",
+         f"Mesure sur {n_pairs} couples cell/seed: angle (0, 0.25, 0.5, 1, 2, 4 deg) x",
          "dpi (96, 150, 200, 300) x qualite JPEG (30, 55, 75, 95) x bruit sigma (0, 3, 6, 12),",
          "trois graines par cell. Chaque check est evalue a son point de fonctionnement,",
-         f"choisi comme le rappel le plus haut tenant un taux de faux positifs sous "
+         f"choisi comme le recall le plus haut tenant un rate de wrong positifs sous "
          f"{FP_BUDGET:.1%}.",
          "",
-         "Le seuil est choisi sur les graines 11 et 23, et le chiffre publie est celui de la",
-         f"seed {VALIDATION_SEED}, jamais regardee avant. Choisir un seuil et rapporter son",
-         "rappel sur les memes tirages le surestime toujours.",
+         "Le threshold est choisi sur les graines 11 et 23, et le chiffre publie est celui de la",
+         f"seed {VALIDATION_SEED}, jamais regardee avant. Choisir un threshold et rapporter son",
+         "recall sur les memes tirages le surestime toujours.",
          "",
-         "Une cell est declaree HORS DOMAINE quand le rappel y passe sous "
+         "Une cell est declaree HORS DOMAINE quand le recall y passe sous "
          f"{RECALL_FLOOR:.0%}.", "",
          "## Ce que la mesure ne couvre pas", "",
          "- Un seul jeu de trois formulaires (W-9, I-9, Cerfa 14011). Les chiffres ne se",
@@ -1014,12 +1014,12 @@ def write_limits(resultats, chemin, n_couples, domaine, n_retenus, essais, crois
          "  nettement plus dur que les deux formulaires americains.",
          "- Les words ne sont enregistres que dans les zones DECLAREES par l'AcroForm, dilatees",
          "  de 8 px. Une value interdite qui reapparaitrait hors de tout field declare, dans une",
-         "  mention manuscrite en marge par exemple, ne serait pas vue.",
+         "  mention manuscrite en margin par exemple, ne serait pas vue.",
          "- Un formulaire sans AcroForm est hors de portee: toute la geometry vient de la",
          "  declaration du PDF, rien n'est mesure a la main.",
          "- Les degradations sont SYNTHETIQUES. Un vrai scanner ajoute des artefacts que cette",
          "  grid n'imite pas: courbure de page, ombre de reliure, poussiere sur la vitre,",
-         "  moire de retramage. La grid borne le domaine, elle ne le prouve pas.",
+         "  moire de retramage. La grid borne le domain, elle ne le prouve pas.",
          "- CONSEQUENCE DIRECTE SUR LE CAPTEUR D'ENCRE, et elle n'est plus une hypothese:",
          "  aucune degradation de cette grid n'AJOUTE d'ink etrangere dans une zone, et le",
          "  capteur retenu pour les fields required gagne donc son duel sur un terrain qui lui",
@@ -1027,8 +1027,8 @@ def write_limits(resultats, chemin, n_couples, domaine, n_retenus, essais, crois
          "  que ce terrain cachait (sonde-ink-parasite/CONSTAT-ENCRE-PARASITE.md): des qu'au",
          "  moins 0,5% d'ink etrangere entre dans la zone, ce capteur declare REMPLI un field",
          "  VIDE dans 1,000 des cas [0,975, 1,000] sur n=151, contre 0,272 pour l'union des",
-         "  sensors de words, 0,185 pleine page et 0,106 en zone. Ce sont des faux negatifs, le",
-         "  cote cher de l'asymetrie. La bascule est une falaise posee sur le seuil publie de",
+         "  sensors de words, 0,185 pleine page et 0,106 en zone. Ce sont des wrong negatifs, le",
+         "  cote cher de l'asymetrie. La bascule est une falaise posee sur le threshold publie de",
          "  0,345%, et les deux populations ne se chevauchent pas d'une seule reading: le",
          "  capteur se fires 97 fois sur 97 jusqu'a 0,323% d'ink ajoutee et 0 fois sur",
          "  167 a partir de 0,380%. Pas de zone grise, une marche. Pour ce field, 0,35% vaut",
@@ -1037,7 +1037,7 @@ def write_limits(resultats, chemin, n_couples, domaine, n_retenus, essais, crois
          "  LE CAPTEUR ET LE SEUIL N'ONT PAS ETE CHANGES, et c'est la bonne decision tant que",
          "  la mesure est une sonde: un field, deux cellules, trois formes de parasite. Elle",
          "  montre qu'un choix a ete tranche sur un terrain biaise, elle ne suffit pas a fixer",
-         "  un seuil. Le changer demande de rejouer cette grid avec l'ink parasite en",
+         "  un threshold. Le changer demande de rejouer cette grid avec l'ink parasite en",
          "  CINQUIEME FACTEUR, et c'est le premier chantier de mesure qui reste ouvert.",
          "- La precision depend de la prevalence. Les courbes la donnent a "
          f"{PREVALENCE:.0%} de dossiers fautifs, value SUPPOSEE et non mesuree.",
@@ -1045,51 +1045,51 @@ def write_limits(resultats, chemin, n_couples, domaine, n_retenus, essais, crois
     suivi = os.path.join(ROOT, "grid", "resultats", "suivi.json")
     if os.path.exists(suivi):
         d = json.load(open(suivi))
-        c, t, cu = d["jeux"]["coin"], d["jeux"]["temoin"], d["cumule"]
-        co = d["coin"]
+        c, t, cu = d["sets"]["corner"], d["sets"]["control"], d["combined"]
+        co = d["corner"]
         l += ["## Suivi hors protocole: la seule cell ou l'outil manque quelque chose", "",
               "HORS PROTOCOLE, et il faut le dire avant les chiffres. Les thresholds publies sortent",
               "d'une regle stricte: deux graines calibrent, la troisieme n'est jamais regardee",
               "avant que le chiffre soit ecrit. Les graines de ce suivi ont ete tirees APRES",
               "avoir vu ou l'outil manquait, sur une cell choisie parce qu'elle manquait.",
-              "Elles ne deplacent aucun seuil et n'entrent dans aucun chiffre publie ailleurs.",
+              "Elles ne deplacent aucun threshold et n'entrent dans aucun chiffre publie ailleurs.",
               "Elles repondent a une seule question: n=18 suffisait-il pour conclure.", "",
               f"Cellule: {co['dpi']} dpi, JPEG {co['jpeg']}, bruit sigma {co['sigma']}, check "
-              f"{d['check']}, seuil publie {d['seuil']}.", "",
-              "| jeu | rappel | IC 95% | positifs |",
+              f"{d['check']}, threshold publie {d['threshold']}.", "",
+              "| jeu | recall | IC 95% | positifs |",
               "|---|---|---|---|",
-              f"| graines d'origine (11, 23, 37) | {d['jeux']['origine']['rappel']:.4f} | "
-              f"[{d['jeux']['origine']['ic'][0]:.3f}, {d['jeux']['origine']['ic'][1]:.3f}] | "
-              f"{d['jeux']['origine']['n']} |",
-              f"| 12 graines neuves | {c['rappel']:.4f} | [{c['ic'][0]:.3f}, "
-              f"{c['ic'][1]:.3f}] | {c['n']} |",
-              f"| CUMULE | {cu['rappel']:.4f} | [{cu['ic'][0]:.3f}, {cu['ic'][1]:.3f}] | "
+              f"| graines d'origin (11, 23, 37) | {d['sets']['origin']['recall']:.4f} | "
+              f"[{d['sets']['origin']['ci'][0]:.3f}, {d['sets']['origin']['ci'][1]:.3f}] | "
+              f"{d['sets']['origin']['n']} |",
+              f"| 12 graines neuves | {c['recall']:.4f} | [{c['ci'][0]:.3f}, "
+              f"{c['ci'][1]:.3f}] | {c['n']} |",
+              f"| CUMULE | {cu['recall']:.4f} | [{cu['ci'][0]:.3f}, {cu['ci'][1]:.3f}] | "
               f"{cu['n']} |", "",
-              f"Le point estime remonte de {d['jeux']['origine']['rappel']:.3f} a "
-              f"{cu['rappel']:.3f}, retour a la moyenne attendu d'un n=18, mais la borne HAUTE",
-              f"reste a {cu['ic'][1]:.3f}, sous le floor de {RECALL_FLOOR:.0%}. Ce n'est",
+              f"Le point estime remonte de {d['sets']['origin']['recall']:.3f} a "
+              f"{cu['recall']:.3f}, retour a la moyenne attendu d'un n=18, mais la borne HAUTE",
+              f"reste a {cu['ci'][1]:.3f}, sous le floor de {RECALL_FLOOR:.0%}. Ce n'est",
               "pas du bruit d'echantillon: le check manque vraiment quelque chose ici.", "",
               "TEMOIN, et c'est lui qui rend les douze graines interpretables. Meme cell,",
               "memes douze graines, seule la compression change:", "",
-              f"- JPEG {co['jpeg']}: {c['tp']}/{c['n']} = {c['rappel']:.4f}",
-              f"- JPEG 30: {t['tp']}/{t['n']} = {t['rappel']:.4f}", "",
+              f"- JPEG {co['jpeg']}: {c['tp']}/{c['n']} = {c['recall']:.4f}",
+              f"- JPEG 30: {t['tp']}/{t['n']} = {t['recall']:.4f}", "",
               "Les graines neuves ne sont donc pas plus dures, c'est la compression. Une",
               "compression FORTE efface le grain du capteur; une compression legere le garde, et",
               "a haute resolution ce grain est assez fin pour se faire read_piece comme de la",
               "structure de caractere. Cette partie du mecanisme est MESUREE.", "",
               "LA FORME REELLE EST UNE CONJONCTION DE QUATRE FACTEURS, pas de deux:", "",
-              f"- angle sous {cu['marche_angle']} deg: {cu['angle_sous_marche'][0]}/"
-              f"{cu['angle_sous_marche'][1]} = {cu['angle_sous_marche'][2]:.4f}",
-              f"- angle a {cu['marche_angle']} deg ou plus: {cu['angle_sur_marche'][0]}/"
-              f"{cu['angle_sur_marche'][1]} = {cu['angle_sur_marche'][2]:.4f}", "",
+              f"- angle sous {cu['angle_step']} deg: {cu['angle_below_step'][0]}/"
+              f"{cu['angle_below_step'][1]} = {cu['angle_below_step'][2]:.4f}",
+              f"- angle a {cu['angle_step']} deg ou plus: {cu['angle_above_step'][0]}/"
+              f"{cu['angle_above_step'][1]} = {cu['angle_above_step'][2]:.4f}", "",
               "Une marche, pas une pente. La cell fautive est donc "
               f"{co['dpi']} dpi ET JPEG {co['jpeg']} ET",
-              f"bruit {co['sigma']} ET angle >= {cu['marche_angle']} deg. Le balayage a deux",
-              "facteurs ci-dessous ne peut pas la voir telle quelle: chaque paire moyenne sur",
-              "les deux facteurs restants, donc elle n'en montre que l'ombre. Il sert a la",
-              "TROUVER; c'est la liste des pires cellules, qui est deja a quatre facteurs, qui",
+              f"bruit {co['sigma']} ET angle >= {cu['angle_step']} deg. Le balayage a deux",
+              "factors ci-dessous ne peut pas la voir telle quelle: chaque paire moyenne sur",
+              "les deux factors restants, donc elle n'en montre que l'ombre. Il sert a la",
+              "TROUVER; c'est la liste des pires cellules, qui est deja a quatre factors, qui",
               "la NOMME.", "",
-              "Reserve sur le mecanisme: la partie compression est mesuree par le temoin, la",
+              "Reserve sur le mecanisme: la partie compression est mesuree par le control, la",
               "partie angle est SUPPOSEE. L'hypothese est que c'est l'ampleur du",
               "reechantillonnage qui compte et non sa presence, un deskew au-dela d'un",
               "demi-degre etalant le grain fin dans l'epaisseur des traits. Elle n'est pas",
@@ -1105,7 +1105,7 @@ def write_limits(resultats, chemin, n_couples, domaine, n_retenus, essais, crois
               "construction. Toutes les boxes ne sont pas des fautes: une page rognee emporte de",
               "vrais fields, donc le check des fields required a raison d'y crier. Ce tableau",
               "sert a split la consequence physique de la contamination.", "",
-              "Une LIGNE UNIFORME n'est pas de la crosstalk: c'est le taux de fond du check",
+              "Une LIGNE UNIFORME n'est pas de la crosstalk: c'est le rate de fond du check",
               "qui reapparait. Les variantes partagent les pieces qu'elles n'abiment pas, donc",
               "un check qui se fires a x% sur un dossier clean se fires a x% sur",
               "toutes les colonnes. Ce qui se lit ici, ce sont les boxes qui DEPASSENT la ligne.",
@@ -1117,7 +1117,7 @@ def write_limits(resultats, chemin, n_couples, domaine, n_retenus, essais, crois
             for n in noms:
                 d = croise[check].get(n)
                 boxes.append("." if d is None else
-                             ("." if d["taux"] == 0 else f"{d['taux']:.3f}"))
+                             ("." if d["rate"] == 0 else f"{d['rate']:.3f}"))
             l.append(f"| {check} | " + " | ".join(boxes) + " |")
         l += ["", "Un point vaut zero declenchement sur "
               f"{next(iter(next(iter(croise.values())).values()))['n']} dossiers.", ""]
@@ -1129,55 +1129,55 @@ def write_limits(resultats, chemin, n_couples, domaine, n_retenus, essais, crois
         if pt is None:
             l += ["Aucune mesure exploitable pour ce check.", ""]
             continue
-        if r["validation"]["rappel"] < RECALL_FLOOR:
-            l += [f"ATTENTION: sous le budget de faux positifs de {FP_BUDGET:.1%}, le meilleur",
-                  f"rappel atteignable est {r['validation']['rappel']:.3f}, sous le floor de",
+        if r["validation"]["recall"] < RECALL_FLOOR:
+            l += [f"ATTENTION: sous le budget de wrong positifs de {FP_BUDGET:.1%}, le meilleur",
+                  f"recall atteignable est {r['validation']['recall']:.3f}, sous le floor de",
                   f"{RECALL_FLOOR:.0%}. Ce check laisse passer des dossiers fautifs plus",
                   "souvent qu'il ne devrait: il ne doit pas etre presente comme une garantie.", ""]
-        c, v, e = r["calibration"], r["validation"], r["ensemble"]
-        l += [f"Reglage retenu: {r['reglage_texte']}. Seuil {r['seuil']:.4g}.", "",
-              "| jeu | rappel | IC 95% | faux positifs par target | IC 95% | "
+        c, v, e = r["calibration"], r["validation"], r["overall"]
+        l += [f"Reglage retenu: {r['settings_text']}. Seuil {r['threshold']:.4g}.", "",
+              "| jeu | recall | IC 95% | wrong positifs par target | IC 95% | "
               "par dossier clean | positifs |",
               "|---|---|---|---|---|---|---|"]
         for etiquette, m in (("calibration (graines 11 et 23)", c),
-                             ("VALIDATION (seed 37, jamais vue)", v), ("ensemble", e)):
-            l.append(f"| {etiquette} | {m['rappel']:.3f} | [{m['ic_rappel'][0]:.3f}, "
-                     f"{m['ic_rappel'][1]:.3f}] | {m['fpr']:.4f} | [{m['ic_fpr'][0]:.4f}, "
-                     f"{m['ic_fpr'][1]:.4f}] | {m['fpr_dossier']:.4f} | {m['n_pos']} |")
+                             ("VALIDATION (seed 37, jamais vue)", v), ("overall", e)):
+            l.append(f"| {etiquette} | {m['recall']:.3f} | [{m['recall_ci'][0]:.3f}, "
+                     f"{m['recall_ci'][1]:.3f}] | {m['fpr']:.4f} | [{m['fpr_ci'][0]:.4f}, "
+                     f"{m['fpr_ci'][1]:.4f}] | {m['dossier_fpr']:.4f} | {m['n_pos']} |")
         l += ["",
-              "Le taux par dossier est celui que l'utilisateur ressent: la probabilite qu'au",
+              "Le rate par dossier est celui que l'utilisateur ressent: la probabilite qu'au",
               "moins une alarme parte sur un dossier entierement clean. C'est lui qui decide si",
               "la gate reste credible.", "",
-              f"Cellules sous le floor: {len(r['tombees'])} sur {r['n_cellules']}.", ""]
-        nc = r.get("cibles_non_certifiables") or []
+              f"Cellules sous le floor: {len(r['fallen_cells'])} sur {r['n_cells']}.", ""]
+        nc = r.get("uncertifiable_targets") or []
         if nc:
             l += ["Cibles qui plafonnent ce check, avec la part des dossiers SAINS ou elles",
-                  "se declenchent au seuil qu'il faudrait pour ne rien manquer:", ""]
-            for name, taux in nc:
-                l.append(f"- {name}: {taux:.1%}")
+                  "se declenchent au threshold qu'il faudrait pour ne rien manquer:", ""]
+            for name, rate in nc:
+                l.append(f"- {name}: {rate:.1%}")
             l += ["", "Sur ces cibles, la bonne reponse de l'outil n'est pas \"ce field est",
                   "vide\" mais \"je ne sais pas read_piece ce field\": meme capteur, consequences",
                   "opposees au filing. Elles restent dans le chiffre de tete ci-dessus, elles",
                   "ne sont pas retirees pour l'embellir.", ""]
-        rr = r.get("restreint")
+        rr = r.get("restricted")
         if rr:
             l += [f"Chiffre SECONDAIRE, a ne pas confondre avec celui de tete: si on ne demande",
                   f"a ce check que les {rr['cibles_gardees']} cibles sur "
-                  f"{rr['cibles_totales']} qu'il sait certifier, il tient un rappel de "
-                  f"{rr['rappel']:.3f} a {rr['fpr']:.4f} de faux positifs par target.", ""]
-        conj = r.get("conjonctions") or {}
-        pires = sorted(((k, c[0]) for k, c in conj.items() if c), key=lambda t: t[1]["rappel"])
-        if pires and pires[0][1]["rappel"] < 1.0:
-            l += ["Pires CROISEMENTS de deux facteurs. Une reading axe par axe peut mentir par",
-                  "omission: trois valeurs marginales toutes au-dessus du floor peuvent se",
+                  f"{rr['cibles_totales']} qu'il sait certifier, il tient un recall de "
+                  f"{rr['recall']:.3f} a {rr['fpr']:.4f} de wrong positifs par target.", ""]
+        conj = r.get("conjunctions") or {}
+        pires = sorted(((k, c[0]) for k, c in conj.items() if c), key=lambda t: t[1]["recall"])
+        if pires and pires[0][1]["recall"] < 1.0:
+            l += ["Pires CROISEMENTS de deux factors. Une reading axe par axe peut mentir par",
+                  "omission: trois values marginales toutes au-dessus du floor peuvent se",
                   "croiser en une cell qui passe dessous.", ""]
             for name, c in pires[:4]:
-                if c["rappel"] >= 1.0:
+                if c["recall"] >= 1.0:
                     continue
-                l.append(f"- {name} = {c['valeurs']}: rappel {c['rappel']:.3f} "
-                         f"[{c['ic'][0]:.3f}, {c['ic'][1]:.3f}] sur {c['n']} positifs"
+                l.append(f"- {name} = {c['values']}: recall {c['recall']:.3f} "
+                         f"[{c['ci'][0]:.3f}, {c['ci'][1]:.3f}] sur {c['n']} positifs"
                          + ("  <- borne haute sous le floor"
-                            if c["ic"][1] < RECALL_FLOOR else ""))
+                            if c["ci"][1] < RECALL_FLOOR else ""))
             l.append("")
         cf = r.get("noisy_targets") or []
         if cf:
@@ -1186,14 +1186,14 @@ def write_limits(resultats, chemin, n_couples, domaine, n_retenus, essais, crois
             for target, combien, total in cf[:6]:
                 l.append(f"- {target[0]} / {target[1]}: {combien} fois sur {total}")
             l.append("")
-        h = r.get("hors_domaine")
+        h = r.get("outside_domain")
         if h and h["n_pos"]:
-            l += [f"Hors domaine (dpi < {r['domaine']}), CAPTEURS BRUTS, c'est-a-dire ce que "
+            l += [f"Hors domain (dpi < {r['domain']}), CAPTEURS BRUTS, c'est-a-dire ce que "
                   "l'outil ferait",
-                  "s'il n'avait pas la regle d'abstention: rappel "
-                  f"{h['rappel']:.3f} [{h['ic_rappel'][0]:.3f}, {h['ic_rappel'][1]:.3f}], "
+                  "s'il n'avait pas la regle d'abstention: recall "
+                  f"{h['recall']:.3f} [{h['recall_ci'][0]:.3f}, {h['recall_ci'][1]:.3f}], "
                   f"declenchements sur dossier clean {h['fpr']:.4f} sur {h['n_neg']} cibles.",
-                  "Ces chiffres-la ne decrivent donc pas le produit, ils justifient la regle: "
+                  "Ces chiffres-la ne decrivent donc pas le produced, ils justifient la regle: "
                   "en",
                   "production, un check qui LIT s'abstient sous le floor au lieu de "
                   "produire",
@@ -1201,81 +1201,81 @@ def write_limits(resultats, chemin, n_couples, domaine, n_retenus, essais, crois
                   "mesure",
                   "ne peut pas dependre du comportement qu'elle sert a regler.", ""]
             if check == "resolution":
-                l += ["Pour CE check, ces declenchements hors domaine ne sont pas des faux",
+                l += ["Pour CE check, ces declenchements hors domain ne sont pas des wrong",
                       "positifs: c'est exactement son task. Il est la pour dire qu'une page",
                       "numerisee sous le floor ne doit pas etre jugee par les autres.", ""]
-        if r["tombees"]:
-            l += ["Frontiere par facteur, nombre de cellules tombees sur le total:", ""]
+        if r["fallen_cells"]:
+            l += ["Frontiere par facteur, nombre de cellules fallen_cells sur le total:", ""]
             for name, vals in r["frontier"].items():
                 l.append("- " + name + ": " + ", ".join(f"{v} -> {a}/{b}" for v, (a, b) in vals.items()))
             l.append("")
-            pires = sorted(r["tombees"].items(), key=lambda kv: kv[1][0])[:6]
-            l += ["Les pires cellules (angle, dpi, jpeg, sigma) et leur rappel:", ""]
+            pires = sorted(r["fallen_cells"].items(), key=lambda kv: kv[1][0])[:6]
+            l += ["Les pires cellules (angle, dpi, jpeg, sigma) et leur recall:", ""]
             for c, (rap, n) in pires:
                 l.append(f"- angle {c[0]}, {c[1]} dpi, JPEG {c[2]}, sigma {c[3]}: "
-                         f"rappel {rap:.2f} sur {n} graines")
+                         f"recall {rap:.2f} sur {n} graines")
             l.append("")
         else:
-            l += ["Aucune cell du domaine explore ne passe sous le floor.", ""]
-        l += ["Rappel par facteur, au seuil retenu:", ""]
-        for name, vals in r["facteurs"].items():
+            l += ["Aucune cell du domain explore ne passe sous le floor.", ""]
+        l += ["Rappel par facteur, au threshold retenu:", ""]
+        for name, vals in r["factors"].items():
             l.append("- " + name + ": " + ", ".join(
-                f"{v} -> {d['rappel']:.3f} [{d['ic'][0]:.2f}, {d['ic'][1]:.2f}]"
+                f"{v} -> {d['recall']:.3f} [{d['ci'][0]:.2f}, {d['ci'][1]:.2f}]"
                 for v, d in vals.items()))
         l.append("")
-    open(chemin, "w", encoding="utf-8").write("\n".join(l) + "\n")
+    open(path, "w", encoding="utf-8").write("\n".join(l) + "\n")
 
 
-def write_thresholds(resultats, chemin):
-    d = json.load(open(chemin, encoding="utf-8"))
+def write_thresholds(resultats, path):
+    d = json.load(open(path, encoding="utf-8"))
     for check, r in resultats.items():
         pt = r["point"]
         if pt is None:
             continue
         mesures = {
-            "rappel": round(r["validation"]["rappel"], 4),
-            "faux_positifs": round(r["validation"]["fpr"], 5),
-            "mesure_sur": "seed 37, jamais utilisee pour choisir le seuil",
-            "reglage": r["reglage_texte"],
-            "reglage_mesure": _reglage_utile(r["reglage"], check),
+            "recall": round(r["validation"]["recall"], 4),
+            "false_positives": round(r["validation"]["fpr"], 5),
+            "measured_with": "seed 37, jamais utilisee pour choisir le threshold",
+            "settings": r["settings_text"],
+            "measured_settings": _reglage_utile(r["settings"], check),
             "curve": f"grid/resultats/pr_{check}.csv",
-            "cellules_hors_domaine": f"{len(r['tombees'])}/{r['n_cellules']}",
-            "domaine_nominal_dpi": r.get("domaine"),
+            "cells_under_floor": f"{len(r['fallen_cells'])}/{r['n_cells']}",
+            "nominal_domain_dpi": r.get("domain"),
         }
-        if r.get("seuil_fige_par_definition"):
+        if r.get("threshold_frozen_by_definition"):
             d["thresholds"][check].update(mesures)
             d["thresholds"][check]["reading"] = reading_sentence(
-                check, r["reglage"], float(r["seuil"]),
+                check, r["settings"], float(r["threshold"]),
                 d["thresholds"][check].get("reading", ""))
             continue
         d["thresholds"][check] = {
-            "value": round(float(r["seuil"]), 4),
-            "origine": "grid",
-            "reading": reading_sentence(check, r["reglage"], float(r["seuil"]),
+            "value": round(float(r["threshold"]), 4),
+            "origin": "grid",
+            "reading": reading_sentence(check, r["settings"], float(r["threshold"]),
                                       d["thresholds"].get(check, {}).get("reading", "")),
-            "reglage": r["reglage_texte"],
-            "reglage_mesure": _reglage_utile(r["reglage"], check),
-            "rappel": round(r["validation"]["rappel"], 4),
-            "faux_positifs": round(r["validation"]["fpr"], 5),
-            "mesure_sur": "seed 37, jamais utilisee pour choisir le seuil",
+            "settings": r["settings_text"],
+            "measured_settings": _reglage_utile(r["settings"], check),
+            "recall": round(r["validation"]["recall"], 4),
+            "false_positives": round(r["validation"]["fpr"], 5),
+            "measured_with": "seed 37, jamais utilisee pour choisir le threshold",
             "curve": f"grid/resultats/pr_{check}.csv",
-            "cellules_hors_domaine": f"{len(r['tombees'])}/{r['n_cellules']}",
-            "domaine_nominal_dpi": r.get("domaine"),
+            "cells_under_floor": f"{len(r['fallen_cells'])}/{r['n_cells']}",
+            "nominal_domain_dpi": r.get("domain"),
         }
-        if "plancher_dpi" in r:
+        if "floor_dpi" in r:
             d["thresholds"][check].update({
-                "value": round(float(r["seuil"]), 4),
-                "reading": f"se fires sous {-r['seuil']:.1f} dpi estimes, soit le floor "
-                           f"de {r['plancher_dpi']} dpi moins une marge de "
-                           f"{r['marge_estimateur']:.1%}; le floor est lu sur le rappel des "
+                "value": round(float(r["threshold"]), 4),
+                "reading": f"se fires sous {-r['threshold']:.1f} dpi estimes, soit le floor "
+                           f"de {r['floor_dpi']} dpi moins une margin de "
+                           f"{r['estimator_margin']:.1%}; le floor est lu sur le recall des "
                            "checks qui dependent de l'OCR et non sur la curve de ce "
-                           "check, et la marge couvre dix fois l'erreur maximale mesuree de "
-                           f"l'estimateur ({r['erreur_max_estimateur']:.4%})",
-                "seuil_de_sa_propre_courbe": r["seuil_courbe_propre"],
-                "rappel_par_dpi_des_dependants": r["rappel_par_dpi_des_dependants"]})
-    d["mesure_le"] = "2026-08-21"
-    d["budget_faux_positifs"] = FP_BUDGET
-    json.dump(d, open(chemin, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
+                           "check, et la margin couvre dix fois l'erreur maximale mesuree de "
+                           f"l'estimateur ({r['max_estimator_error']:.4%})",
+                "own_curve_threshold": r["own_curve_threshold"],
+                "dependent_recall_by_dpi": r["dependent_recall_by_dpi"]})
+    d["measured_on"] = "2026-08-21"
+    d["false_positive_budget"] = FP_BUDGET
+    json.dump(d, open(path, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
 
 
 if __name__ == "__main__":

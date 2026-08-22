@@ -8,14 +8,14 @@ une value qui ne s'imprime jamais. Le filing, lui, lit la feuille.
 
 ## Ce que ca mesure
 
-Neuf checks, chacun avec un seuil LU sur une curve precision/rappel, pas choisi a la main.
+Neuf checks, chacun avec un threshold LU sur une curve precision/recall, pas choisi a la main.
 Grille de 384 cellules (angle x dpi x qualite JPEG x bruit) x 3 graines = 1152 dossiers,
-13 824 readings d'images, 121 minutes sur 13 processus. Le seuil est choisi sur les graines 11
+13 824 readings d'images, 121 minutes sur 13 processus. Le threshold est choisi sur les graines 11
 et 23; le chiffre ci-dessous est celui de la seed 37, jamais regardee avant.
 
-| check | ce qu'il attrape | capteur retenu | seuil | rappel | faux positifs par target |
+| check | ce qu'il attrape | capteur retenu | threshold | recall | faux positifs par target |
 |---|---|---|---|---|---|
-| required_field | un field required jamais rempli | ink ajoutee (seuil 128) | -0.345 | 1.000 | 0.00000 |
+| required_field | un field required jamais rempli | ink ajoutee (threshold 128) | -0.345 | 1.000 | 0.00000 |
 | required_checkbox | une case obligatoire non cochee | disque central 0.30 du cote | -14.38 | 1.000 | 0.00000 |
 | signature | une signature absente | components connexes | -342.1 | 1.000 | 0.00000 |
 | expiry | une piece perimee A L'HORLOGE CHOISIE | date lue par OCR pleine page | 0 (definition) | 1.000 | 0.00000 |
@@ -29,7 +29,7 @@ et 23; le chiffre ci-dessous est celui de la seed 37, jamais regardee avant.
 UN dossier fictif de trois formulaires (W-9, I-9, Cerfa 14011, page 1 pour chacun), UNE
 person inventee, UN seul defaut par check, rendus 1152 fois a travers un modele de bruit
 SYNTHETIQUE. Aucun scan reel n'est entre dans cette mesure. Les 1152 mesurent donc le modele
-de bruit et pas le monde: un rappel de 1,000 est celui du meme defaut revu 864 fois, pas celui
+de bruit et pas le monde: un recall de 1,000 est celui du meme defaut revu 864 fois, pas celui
 de 864 defauts differents. Ce que ces chiffres ne disent pas: ce que l'outil fait sur un autre
 formulaire, sur une autre facon de rater le meme check, ou sur une vraie vitre de scanner
 avec sa poussiere, son ombre de reliure et sa courbure de page. `LIMITES.md` detaille chacun
@@ -37,17 +37,17 @@ de ces trous, et l'un d'eux touche le capteur qui a gagne son duel.
 
 Le chiffre qu'un utilisateur ressent n'est pas celui de la colonne de droite, c'est celui du
 dossier entier: **4 dossiers sur 864 entierement sains portent au moins une alarme, soit
-0,46%**, et les quatre viennent du check des valeurs interdites.
+0,46%**, et les quatre viennent du check des values interdites.
 
 Un dossier fautif est refuse au filing: des mois de delai. Une gate qui crie pour rien perd
 sa credibilite, et une regle qui crie au loup fait survoler toutes celles d'a cote. Les deux
 couts ne sont pas du meme genre, et le point de fonctionnement est choisi avec cette asymetrie
-declaree: rappel le plus haut tenable sous 0,2% de faux positifs par target.
+declaree: recall le plus haut tenable sous 0,2% de faux positifs par target.
 
-## Le domaine, et ce qui se passe dehors
+## Le domain, et ce qui se passe dehors
 
-**Numerisation a 150 dpi ou plus.** En dessous, sensors bruts, le check des valeurs
-interdites tombe a 0,042 de rappel et la consistency se fires sur 84% des dossiers sains.
+**Numerisation a 150 dpi ou plus.** En dessous, sensors bruts, le check des values
+interdites tombe a 0,042 de recall et la consistency se fires sur 84% des dossiers sains.
 Ces deux chiffres ne decrivent pas le produit, ils justifient la regle qui suit: ils sont
 mesures SANS l'abstention, parce qu'une mesure ne peut pas dependre du comportement qu'elle
 sert a regler.
@@ -57,22 +57,22 @@ check qui LIT s'abstient sur la piece concernee**, avec un verdict "indecidable"
 pas "conforme". Avant cette regle, la consistency criait sur 456 des 864 dossiers portant une
 piece a 72 dpi, en comparant des jetons qu'elle n'avait pas su read_piece.
 
-Le seuil de resolution est le seul a ne pas sortir de sa propre curve: sa curve le poserait
+Le threshold de resolution est le seul a ne pas sortir de sa propre curve: sa curve le poserait
 a 111 dpi, l'endroit qui separe le mieux la variant fautive du reste. Mais la question que ce
 check doit poser n'est pas "cette page est-elle a 72 dpi", c'est "cette page est-elle assez
 nette pour que les AUTRES tiennent". Il est donc pose au floor, moins 1% de marge, la marge
 valant dix fois l'erreur maximale mesuree de l'estimateur de resolution (0,0133%).
 
-Dans ce domaine, l'outil manque quelque chose a un seul endroit, et il est nomme: le check
-des valeurs interdites descend a **0,889 de rappel [0,807, 0,939] sur 90 positifs** dans la
+Dans ce domain, l'outil manque quelque chose a un seul endroit, et il est nomme: le check
+des values interdites descend a **0,889 de recall [0,807, 0,939] sur 90 positifs** dans la
 conjonction 300 dpi ET JPEG 95 ET bruit 12 ET deskew de 0,5 degre ou plus. Sous ce demi
 degre, 30 sur 30. La borne haute de l'intervalle reste sous le floor de 95%, donc ce n'est
-pas du bruit d'echantillon. Un temoin a la meme cell en JPEG 30 rend 0,986: c'est bien la
+pas du bruit d'echantillon. Un control a la meme cell en JPEG 30 rend 0,986: c'est bien la
 compression, une compression forte effacant le grain du capteur qu'une compression legere
 garde. La part du mecanisme qui tient a l'angle reste une hypothese non testee.
 
-`LIMITES.md` donne le detail par check: rappel par facteur, pires cellules, pires
-croisements de deux facteurs, matrice de crosstalk, le suivi hors protocole de cette cell,
+`LIMITES.md` donne le detail par check: recall par facteur, pires cellules, pires
+croisements de deux factors, matrice de crosstalk, le suivi hors protocole de cette cell,
 et ce que la mesure ne couvre pas.
 
 ## Les deux duels entre sensors
@@ -82,9 +82,9 @@ le contredit.**
 
 Pour "ce field required est-il vide", quatre sensors concurrents:
 
-| capteur | rappel | faux positifs par target |
+| capteur | recall | faux positifs par target |
 |---|---|---|
-| ink ajoutee, seuil 128 (retenu) | 1.000 | 0.0000 |
+| ink ajoutee, threshold 128 (retenu) | 1.000 | 0.0000 |
 | OCR pleine page + OCR de zone, confiance minimale 0 | 1.000 | 0.0003 |
 | OCR seul, confiance minimale 10 et plus | 0.000 | 0.0000 |
 
@@ -104,14 +104,14 @@ degradations. Des qu'au moins 0,5% d'ink etrangere entre dans la zone, sur un fi
 
 | capteur | faux negatifs, un field vide declare rempli | faux positifs, un field rempli declare vide |
 |---|---|---|
-| ink, seuil 128 (RETENU) | **1.000** [0.975, 1.000] | 0.000 [0.000, 0.014] |
+| ink, threshold 128 (RETENU) | **1.000** [0.975, 1.000] | 0.000 [0.000, 0.014] |
 | union, confiance 0 | 0.272 [0.207, 0.347] | 0.030 [0.015, 0.059] |
 | OCR pleine page | 0.185 [0.132, 0.255] | 0.136 [0.100, 0.183] |
 | OCR de zone | 0.106 [0.066, 0.165] | 0.114 [0.081, 0.158] |
 
 Le capteur retenu rate **100% des fields vides** dans ces conditions, et ce sont des faux
 negatifs, le cote cher de l'asymetrie declaree plus haut: le filing refuse le dossier et
-l'outil n'a rien dit. La bascule est une falaise posee exactement sur le seuil publie de
+l'outil n'a rien dit. La bascule est une falaise posee exactement sur le threshold publie de
 0,345%, et les deux populations ne se chevauchent PAS D'UNE SEULE LECTURE: le capteur se
 fires 97 fois sur 97 jusqu'a 0,323% d'ink ajoutee, et 0 fois sur 167 a partir de
 0,380%. Il n'y a pas de zone grise, il y a une marche. Pour ce field de 15 770 pixels
@@ -119,16 +119,16 @@ canoniques, 0,35% vaut une
 tache de 9 x 8 px a 200 dpi, c'est-a-dire une poussiere sur la vitre du scanner. Un trait de
 stylo qui deborde a peine du field voisin ajoute deja 0,61%.
 
-Le seuil et le capteur n'ont PAS ete changes, et c'est delibere: cette sonde porte sur un
+Le threshold et le capteur n'ont PAS ete changes, et c'est delibere: cette sonde porte sur un
 seul field, deux cellules et trois formes de parasite dessinees a la main, n=151. Elle suffit
 a montrer qu'un choix de conception a ete tranche sur un terrain biaise; elle ne suffit pas a
-fixer un seuil. Le faire demanderait de rejouer la grid entiere avec l'ink parasite en
+fixer un threshold. Le faire demanderait de rejouer la grid entiere avec l'ink parasite en
 cinquieme facteur. En attendant, la ligne du tableau du duel qui dit 0,0000 de faux positifs
 pour l'ink reste vraie, et elle ne dit rien de ce que coute son unique mode d'echec.
 
 Pour "cette signature est-elle absente", ink differentielle contre components connexes:
-**egalite**. Les six reglages rendent exactement 1,000 de rappel et 0,0000 de faux positifs a
-tous les dpi. Ce corpus ne les distingue pas, et le reglage retenu n'est appuye par aucune
+**egalite**. Les six reglages rendent exactement 1,000 de recall et 0,0000 de faux positifs a
+tous les dpi. Ce corpus ne les distingue pas, et le settings retenu n'est appuye par aucune
 mesure. C'est un resultat, pas un vainqueur.
 
 ## Comment ca marche
@@ -216,9 +216,9 @@ Outillage local uniquement. Aucun service distant, aucune depense.
 ## Le corpus
 
 Trois formulaires VIERGES tels que leur administration les publie: W-9 (IRS) et I-9 (USCIS),
-domaine public 17 U.S.C. 105, et Cerfa 14011*02 (service-public.fr, Licence Ouverte 2.0
+domain public 17 U.S.C. 105, et Cerfa 14011*02 (service-public.fr, Licence Ouverte 2.0
 Etalab). Producteur, source, date de recuperation, licence et sha256 dans `corpus/CORPUS.md`,
-avec un test qui echoue dans les deux sens.
+avec un test qui echoue dans les deux direction.
 
 Jamais un document delivre a quelqu'un. Un document delivre ne se caviarde pas completement:
 le code-barres 2D encode l'identity et survit au rectangle noir, la couche de texte reste

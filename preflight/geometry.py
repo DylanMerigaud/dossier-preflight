@@ -1,4 +1,4 @@
-"""Les zones viennent du PDF lui-meme. Aucune coordonnee mesuree a la main."""
+"""Zones come from the PDF itself. No coordinate is measured by hand."""
 import os
 from dataclasses import dataclass
 
@@ -9,35 +9,35 @@ from . import CANON_DPI
 
 @dataclass(frozen=True)
 class Zone:
-    """Rectangle declare par l'AcroForm, en pixels du repere canonique."""
+    """A rectangle declared by the AcroForm, in canonical-frame pixels."""
     name: str
     page: int
     x0: int
     y0: int
     x1: int
     y1: int
-    genre: str          # /Tx field texte, /Btn case a cocher, /Push bouton, /Ch liste
+    kind: str          # /Tx text field, /Btn checkbox, /Push push button, /Ch list
 
     @property
-    def largeur(self):
+    def width(self):
         return self.x1 - self.x0
 
     @property
-    def hauteur(self):
+    def height(self):
         return self.y1 - self.y0
 
-    def expanded(self, marge):
-        return Zone(self.name, self.page, self.x0 - marge, self.y0 - marge,
-                    self.x1 + marge, self.y1 + marge, self.genre)
+    def expanded(self, margin):
+        return Zone(self.name, self.page, self.x0 - margin, self.y0 - margin,
+                    self.x1 + margin, self.y1 + margin, self.kind)
 
     def contains(self, cx, cy):
         return self.x0 <= cx <= self.x1 and self.y0 <= cy <= self.y1
 
 
 def declared_zones(pdf, page=1, dpi=CANON_DPI):
-    """Les rectangles que le formulaire declare, convertis en pixels ecran.
+    """The rectangles the form declares, converted to screen pixels.
 
-    Le PDF a son origine en bas a gauche et l'image en haut a gauche: d'ou le H - y.
+    A PDF has its origin bottom left and an image has it top left: hence the H - y.
     """
     p = PdfReader(pdf).pages[page - 1]
     H, s = float(p.mediabox.height), dpi / 72.0
@@ -53,12 +53,12 @@ def declared_zones(pdf, page=1, dpi=CANON_DPI):
 
 
 def _kind(o):
-    """Un bouton poussoir n'est pas une case a cocher.
+    """A push button is not a checkbox.
 
-    Le Cerfa 14011 porte deux poussoirs "Imprimer" et "Reinitialiser" declares /Btn comme les
-    vraies boxes. Les compter comme des boxes pollue le taux de faux positifs du check des
-    boxes obligatoires: ils ne seront jamais coches, par construction. Le drapeau /Ff les
-    distingue (bit 17 poussoir, bit 16 bouton radio).
+    Cerfa 14011 carries two push buttons, "Imprimer" and "Reinitialiser", declared /Btn just
+    like the real boxes. Counting them as boxes pollutes the false positive rate of the
+    required-checkbox check: by construction they will never be ticked. The /Ff flag tells
+    them apart (bit 17 push button, bit 16 radio button).
     """
     ft = str(o.get("/FT"))
     if ft != "/Btn":

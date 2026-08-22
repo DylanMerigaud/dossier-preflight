@@ -1,7 +1,7 @@
-"""Ce qu'un filing recoit vraiment: une page tournee, bruitee, floue, recompressee.
+"""What a counter actually receives: a page that is skewed, noisy, blurred and recompressed.
 
-L'ordre compte et il imite la chaine physique: la feuille est posee de travers (rotation),
-le capteur ajoute son bruit, l'optique floute, le pilote compresse en JPEG.
+The order matters and it mirrors the physical chain: the sheet is laid down crooked
+(rotation), the sensor adds its noise, the optics blur, the driver compresses to JPEG.
 """
 from dataclasses import dataclass, asdict
 
@@ -13,15 +13,15 @@ from . import CANON_DPI
 
 @dataclass(frozen=True)
 class Degradation:
-    """Une cell de la grid. dpi est le dpi de NUMERISATION, pas le repere canonique."""
+    """One cell of the grid. `dpi` is the SCANNING dpi, not the canonical frame."""
     angle: float = 0.0
     dpi: int = CANON_DPI
     jpeg: int = 95
     sigma: float = 0.0
     blur: float = 0.4
     seed: int = 0
-    quarter_turns: int = 0          # rotation grossiere en quarts de tour: 0, 1, 2, 3
-    crop: float = 0.0      # fraction de la hauteur coupee en bas, page tronquee
+    quarter_turns: int = 0   # coarse rotation in quarter turns: 0, 1, 2, 3
+    crop: float = 0.0        # fraction of the height cut off at the bottom, truncated page
 
     def key(self):
         return (f"a{self.angle}_d{self.dpi}_q{self.jpeg}_s{self.sigma}"
@@ -31,9 +31,14 @@ class Degradation:
         return asdict(self)
 
 
-def apply(gris, deg):
-    """Applique la degradation a une page DEJA rendue au dpi voulu. Retour: uint8 (H, W)."""
-    im = Image.fromarray(gris)
+def apply(grey, deg):
+    """Degrade a page ALREADY rendered at the wanted dpi. Returns uint8 (H, W).
+
+    Every field is a no-op at its neutral value, so Degradation(angle=0, jpeg=100, sigma=0,
+    blur=0) returns the page untouched. That is what the command line uses on real scans: the
+    grid degrades, production does not.
+    """
+    im = Image.fromarray(grey)
     if deg.quarter_turns:
         im = im.rotate(-90 * deg.quarter_turns, expand=True, fillcolor=255)
     if deg.crop:
@@ -49,8 +54,8 @@ def apply(gris, deg):
         im = im.filter(ImageFilter.GaussianBlur(deg.blur))
     if deg.jpeg < 100:
         import io
-        tampon = io.BytesIO()
-        im.save(tampon, format="JPEG", quality=deg.jpeg)
-        tampon.seek(0)
-        im = Image.open(tampon).convert("L")
+        buffer = io.BytesIO()
+        im.save(buffer, format="JPEG", quality=deg.jpeg)
+        buffer.seek(0)
+        im = Image.open(buffer).convert("L")
     return np.asarray(im)

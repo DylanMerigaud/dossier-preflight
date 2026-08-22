@@ -1,18 +1,18 @@
-"""Les checks: du refus de filing, pas de l'extraction.
+"""The checks: counter rejection, not extraction.
 
-Chacun rend un SCORE CONTINU oriente dans le meme sens (plus haut = plus de raison de
-refuser) et le compare a un seuil. Cette orientation unique est ce qui permet de plot une
-curve precision/rappel par check et d'y LIRE le point de fonctionnement, au lieu de
-choisir un nombre a la main.
+Each one returns a CONTINUOUS SCORE oriented the same way (higher = more reason to reject)
+and compares it to a threshold. That single orientation is what makes it possible to plot a
+precision/recall curve per check and READ the operating point off it, instead of picking a
+number by hand.
 
-LA PERTE EST ASYMETRIQUE, ET ELLE EST DECLAREE ICI:
-  un FAUX NEGATIF, c'est le filing qui refuse le dossier: des mois de delai, une convocation
-  a reprendre, parfois une piece a redemander a une administration etrangere.
-  un FAUX POSITIF, c'est la gate qui crie sur un dossier clean: on cesse de la croire, et une
-  regle qui crie au loup fait survoler toutes celles d'a cote.
-Le premier coute plus cher que le second, mais le second detruit l'outil. Le point de
-fonctionnement retenu vise donc le rappel le plus haut ATTEIGNABLE a taux de faux positifs
-tenu, et ce taux tenu est ecrit dans thresholds.json a cote de chaque value.
+THE LOSS IS ASYMMETRIC, AND IT IS DECLARED HERE:
+  a FALSE NEGATIVE is the counter rejecting the dossier: months of delay, a summons to start
+  again, sometimes a document to request again from a foreign administration.
+  a FALSE POSITIVE is the gate crying on a clean dossier: people stop believing it, and a rule
+  that cries wolf makes every rule next to it get skimmed.
+The first costs more than the second, but the second destroys the tool. The retained operating
+point therefore aims for the highest ATTAINABLE recall at a held false positive rate, and that
+held rate is written in thresholds.json next to each value.
 """
 import datetime as dt
 import re
@@ -23,17 +23,17 @@ from .sensors import normalize
 from .geometry import declared_zones
 
 CHECKS = ("required_field", "required_checkbox", "signature", "expiry", "consistency",
-             "forbidden_value", "resolution", "cropped_page", "rotated_page")
+          "forbidden_value", "resolution", "cropped_page", "rotated_page")
 
 
 @dataclass(frozen=True)
 class Settings:
-    """Les parametres de nuisance que la grid balaie, pas des thresholds de decision."""
+    """The nuisance parameters the grid sweeps, not decision thresholds."""
     min_conf: float = 40.0
     disc_ratio: float = 0.42
     ink_threshold: int = 160
-    signature_sensor: str = "components"     # "components" ou "ink", duel A/B
-    text_sensor: str = "union"               # "page", "zone", "union" ou "ink", duel A/B
+    signature_sensor: str = "components"     # "components" or "ink", A/B duel
+    text_sensor: str = "union"               # "page", "zone", "union" or "ink", A/B duel
 
 
 @dataclass(frozen=True)
@@ -41,19 +41,19 @@ class Finding:
     check: str
     piece: str
     target: str
-    score: float          # None quand le check ne peut pas conclure
+    score: float          # None when the check cannot conclude
     fires: bool
     detail: str = ""
 
 
 def _alnum(words):
-    """Le nombre de caracteres alphanumeriques AJOUTES lus dans la zone.
+    """The number of ADDED alphanumeric characters read inside the zone.
 
-    C'est la mesure du check "field required", et elle a remplace "confiance du mot le plus
-    sur" apres mesure: sur le Cerfa, l'OCR de zone lit les bordures du field comme trois
-    barres verticales avec une confiance de 97. La confiance disait donc "ce field est
-    rempli" sur un field VIDE, ce qui est un faux negatif, le cote cher de l'asymetrie. Une
-    barre verticale ne porte aucun caractere alphanumerique; un name en porte treize.
+    This is the measurement behind the "required field" check, and it replaced "confidence of
+    the most confident word" after measurement: on the Cerfa, per zone OCR reads the field
+    borders as three vertical bars at confidence 97. Confidence therefore said "this field is
+    filled" about an EMPTY field, which is a false negative, the expensive side of the
+    asymmetry. A vertical bar carries no alphanumeric character; a surname carries thirteen.
     """
     return sum(len(re.sub(r"[^0-9A-Za-z]", "", m[0])) for m in words)
 
@@ -62,26 +62,26 @@ def _key(t):
     return re.sub(r"[^0-9a-z]", "", normalize(t))
 
 
-def _tokens(textes):
-    return {j for t in textes for j in re.findall(r"[0-9a-z]+", normalize(t)) if len(j) >= 2}
+def _tokens(texts):
+    return {j for t in texts for j in re.findall(r"[0-9a-z]+", normalize(t)) if len(j) >= 2}
 
 
 def _overlap(a, b):
-    """Est-ce que tout ce que dit la plus petite reading est aussi dit par la plus grande.
+    """Is everything the smaller reading says also said by the larger one.
 
-    Deux choix, tous deux payes par la mesure:
-      - ressemblance et non egalite. Le Cerfa fait read_piece "LDES ACACIAS": la bordure gauche du
-        field se colle au mot, et un recouvrement de jetons EXACT tombe alors a 0,50 sur un
-        dossier SAIN. "ldes" contre "des" ressemble a 0,86.
-      - le PIRE jeton et non la moyenne. Sur l'address divergente, la moyenne est tiree vers
-        le haut par les jetons qui coincident encore et la separation tombe a 0,07 contre
-        0,37. Le pire jeton donne 0,14 contre 0,73: c'est la divergence d'UNE data qu'on
-        cherche, pas la ressemblance globale de deux pieces.
+    Two choices, both paid for by measurement:
+      - similarity and not equality. The Cerfa gets read as "LDES ACACIAS": the field's left
+        border sticks to the word, and EXACT token overlap then drops to 0.50 on a CLEAN
+        dossier. "ldes" against "des" is similar at 0.86.
+      - the WORST token, not the mean. On the diverging address the mean is pulled up by the
+        tokens that still coincide and the separation falls to 0.07 against 0.37. The worst
+        token gives 0.14 against 0.73: what we are looking for is ONE piece of data diverging,
+        not the overall similarity of two documents.
     """
     if not a or not b:
         return 0.0
-    petit, grand = (a, b) if len(a) <= len(b) else (b, a)
-    return min(max(_similarity(x, y) for y in grand) for x in petit)
+    small, large = (a, b) if len(a) <= len(b) else (b, a)
+    return min(max(_similarity(x, y) for y in large) for x in small)
 
 
 def _similarity(a, b):
@@ -89,58 +89,57 @@ def _similarity(a, b):
 
 
 def _best_ngram(words, target, n_max=4):
-    """La meilleure ressemblance entre une value cherchee et une suite de words lus.
+    """The best similarity between a wanted value and a run of words read on the page.
 
-    Le filtre de longueur n'est pas une optimisation gratuite: deux chaines dont les
-    longueurs different d'un facteur deux ne peuvent pas se ressembler a plus de 2/3, donc
-    les comparer ne peut pas changer le maximum. Il fait tenir le balayage de la grid en
-    minutes au lieu d'heures.
+    The length filter is not a free optimisation: two strings whose lengths differ by a factor
+    of two cannot be more than 2/3 similar, so comparing them cannot change the maximum. It is
+    what keeps the grid sweep down to minutes instead of hours.
     """
-    but = _key(target)
-    if not but or not words:
+    goal = _key(target)
+    if not goal or not words:
         return 0.0
-    textes = [m[0] for m in sorted(words, key=lambda m: (m[2] // 20, m[1]))]
-    cles = [_key(t) for t in textes]
+    texts = [m[0] for m in sorted(words, key=lambda m: (m[2] // 20, m[1]))]
+    keys = [_key(t) for t in texts]
     best = 0.0
-    for n in range(1, min(n_max, len(cles)) + 1):
-        for i in range(len(cles) - n + 1):
-            bout = "".join(cles[i:i + n])
-            if not bout or not (0.5 * len(but) <= len(bout) <= 2.0 * len(but)):
+    for n in range(1, min(n_max, len(keys)) + 1):
+        for i in range(len(keys) - n + 1):
+            run = "".join(keys[i:i + n])
+            if not run or not (0.5 * len(goal) <= len(run) <= 2.0 * len(goal)):
                 continue
-            best = max(best, _similarity(bout, but))
+            best = max(best, _similarity(run, goal))
     return best
 
 
 _ZONE_MEMO = {}
 
 
-def zones(gab):
-    key = (gab.pdf, gab.page)
+def zones(tpl):
+    key = (tpl.pdf, tpl.page)
     if key not in _ZONE_MEMO:
-        _ZONE_MEMO[key] = declared_zones(gab.pdf, gab.page)
+        _ZONE_MEMO[key] = declared_zones(tpl.pdf, tpl.page)
     return _ZONE_MEMO[key]
 
 
-def _read_date(lec, gab, field, reg):
-    """La date telle qu'elle est VRAIMENT imprimee, pas celle que le PDF pretend porter."""
-    z = zones(gab).get(field)
+def _read_date(reading, tpl, name, settings):
+    """The date as it is REALLY printed, not the one the PDF claims to carry."""
+    z = zones(tpl).get(name)
     if z is None:
         return None, ""
-    words = lec.zone_words(z, reg.min_conf, capteur=reg.text_sensor)
+    words = reading.zone_words(z, settings.min_conf, sensor=settings.text_sensor)
     raw = " ".join(m[0] for m in sorted(words, key=lambda m: m[1]))
-    chiffres = re.sub(r"\D", "", raw)
-    if len(chiffres) != 8:
+    digits = re.sub(r"\D", "", raw)
+    if len(digits) != 8:
         return None, raw
-    shape = "%m%d%Y" if gab.date_format == "us" else "%d%m%Y"
+    shape = "%m%d%Y" if tpl.date_format == "us" else "%d%m%Y"
     try:
-        return dt.datetime.strptime(chiffres, shape).date(), raw
+        return dt.datetime.strptime(digits, shape).date(), raw
     except ValueError:
         return None, raw
 
 
-# Chaque check ne depend que d'une poignee de reglages. L'analyse s'en sert pour ne
-# sweep que ce qui compte: sweep les 288 combinations pour les neuf checks couterait
-# 288 evaluations completes la ou 12 suffisent au check des fields required.
+# Each check only depends on a handful of settings. The analysis uses this to sweep only what
+# matters: sweeping all 288 combinations for the nine checks would cost 288 full evaluations
+# where 12 are enough for the required-field check.
 NUISANCES = {
     "required_field": ("min_conf", "text_sensor", "ink_threshold"),
     "required_checkbox": ("disc_ratio", "ink_threshold"),
@@ -155,7 +154,7 @@ NUISANCES = {
 
 
 def measured_settings():
-    """Les reglages que la grid a retenus, un par check. Fallback: les valeurs de spike."""
+    """The settings the grid retained, one per check. Fallback: the spike values."""
     from .thresholds import load_settings
     base = Settings()
     return {c: replace(base, **{k: v for k, v in (load_settings().get(c) or {}).items()
@@ -163,176 +162,177 @@ def measured_settings():
             for c in CHECKS}
 
 
-def evaluate(readings, ref, clock="filing", reg=None, thresholds=None, checks=None,
-            abstention=True):
-    """Tous les constats d'un dossier, a une clock et un jeu de thresholds donnes.
+def evaluate(readings, ref, clock="filing", settings=None, thresholds=None, checks=None,
+             abstention=True):
+    """Every finding of a dossier, at a given clock and a given set of thresholds.
 
-    `checks` restreint le calcul: l'analyse de la grid appelle ce meme code un check
-    a la fois, pour qu'il n'existe jamais deux implementations d'un check, celle qui
-    tourne et celle qui est mesuree.
+    `checks` restricts the computation: the grid analysis calls this same code one check at a
+    time, so that a check never has two implementations, the one that ships and the one that
+    is measured.
 
-    `abstention=False` DEBRANCHE le refus de juger une piece sous le floor, et la grid
-    s'en sert pour choisir ce floor justement. Sans ce debranchement il y a une boucle:
-    l'abstention lit le seuil de resolution, la recherche de domaine mesure des checks qui
-    s'abstiennent donc ne manquent plus rien, le domaine s'elargit jusqu'au dpi le plus bas,
-    et le seuil de resolution le suit. Mesure au 2026-08-21: le domaine tombait de 150 a 96
-    dpi d'une publication a l'autre, et serait remonte a la suivante. Une mesure ne peut pas
-    dependre du comportement qu'elle sert a regler.
+    `abstention=False` DISABLES the refusal to judge a piece below the floor, and the grid
+    uses that to choose the floor in the first place. Without the switch there is a loop:
+    abstention reads the resolution threshold, the domain search measures checks that abstain
+    and therefore miss nothing, the domain widens to the lowest dpi, and the resolution
+    threshold follows it down. Measured 2026-08-21: the domain fell from 150 to 96 dpi from one
+    publication to the next, and would have climbed back at the following one. A measurement
+    cannot depend on the behaviour it is used to tune.
     """
     from .thresholds import load_thresholds
     thresholds = thresholds or load_thresholds()
-    actifs = set(checks) if checks is not None else set(CHECKS)
-    # reg=None veut dire "prends ce que la grid a mesure", et c'est le mode normal. La grid
-    # elle-meme passe un reglage explicite, puisque c'est justement ce qu'elle balaie.
-    par_controle = {c: reg for c in CHECKS} if reg is not None else measured_settings()
+    active = set(checks) if checks is not None else set(CHECKS)
+    # settings=None means "take what the grid measured", and that is the normal mode. The grid
+    # itself passes explicit settings, since sweeping them is precisely its job.
+    per_check = {c: settings for c in CHECKS} if settings is not None else measured_settings()
     floor = -thresholds["resolution"]
-    date_ref = ref.clock(clock)
+    ref_date = ref.clock(clock)
     out = []
-    for piece_id, nom_gab in ref.pieces:
-        lec = readings.get(piece_id)
-        if lec is None:
+    for piece_id, template_name in ref.pieces:
+        reading = readings.get(piece_id)
+        if reading is None:
             continue
-        gab = ref.templates[nom_gab]
-        Z = zones(gab)
-        # UNE PIECE SOUS LE PLANCHER NE SE JUGE PAS, ELLE SE SIGNALE. Les checks qui
-        # LISENT s'abstiennent, avec un score None qui vaut "indecidable" et non "conforme".
-        # Mesure du 2026-08-21 sans cette regle: la consistency se declenchait sur 52,8% des
-        # dossiers portant une piece a 72 dpi, en comparant des jetons qu'elle n'avait pas su
-        # read_piece. Ce n'etait pas une erreur de seuil, c'etait une reponse a une question qu'il
-        # ne fallait pas poser. Le check de resolution, lui, crie: c'est son task.
-        illisible = abstention and lec.source_dpi < floor
+        tpl = ref.templates[template_name]
+        Z = zones(tpl)
+        # A PIECE BELOW THE FLOOR IS NOT JUDGED, IT IS FLAGGED. The checks that READ abstain,
+        # with a score of None meaning "undecidable" and not "compliant". Measured 2026-08-21
+        # without this rule: consistency fired on 52.8% of the dossiers carrying a piece at 72
+        # dpi, comparing tokens it had not managed to read. That was not a threshold error, it
+        # was an answer to a question that should not have been asked. The resolution check
+        # does fire: that is its job.
+        unreadable = abstention and reading.source_dpi < floor
 
-        # C1 field required jamais rempli. Capteur: POSITIONS DE MOTS, pas l'ink. Le spike a
-        # mesure qu'un field texte VIDE lit encore +2,44% d'ink contre +4,5 pour un rempli.
-        lit_le_texte = par_controle["required_field"].text_sensor != "ink"
-        for role in (gab.required if "required_field" in actifs else ()):
-            for field in gab.field(role):
-                z = Z.get(field)
+        # C1 required field never filled. Sensor: WORD POSITIONS, not ink. The spike measured
+        # that an EMPTY text field still reads +2.44% ink against +4.5% for a filled one.
+        reads_text = per_check["required_field"].text_sensor != "ink"
+        for role in (tpl.required if "required_field" in active else ()):
+            for name in tpl.field_ids(role):
+                z = Z.get(name)
                 if z is None:
                     continue
-                if illisible and lit_le_texte:
-                    out.append(Finding("required_field", piece_id, field, None, False,
-                                       "piece sous le floor de resolution"))
+                if unreadable and reads_text:
+                    out.append(Finding("required_field", piece_id, name, None, False,
+                                       "piece below the resolution floor"))
                     continue
-                r = par_controle["required_field"]
+                r = per_check["required_field"]
                 if r.text_sensor == "ink":
-                    # Le capteur que le spike accusait: l'ink ajoutee dans la zone. Il ne
-                    # sait pas ce qui est ecrit, seulement qu'il y a quelque chose de plus
-                    # sombre qu'avant, et une bordure sale suffit a le faire mentir.
-                    d = lec.field_ink.get(field, {}).get(str(r.ink_threshold))
+                    # The sensor the spike accused: ink added inside the zone. It does not know
+                    # what is written, only that something is darker than before, and a dirty
+                    # border is enough to make it lie.
+                    d = reading.field_ink.get(name, {}).get(str(r.ink_threshold))
                     if d is None:
                         continue
                     score, detail = -float(d), f"ink {d:+.2f}"
                 else:
-                    words = lec.zone_words(z, r.min_conf, capteur=r.text_sensor)
+                    words = reading.zone_words(z, r.min_conf, sensor=r.text_sensor)
                     score, detail = -float(_alnum(words)), " ".join(m[0] for m in words)[:40]
-                out.append(Finding("required_field", piece_id, field, score,
+                out.append(Finding("required_field", piece_id, name, score,
                                    score > thresholds["required_field"], detail))
 
-        # C2 case obligatoire non cochee. Encre differentielle dans un disque CENTRAL: le
-        # trait de la case reste dehors, sinon on mesure le formulaire et pas la coche.
-        for role in (gab.required_boxes if "required_checkbox" in actifs else ()):
-            field = gab.boxes[role]
-            r = par_controle["required_checkbox"]
-            d = lec.boxes.get(field, {}).get(f"{r.disc_ratio}|{r.ink_threshold}")
+        # C2 required checkbox left unticked. Differential ink inside a CENTRAL disc: the box
+        # outline stays outside, otherwise we measure the form and not the tick.
+        for role in (tpl.required_boxes if "required_checkbox" in active else ()):
+            name = tpl.boxes[role]
+            r = per_check["required_checkbox"]
+            d = reading.boxes.get(name, {}).get(f"{r.disc_ratio}|{r.ink_threshold}")
             if d is None:
                 continue
-            out.append(Finding("required_checkbox", piece_id, field, -d,
+            out.append(Finding("required_checkbox", piece_id, name, -d,
                                -d > thresholds["required_checkbox"], f"delta {d:+.1f}"))
 
-        # C3 signature absente. Deux sensors concurrents, le duel est tranche par la grid.
-        for role in (gab.required_signatures if "signature" in actifs else ()):
-            field = gab.signatures[role]
-            r = par_controle["signature"]
-            v = lec.signatures.get(field, {}).get(str(r.ink_threshold))
+        # C3 missing signature. Two competing sensors, the duel is settled by the grid.
+        for role in (tpl.required_signatures if "signature" in active else ()):
+            name = tpl.signatures[role]
+            r = per_check["signature"]
+            v = reading.signatures.get(name, {}).get(str(r.ink_threshold))
             if v is None:
                 continue
-            taux, n, aire, diag = v
-            score = -diag if r.signature_sensor == "components" else -taux
-            out.append(Finding("signature", piece_id, field, score,
+            rate, n, area, diag = v
+            score = -diag if r.signature_sensor == "components" else -rate
+            out.append(Finding("signature", piece_id, name, score,
                                score > thresholds["signature"],
-                               f"taux {taux:+.1f} n {n} diag {diag:.0f}"))
+                               f"rate {rate:+.1f} n {n} diag {diag:.0f}"))
 
-        # C4 date perimee AU JOUR DU DEPOT. Deux clocks: la meme piece peut etre bonne pour
-        # un dossier et perimee pour l'autre au meme instant, et c'est l'clock qui tranche,
-        # jamais la date du jour implicite.
-        for role, genre in (gab.dates.items() if "expiry" in actifs else ()):
-            if genre != "expiration":
+        # C4 expired ON THE DAY OF FILING. Two clocks: the same piece can be good for one
+        # dossier and expired for another at the very same instant, and it is the clock that
+        # decides, never an implicit today.
+        for role, kind in (tpl.dates.items() if "expiry" in active else ()):
+            if kind != "expiration":
                 continue
-            for field in gab.field(role):
-                if illisible:
-                    out.append(Finding("expiry", piece_id, field, None, False,
-                                       "piece sous le floor de resolution"))
+            for name in tpl.field_ids(role):
+                if unreadable:
+                    out.append(Finding("expiry", piece_id, name, None, False,
+                                       "piece below the resolution floor"))
                     continue
-                date, raw = _read_date(lec, gab, field, par_controle["expiry"])
+                date, raw = _read_date(reading, tpl, name, per_check["expiry"])
                 if date is None:
-                    out.append(Finding("expiry", piece_id, field, None, False,
-                                       f"illisible {raw[:24]!r}"))
+                    out.append(Finding("expiry", piece_id, name, None, False,
+                                       f"unreadable {raw[:24]!r}"))
                     continue
-                jours = (date_ref - date).days
-                out.append(Finding("expiry", piece_id, field, float(jours),
-                                   jours > thresholds["expiry"],
-                                   f"{date} vs {clock} {date_ref}"))
+                days = (ref_date - date).days
+                out.append(Finding("expiry", piece_id, name, float(days),
+                                   days > thresholds["expiry"],
+                                   f"{date} vs {clock} {ref_date}"))
 
-        # C7 sous le floor de resolution. Le dpi n'est pas lu dans une metadonnee (un vrai
-        # scan n'en a pas): il est ESTIME par l'scale qui recale la page sur le blank.
-        if "resolution" in actifs:
-            out.append(Finding("resolution", piece_id, "", -lec.source_dpi,
-                               -lec.source_dpi > thresholds["resolution"],
-                               f"{lec.source_dpi:.0f} dpi estimes"))
-        # C8 page coupee.
-        if "cropped_page" in actifs:
-            out.append(Finding("cropped_page", piece_id, "", 1.0 - lec.coverage,
-                               1.0 - lec.coverage > thresholds["cropped_page"],
-                               f"coverage {lec.coverage:.3f}"))
-        # C9 page tournee. Score continu: de combien le quarter_turns retenu bat le quarter_turns d'origine.
-        if "rotated_page" in actifs:
-            out.append(Finding("rotated_page", piece_id, "", lec.orientation_margin,
-                               lec.orientation_margin > thresholds["rotated_page"],
-                               f"quarter_turns {lec.quarter_turns}"))
+        # C7 below the resolution floor. The dpi is not read from metadata (a real scan has
+        # none): it is ESTIMATED from the scale that registers the page onto the blank.
+        if "resolution" in active:
+            out.append(Finding("resolution", piece_id, "", -reading.source_dpi,
+                               -reading.source_dpi > thresholds["resolution"],
+                               f"{reading.source_dpi:.0f} estimated dpi"))
+        # C8 cropped page.
+        if "cropped_page" in active:
+            out.append(Finding("cropped_page", piece_id, "", 1.0 - reading.coverage,
+                               1.0 - reading.coverage > thresholds["cropped_page"],
+                               f"coverage {reading.coverage:.3f}"))
+        # C9 rotated page. Continuous score: by how much the chosen quarter turn beats the
+        # original one.
+        if "rotated_page" in active:
+            out.append(Finding("rotated_page", piece_id, "", reading.orientation_margin,
+                               reading.orientation_margin > thresholds["rotated_page"],
+                               f"quarter turns {reading.quarter_turns}"))
 
-        # C6 value interdite qui reapparait. Comparaison sur la shape NUE (sans separateurs):
-        # un number interdit reste interdit qu'il soit imprime 999-99-9999 ou 999999999.
-        added_words = (lec.all_words(par_controle["forbidden_value"].min_conf)
-                        if "forbidden_value" in actifs and not illisible else [])
-        for val in (ref.forbidden_values if "forbidden_value" in actifs else ()):
-            if illisible:
+        # C6 forbidden value reappearing. Compared on the BARE form (no separators): a
+        # forbidden number stays forbidden whether printed 999-99-9999 or 999999999.
+        page_words = (reading.all_words(per_check["forbidden_value"].min_conf)
+                      if "forbidden_value" in active and not unreadable else [])
+        for val in (ref.forbidden_values if "forbidden_value" in active else ()):
+            if unreadable:
                 out.append(Finding("forbidden_value", piece_id, val, None, False,
-                                   "piece sous le floor de resolution"))
+                                   "piece below the resolution floor"))
                 continue
-            s = _best_ngram(added_words, val)
+            s = _best_ngram(page_words, val)
             out.append(Finding("forbidden_value", piece_id, val, s,
-                               s > thresholds["forbidden_value"], f"ressemblance {s:.2f}"))
+                               s > thresholds["forbidden_value"], f"similarity {s:.2f}"))
 
-    # C5 meme data divergente entre deux pieces. Mesuree par RECOUVREMENT DE JETONS, sans
-    # passer par le reference: deux pieces peuvent se contredire alors qu'aucune des deux
-    # n'est celle qu'on attendait.
-    for coh in (ref.consistencies if "consistency" in actifs else ()):
-        lus = []
-        illisibles = []
-        for l in coh["readings"]:
-            lec = readings.get(l["piece"])
-            if lec is None:
+    # C5 the same data diverging between two pieces. Measured by TOKEN OVERLAP, without going
+    # through the reference: two pieces can contradict each other even when neither of them is
+    # the one that was expected.
+    for cons in (ref.consistencies if "consistency" in active else ()):
+        read = []
+        unreadable_pieces = []
+        for side in cons["readings"]:
+            reading = readings.get(side["piece"])
+            if reading is None:
                 continue
-            if abstention and lec.source_dpi < floor:
-                illisibles.append(l["piece"])
+            if abstention and reading.source_dpi < floor:
+                unreadable_pieces.append(side["piece"])
                 continue
-            gab = ref.templates[dict(ref.pieces)[l["piece"]]]
-            for field in gab.field(l["field"]):
-                z = zones(gab).get(field)
+            tpl = ref.templates[dict(ref.pieces)[side["piece"]]]
+            for name in tpl.field_ids(side["field"]):
+                z = zones(tpl).get(name)
                 if z is not None:
-                    rc = par_controle["consistency"]
-                    lus.append((l["piece"], _tokens(
-                        m[0] for m in lec.zone_words(z, rc.min_conf, capteur=rc.text_sensor))))
-        if illisibles:
-            out.append(Finding("consistency", "+".join(illisibles), coh["data"], None, False,
-                               "piece sous le floor de resolution"))
+                    rc = per_check["consistency"]
+                    read.append((side["piece"], _tokens(
+                        m[0] for m in reading.zone_words(z, rc.min_conf, sensor=rc.text_sensor))))
+        if unreadable_pieces:
+            out.append(Finding("consistency", "+".join(unreadable_pieces), cons["data"], None,
+                               False, "piece below the resolution floor"))
             continue
-        for i in range(len(lus)):
-            for j in range(i + 1, len(lus)):
-                (pa, a), (pb, b) = lus[i], lus[j]
-                rec = _overlap(a, b)
-                out.append(Finding("consistency", f"{pa}+{pb}", coh["data"], 1.0 - rec,
-                                   1.0 - rec > thresholds["consistency"],
+        for i in range(len(read)):
+            for j in range(i + 1, len(read)):
+                (pa, a), (pb, b) = read[i], read[j]
+                overlap = _overlap(a, b)
+                out.append(Finding("consistency", f"{pa}+{pb}", cons["data"], 1.0 - overlap,
+                                   1.0 - overlap > thresholds["consistency"],
                                    f"{sorted(a)} vs {sorted(b)}"[:70]))
     return out

@@ -1,27 +1,27 @@
-"""Ramener un scan dans le repere du blank, AVANT que la moindre coordonnee soit lue.
+"""Bring a scan into the blank's frame, BEFORE a single coordinate is read.
 
-Le spike a paye cette lecon: l'ink lue dans les zones d'un scan tourne de 0,45 deg a
-annonce 8 boxes cochees sur 8 alors que rien n'etait coche. Un check par coordonnees sur
-une page non redressee ne mesure pas ce qu'il croit measure.
+The spike paid for this lesson: ink measured inside the zones of a scan rotated by 0.45 deg
+reported 8 ticked boxes out of 8 when nothing was ticked. A coordinate-based check on a page
+that has not been deskewed does not measure what it thinks it measures.
 
-Deux etages:
+Two stages:
 
-  deskew  axe puis angle fin, par maximisation de la variance du profil de projection
-             horizontal, grossier puis fin. Trois pieges mesures le 2026-08-21 sur les
-             cellules dures:
-               - reduire d'un FACTEUR fixe (/8) donne 102 px de large a 96 dpi et l'angle
-                 devient introuvable. On normalise a une LARGEUR target.
-               - le seuil d'ink fixe a 160 rate les petits angles sur image reduite, parce
-                 que le reechantillonnage eclaircit les traits. Otsu par image le corrige.
-               - sur une page couchee a 90 deg le profil horizontal n'a plus de structure de
-                 lignes: l'angle fin part chercher dans le vide et rend -0,15 au lieu de
-                 -0,50. L'AXE se decide donc AVANT l'angle, par le meme critere.
-             Cout 19 fois moindre que la recherche naive pleine page, meme angle trouve.
+  deskew    axis first, then fine angle, by maximising the variance of the horizontal
+            projection profile, coarse then fine. Three traps measured 2026-08-21 on the hard
+            cells:
+              - downscaling by a fixed FACTOR (/8) gives 102 px of width at 96 dpi and the
+                angle becomes impossible to find. Normalise to a TARGET WIDTH instead.
+              - a fixed ink threshold of 160 misses small angles on a downscaled image,
+                because resampling lightens the strokes. Per-image Otsu fixes it.
+              - on a page lying at 90 deg the horizontal profile no longer has line structure:
+                the fine angle search wanders and returns -0.15 instead of -0.50. The AXIS is
+                therefore decided BEFORE the angle, by the same criterion.
+            19 times cheaper than the naive full-page search, and it finds the same angle.
 
-  register    orientation en quarts de tour, scale et translation, par correlation croisee
-             contre le VIERGE. C'est ce qui rend le repere canonique independant du dpi de
-             numerisation, et c'est aussi ce qui donne le dpi source estime et la coverage
-             de page sans read_piece la moindre metadonnee (un vrai scan ne les a pas).
+  register  orientation in quarter turns, scale and translation, by cross-correlation against
+            the BLANK. This is what makes the canonical frame independent of the scanning dpi,
+            and it is also what yields the estimated source dpi and the page coverage without
+            reading a single piece of metadata (a real scan has none).
 """
 from dataclasses import dataclass, replace
 
@@ -30,86 +30,86 @@ from PIL import Image
 
 from . import CANON_DPI
 
-PLAGE_ANGLE = 6.0          # la grid injecte jusqu'a 4 deg
-LARGEUR_GROSSIER = 400
-LARGEUR_FIN = 850
-PAS_GROSSIER = 0.2
-PAS_FIN = 0.05
+ANGLE_RANGE = 6.0          # the grid injects up to 4 deg
+COARSE_WIDTH = 400
+FINE_WIDTH = 850
+COARSE_STEP = 0.2
+FINE_STEP = 0.05
 
 
-def otsu(gris):
-    """Seuil d'ink propre a l'image. Un seuil fixe ne survit pas au changement de dpi."""
-    h = np.histogram(gris, bins=256, range=(0, 256))[0].astype(np.float64)
-    tot = h.sum()
+def otsu(grey):
+    """An ink threshold specific to the image. A fixed threshold does not survive a dpi change."""
+    h = np.histogram(grey, bins=256, range=(0, 256))[0].astype(np.float64)
+    total = h.sum()
     w0 = np.cumsum(h)
-    w1 = tot - w0
+    w1 = total - w0
     m = np.cumsum(h * np.arange(256))
     with np.errstate(invalid="ignore", divide="ignore"):
-        inter = (m[-1] * w0 / tot - m) ** 2 / (w0 * w1)
-    return int(np.nanargmax(inter))
+        between = (m[-1] * w0 / total - m) ** 2 / (w0 * w1)
+    return int(np.nanargmax(between))
 
 
-def ink(gris, seuil=None):
-    return gris < (otsu(gris) if seuil is None else seuil)
+def ink(grey, threshold=None):
+    return grey < (otsu(grey) if threshold is None else threshold)
 
 
-def _width(gris, target):
-    h, w = gris.shape
+def _width(grey, target):
+    h, w = grey.shape
     if w <= target:
-        return gris
+        return grey
     f = target / float(w)
-    return np.asarray(Image.fromarray(gris).resize((int(w * f), int(h * f)), Image.BILINEAR))
+    return np.asarray(Image.fromarray(grey).resize((int(w * f), int(h * f)), Image.BILINEAR))
 
 
-def _profile_variance(gris, seuil, angle):
+def _profile_variance(grey, threshold, angle):
     if angle:
-        gris = np.asarray(Image.fromarray(gris).rotate(angle, resample=Image.BILINEAR,
+        grey = np.asarray(Image.fromarray(grey).rotate(angle, resample=Image.BILINEAR,
                                                        fillcolor=255))
-    return float(np.var((gris < seuil).sum(axis=1)))
+    return float(np.var((grey < threshold).sum(axis=1)))
 
 
-def deskew(gris, plage=PLAGE_ANGLE, axes=(0, 1)):
-    """Retour: (quarter_turns d'axe, angle applique, image droite et debout).
+def deskew(grey, span=ANGLE_RANGE, axes=(0, 1)):
+    """Returns (axis quarter turn, applied angle, upright straightened image).
 
-    Le quarter_turns d'axe vaut 0 ou 1: il dit s'il a fallu coucher la page pour retrouver des lignes
-    de texte horizontales. Le demi-tour (0 contre 180) n'est pas decidable ici, les deux ont
-    exactement le meme profil de projection: c'est le recalage contre le blank qui tranche.
+    The axis quarter turn is 0 or 1: it says whether the page had to be laid down to recover
+    horizontal text lines. The half turn (0 against 180) is not decidable here, both have
+    exactly the same projection profile: registration against the blank settles that.
     """
-    meilleur = None
-    for axe in axes:
-        tourne = np.rot90(gris, -axe) if axe else gris
-        petit = _width(tourne, LARGEUR_GROSSIER)
-        s = otsu(petit)
-        ang = max(np.arange(-plage, plage + 1e-9, PAS_GROSSIER),
-                  key=lambda a: _profile_variance(petit, s, a))
-        v = _profile_variance(petit, s, ang)
-        if meilleur is None or v > meilleur[0]:
-            meilleur = (v, axe, ang, tourne)
-    _, axe, grossier, tourne = meilleur
-    moyen = _width(tourne, LARGEUR_FIN)
-    sm = otsu(moyen)
-    fin = max(np.arange(grossier - PAS_GROSSIER, grossier + PAS_GROSSIER + 1e-9, PAS_FIN),
-              key=lambda a: _profile_variance(moyen, sm, a))
-    if abs(fin) < 1e-9:
-        return axe, 0.0, tourne
-    return axe, float(fin), np.asarray(Image.fromarray(tourne).rotate(
-        fin, resample=Image.BICUBIC, fillcolor=255))
+    best = None
+    for axis in axes:
+        turned = np.rot90(grey, -axis) if axis else grey
+        small = _width(turned, COARSE_WIDTH)
+        s = otsu(small)
+        ang = max(np.arange(-span, span + 1e-9, COARSE_STEP),
+                  key=lambda a: _profile_variance(small, s, a))
+        v = _profile_variance(small, s, ang)
+        if best is None or v > best[0]:
+            best = (v, axis, ang, turned)
+    _, axis, coarse, turned = best
+    medium = _width(turned, FINE_WIDTH)
+    sm = otsu(medium)
+    fine = max(np.arange(coarse - COARSE_STEP, coarse + COARSE_STEP + 1e-9, FINE_STEP),
+               key=lambda a: _profile_variance(medium, sm, a))
+    if abs(fine) < 1e-9:
+        return axis, 0.0, turned
+    return axis, float(fine), np.asarray(Image.fromarray(turned).rotate(
+        fine, resample=Image.BICUBIC, fillcolor=255))
 
 
 @dataclass(frozen=True)
 class Registration:
-    quarter_turns: int             # quarts de tour a apply au scan pour le remettre droit
-    scale: float         # facteur applique au scan pour atteindre le repere canonique
+    quarter_turns: int      # quarter turns to apply to the scan to set it upright
+    scale: float            # factor applied to the scan to reach the canonical frame
     dx: int
     dy: int
-    peak: float             # peak de correlation croisee normalise, 0 a 1
-    coverage: float      # fraction de l'ink du blank que le frame du scan recouvre
-    source_dpi: float      # CANON_DPI / scale, estime sans read_piece aucune metadonnee
-    pics: tuple = ()       # meilleur peak par quarter_turns evalue, pour la marge d'orientation
+    peak: float             # normalised cross-correlation peak, 0 to 1
+    coverage: float         # fraction of the blank's ink that the scan's frame covers
+    source_dpi: float       # CANON_DPI / scale, estimated without reading any metadata
+    peaks: tuple = ()       # best peak per quarter turn tried, for the orientation margin
 
 
 def _correlation(a, b):
-    """Pic de correlation croisee normalisee entre deux cartes d'ink, et son decalage."""
+    """Normalised cross-correlation peak between two ink maps, and its offset."""
     H = max(a.shape[0], b.shape[0])
     W = max(a.shape[1], b.shape[1])
     A = np.zeros((H, W), np.float32)
@@ -128,145 +128,143 @@ def _correlation(a, b):
     return dy, dx, float(c.max() / (na * nb))
 
 
-def _resize(gris, scale):
-    h, w = gris.shape
-    return np.asarray(Image.fromarray(gris).resize(
+def _resize(grey, scale):
+    h, w = grey.shape
+    return np.asarray(Image.fromarray(grey).resize(
         (max(1, int(round(w * scale))), max(1, int(round(h * scale)))), Image.BILINEAR))
 
 
-def register(gris, blank, ratios=(0.78, 0.84, 0.90, 0.96, 1.0, 1.04), task=480,
-            quarts=(0, 1, 2, 3), affinages=((0.06, 7, 720), (0.012, 7, 720))):
-    """Orientation, scale et translation qui collent le scan sur le blank.
+def register(grey, blank, ratios=(0.78, 0.84, 0.90, 0.96, 1.0, 1.04), width=480,
+             quarters=(0, 1, 2, 3), refinements=((0.06, 7, 720), (0.012, 7, 720))):
+    """Orientation, scale and translation that stick the scan onto the blank.
 
-    Tout se joue sur des cartes d'ink reduites a `task` pixels de large: la correlation
-    y coute quelques millisecondes. L'scale de base vient du rapport des hauteurs, et les
-    ratios balaient autour, vers le bas surtout, parce qu'une page ROGNEE fait croire a une
-    scale trop grande: rogner 18% de la hauteur fait surestimer l'scale de 22%.
+    Everything happens on ink maps downscaled to `width` pixels: correlation there costs a few
+    milliseconds. The base scale comes from the ratio of heights, and the ratios sweep around
+    it, mostly downwards, because a CROPPED page makes the scale look too large: cropping 18%
+    of the height overestimates the scale by 22%.
 
-    Le balayage grossier seul ne suffit pas. Son pas de 6% laisse 2,4% d'erreur d'scale,
-    soit 53 px de derive en bas d'une page de 2200 px: assez pour que les zones declarees
-    tombent une ligne trop bas et que le disque d'une case rate la case. Mesure le
-    2026-08-21: sans affinage, la page rognee declenchait a tort le check des boxes
-    obligatoires (delta d'ink +6,7 au lieu de +21,1) et celui des fields required. Deux
-    passes d'affinage ramenent l'erreur d'scale sous 0,2%.
+    The coarse sweep alone is not enough. Its 6% step leaves 2.4% of scale error, which is 53
+    px of drift at the bottom of a 2200 px page: enough for the declared zones to land one line
+    too low and for a checkbox disc to miss its box. Measured 2026-08-21: without refinement the
+    cropped page wrongly fired the required-checkbox check (ink delta +6.7 instead of +21.1) and
+    the required-field one. Two refinement passes bring the scale error under 0.2%.
     """
     H, W = blank.shape
-    meilleur = None
-    par_quart = {}
+    best = None
+    per_quarter = {}
 
-    def essayer(ref, f, tourne, quarter_turns, ech):
-        dy, dx, peak = _correlation(ref, ink(_resize(tourne, ech * f)).astype(np.float32))
-        par_quart[quarter_turns] = max(par_quart.get(quarter_turns, 0.0), peak)
-        return (peak, quarter_turns, ech, dx / f, dy / f, tourne)
+    def attempt(ref, f, turned, quarter_turns, scale):
+        dy, dx, peak = _correlation(ref, ink(_resize(turned, scale * f)).astype(np.float32))
+        per_quarter[quarter_turns] = max(per_quarter.get(quarter_turns, 0.0), peak)
+        return (peak, quarter_turns, scale, dx / f, dy / f, turned)
 
-    f = task / float(W)
+    f = width / float(W)
     ref = ink(_resize(blank, f)).astype(np.float32)
-    for quarter_turns in quarts:
-        tourne = np.rot90(gris, -quarter_turns) if quarter_turns else gris
-        base = H / float(tourne.shape[0])
+    for quarter_turns in quarters:
+        turned = np.rot90(grey, -quarter_turns) if quarter_turns else grey
+        base = H / float(turned.shape[0])
         for r in ratios:
-            c = essayer(ref, f, tourne, quarter_turns, base * r)
-            if meilleur is None or c[0] > meilleur[0]:
-                meilleur = c
-    for demi, n, larg in affinages:
-        _, quarter_turns, ech, _, _, tourne = meilleur
-        f = larg / float(W)
+            c = attempt(ref, f, turned, quarter_turns, base * r)
+            if best is None or c[0] > best[0]:
+                best = c
+    for half, n, w in refinements:
+        _, quarter_turns, scale, _, _, turned = best
+        f = w / float(W)
         ref = ink(_resize(blank, f)).astype(np.float32)
-        for r in np.linspace(1 - demi, 1 + demi, n):
-            c = essayer(ref, f, tourne, quarter_turns, ech * r)
-            if c[0] > meilleur[0]:
-                meilleur = c
-    peak, quarter_turns, ech, dx, dy, tourne = meilleur
-    par_quart = tuple(sorted(par_quart.items()))
-    h, w = tourne.shape
+        for r in np.linspace(1 - half, 1 + half, n):
+            c = attempt(ref, f, turned, quarter_turns, scale * r)
+            if c[0] > best[0]:
+                best = c
+    peak, quarter_turns, scale, dx, dy, turned = best
+    peaks = tuple(sorted(per_quarter.items()))
+    h, w = turned.shape
     y0, x0 = max(0, int(round(dy))), max(0, int(round(dx)))
-    y1, x1 = min(H, int(round(dy + h * ech))), min(W, int(round(dx + w * ech)))
-    enc_ref = ink(blank)
-    dedans = int(enc_ref[y0:y1, x0:x1].sum()) if (y1 > y0 and x1 > x0) else 0
-    return Registration(quarter_turns, float(ech), int(round(dx)), int(round(dy)), peak,
-                    dedans / max(1, int(enc_ref.sum())), CANON_DPI / float(ech), par_quart)
+    y1, x1 = min(H, int(round(dy + h * scale))), min(W, int(round(dx + w * scale)))
+    blank_ink = ink(blank)
+    inside = int(blank_ink[y0:y1, x0:x1].sum()) if (y1 > y0 and x1 > x0) else 0
+    return Registration(quarter_turns, float(scale), int(round(dx)), int(round(dy)), peak,
+                        inside / max(1, int(blank_ink.sum())), CANON_DPI / float(scale), peaks)
 
 
 @dataclass(frozen=True)
 class Frame:
-    """Le scan a SA resolution, et le blank amene jusqu'a lui.
+    """The scan at ITS resolution, and the blank brought to it.
 
-    C'EST L'INVERSE DE CE QU'ON FAIT D'INSTINCT, et le renversement est une mesure, pas un
-    gout. Ramener le scan dans un repere canonique a 200 dpi oblige a le reechantillonner des
-    que sa resolution differe, et ce reechantillonnage detruit le petit texte encadre: sur le
-    Cerfa 14011, un scan a 300 dpi rendait 0 caractere lisible dans trois fields qui en
-    rendaient 14, 5 et 10 a 200 dpi, ou l'scale vaut exactement 1. Les trois filtres
-    (bilineaire, bicubique, Lanczos) echouaient pareil, donc ce n'etait pas le filtre.
-    La grid aurait alors mesure mon reechantillonnage et conclu, faux, que l'outil casse a
-    300 dpi. Le blank, lui, est un render propre et synthetique: le reechantillonner ne coute
-    rien.
+    THIS IS THE OPPOSITE OF THE INSTINCTIVE CHOICE, and the reversal is a measurement, not a
+    preference. Bringing the scan into a canonical 200 dpi frame forces a resample whenever its
+    resolution differs, and that resampling destroys small boxed text: on Cerfa 14011, a scan at
+    300 dpi returned 0 readable characters in three fields that returned 14, 5 and 10 at 200
+    dpi, where the scale is exactly 1. All three filters (bilinear, bicubic, Lanczos) failed the
+    same way, so it was not the filter. The grid would then have measured my own resampling and
+    concluded, wrongly, that the tool breaks at 300 dpi. The blank, by contrast, is a clean
+    synthetic render: resampling it costs nothing.
 
-    Les coordonnees ENREGISTREES restent canoniques: seuls les pixels lus sont natifs.
+    The RECORDED coordinates stay canonical: only the pixels read are native.
     """
-    scan: object            # scan redresse, resolution native
-    blank: object          # blank amene dans le meme frame, meme shape
-    scale: float          # scan -> canonique
+    scan: object            # deskewed scan, native resolution
+    blank: object           # blank brought into the same frame, same shape
+    scale: float            # scan -> canonical
     dx: int
     dy: int
 
     def zone(self, z):
-        """Une zone canonique traduite en coordonnees du scan."""
+        """A canonical zone translated into scan coordinates."""
         from .geometry import Zone
         return Zone(z.name, z.page,
                     int(round((z.x0 - self.dx) / self.scale)),
                     int(round((z.y0 - self.dy) / self.scale)),
                     int(round((z.x1 - self.dx) / self.scale)),
-                    int(round((z.y1 - self.dy) / self.scale)), z.genre)
+                    int(round((z.y1 - self.dy) / self.scale)), z.kind)
 
     def to_canonical(self, x, y):
         return self.dx + x * self.scale, self.dy + y * self.scale
 
 
-def build_frame(gris, blank, rec):
-    """Le blank redessine dans le frame du scan. Ce qui manque reste blanc."""
-    tourne = np.rot90(gris, -rec.quarter_turns) if rec.quarter_turns else gris
-    h, w = tourne.shape
-    mis = _resize(blank, 1.0 / rec.scale)
-    oy, ox = int(round(-rec.dy / rec.scale)), int(round(-rec.dx / rec.scale))
-    toile = np.full((h, w), 255, np.uint8)
+def build_frame(grey, blank, reg):
+    """The blank redrawn inside the scan's frame. What is missing stays white."""
+    turned = np.rot90(grey, -reg.quarter_turns) if reg.quarter_turns else grey
+    h, w = turned.shape
+    scaled = _resize(blank, 1.0 / reg.scale)
+    oy, ox = int(round(-reg.dy / reg.scale)), int(round(-reg.dx / reg.scale))
+    canvas = np.full((h, w), 255, np.uint8)
     ys, xs = max(0, oy), max(0, ox)
-    ye, xe = min(h, oy + mis.shape[0]), min(w, ox + mis.shape[1])
+    ye, xe = min(h, oy + scaled.shape[0]), min(w, ox + scaled.shape[1])
     if ye > ys and xe > xs:
-        toile[ys:ye, xs:xe] = mis[ys - oy:ye - oy, xs - ox:xe - ox]
-    return Frame(tourne, toile, rec.scale, rec.dx, rec.dy)
+        canvas[ys:ye, xs:xe] = scaled[ys - oy:ye - oy, xs - ox:xe - ox]
+    return Frame(turned, canvas, reg.scale, reg.dx, reg.dy)
 
 
 @dataclass(frozen=True)
 class Preparation:
-    """Tout ce qu'on sait d'un scan une fois le blank amene sur lui."""
+    """Everything known about a scan once the blank has been brought onto it."""
     frame: object
-    angle: float               # angle de deskew applique
-    quarter_turns: int                 # quarts de tour qu'il a fallu remettre, 0 si la page etait droite
+    angle: float                # deskew angle applied
+    quarter_turns: int          # quarter turns that had to be undone, 0 if the page was upright
     scale: float
-    source_dpi: float          # dpi de numerisation estime, sans metadonnee
+    source_dpi: float           # estimated scanning dpi, without metadata
     peak: float
-    coverage: float          # 1.0 si la page est entiere
-    orientation_margin: float   # peak du quarter_turns retenu moins peak du quarter_turns 0 d'origine
+    coverage: float             # 1.0 if the whole page is there
+    orientation_margin: float   # peak of the chosen quarter turn minus peak of the original 0
 
 
-def prepare(gris, blank):
-    """Chaine complete, du scan raw au repere canonique.
+def prepare(grey, blank):
+    """The full chain, from raw scan to canonical frame.
 
-    L'axe sort du deskew, le demi-tour sort du recalage: une fois la page debout, seuls
-    les quarts 0 et 2 restent a departager, et ils ont exactement le meme profil de
-    projection. La marge d'orientation compare le quarter_turns retenu au quarter_turns 0 D'ORIGINE: c'est
-    elle qui donne au check "page tournee" un score continu, donc une curve, au lieu d'un
-    booleen sans seuil a read_piece.
+    The axis comes out of the deskew, the half turn comes out of the registration: once the
+    page is upright only quarters 0 and 2 remain to be told apart, and they have exactly the
+    same projection profile. The orientation margin compares the chosen quarter turn to the
+    ORIGINAL quarter 0: that is what gives the "rotated page" check a continuous score, and
+    therefore a curve, instead of a boolean with no threshold to read.
     """
-    axe, angle, droit = deskew(gris)
-    rec = register(droit, blank, quarts=(0, 2))
-    quarter_turns = (axe + rec.quarter_turns) % 4
+    axis, angle, straight = deskew(grey)
+    reg = register(straight, blank, quarters=(0, 2))
+    quarter_turns = (axis + reg.quarter_turns) % 4
     if quarter_turns == 0:
-        pic0 = rec.peak
-    elif axe == 0:
-        pic0 = dict(rec.pics).get(0, 0.0)
+        peak0 = reg.peak
+    elif axis == 0:
+        peak0 = dict(reg.peaks).get(0, 0.0)
     else:
-        _, _, droit0 = deskew(gris, axes=(0,))
-        pic0 = register(droit0, blank, quarts=(0,)).peak
-    return Preparation(build_frame(droit, blank, rec), angle, quarter_turns, float(rec.scale),
-                       rec.source_dpi, rec.peak, rec.coverage, float(rec.peak - pic0))
+        _, _, straight0 = deskew(grey, axes=(0,))
+        peak0 = register(straight0, blank, quarters=(0,)).peak
+    return Preparation(build_frame(straight, blank, reg), angle, quarter_turns, float(reg.scale),
+                       reg.source_dpi, reg.peak, reg.coverage, float(reg.peak - peak0))

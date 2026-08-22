@@ -18,7 +18,7 @@ ensuite la meme rotation, le meme bruit, le meme blur et la meme compression que
 tache (depot localise), pliure (ombre de pli en travers), trait (stylo du field voisin qui
 deborde). Champ target: `employment` / `City or Town`, celui que la variant `empty_required_field`
 laisse vide. Deux cellules (0,25 deg / 200 dpi / JPEG 95 / bruit 0 et 0,5 deg / 200 dpi /
-JPEG 55 / bruit 6), six graines, sept intensites plus un temoin sans parasite. 528 readings.
+JPEG 55 / bruit 6), six graines, sept intensites plus un control sans parasite. 528 readings.
 
 Temoin sans parasite: 0 faux negatif et 0 faux positif pour les quatre sensors. Le banc est
 clean.
@@ -44,9 +44,9 @@ FAUX POSITIFS, un field REMPLI declare vide, memes conditions. C'est le prix a p
 | zone | 0.114 | [0.081, 0.158] | 264 |
 | page | 0.136 | [0.100, 0.183] | 264 |
 
-## La bascule est exactement au seuil publie
+## La bascule est exactement au threshold publie
 
-Le seuil retenu est 0,345% d'ink ajoutee. Mesure, par value d'ink reellement ajoutee:
+Le threshold retenu est 0,345% d'ink ajoutee. Mesure, par value d'ink reellement ajoutee:
 
     0,00 a 0,32%  ->  se fires 97 fois sur 97
     0,38% et plus ->  se fires  0 fois sur 151
@@ -56,7 +56,7 @@ Pas de zone grise: une falaise. Pour ce field de 415 x 38 = 15 770 px canoniques
 scanner suffit. Un trait de stylo qui deborde a peine du field voisin ajoute deja 0,61%.
 
 L'ombre de pliure a un comportement a part et il est instructif: tant qu'elle laisse le papier
-au-dessus du seuil de binarisation (128), elle est parfaitement invisible au capteur, puis
+au-dessus du threshold de binarisation (128), elle est parfaitement invisible au capteur, puis
 toute la bande bascule d'un coup (0,00% d'ink ajoutee, puis 39%, puis 100%).
 
 ## Ce que les sensors de words ratent, eux
@@ -70,7 +70,7 @@ capteur de words ne confond pas une tache avec une value en general, mais il le 
 ## Ce que je recommande, et ce que ca coute
 
 Passer le check des fields required de `ink` a `union`. Sur la grid publiee, `union`
-(confiance minimale 0) tenait deja 1,000 de rappel, avec 0,0003 de faux positifs par target
+(confiance minimale 0) tenait deja 1,000 de recall, avec 0,0003 de faux positifs par target
 contre 0,0000 pour l'ink: le cout est de trois cibles sur dix mille. En echange, sous ink
 etrangere, les faux negatifs passent de 1,000 a 0,272, et les faux positifs de 0,000 a 0,030.
 
@@ -82,6 +82,6 @@ l'asymetrie declaree.
 
 Une sonde ciblee, pas une grid. Un seul field, deux cellules, trois formes de parasite
 dessinees par moi, n=151 et n=264. Elle suffit a montrer qu'une decision de conception a ete
-prise sur un terrain biaise; elle ne suffit pas a fixer un seuil. Si le capteur change, c'est
+prise sur un terrain biaise; elle ne suffit pas a fixer un threshold. Si le capteur change, c'est
 la grid complete qui doit le confirmer, avec l'ink parasite ajoutee comme cinquieme
 facteur.

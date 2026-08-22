@@ -1,4 +1,4 @@
-"""Rendu PDF vers image grise, avec cache disque: la meme page au meme dpi ne se rend qu'une fois."""
+"""PDF to greyscale image, with a disk cache: the same page at the same dpi renders once."""
 import hashlib
 import os
 import subprocess
@@ -20,17 +20,17 @@ def _key(pdf, dpi, page):
 
 
 def render(pdf, dpi=CANON_DPI, page=1, cache=None):
-    """Page rendue en niveaux de gris, uint8. Retour: tableau numpy (H, W)."""
-    rep = cache or CACHE
-    os.makedirs(rep, exist_ok=True)
-    dest = os.path.join(rep, f"{_key(pdf, dpi, page)}.png")
+    """One page as greyscale uint8. Returns a numpy array of shape (H, W)."""
+    directory = cache or CACHE
+    os.makedirs(directory, exist_ok=True)
+    dest = os.path.join(directory, f"{_key(pdf, dpi, page)}.png")
     if not os.path.exists(dest):
-        with tempfile.TemporaryDirectory(dir=rep) as t:
-            prefixe = os.path.join(t, "p")
+        with tempfile.TemporaryDirectory(dir=directory) as t:
+            prefix = os.path.join(t, "p")
             subprocess.run(["pdftoppm", "-r", str(dpi), "-gray", "-png",
-                            "-f", str(page), "-l", str(page), pdf, prefixe], check=True)
-            produit = [f for f in sorted(os.listdir(t)) if f.endswith(".png")]
-            if not produit:
-                raise RuntimeError(f"pdftoppm n'a rien produit pour {pdf} page {page}")
-            os.replace(os.path.join(t, produit[0]), dest)
+                            "-f", str(page), "-l", str(page), pdf, prefix], check=True)
+            produced = [f for f in sorted(os.listdir(t)) if f.endswith(".png")]
+            if not produced:
+                raise RuntimeError(f"pdftoppm produced nothing for {pdf} page {page}")
+            os.replace(os.path.join(t, produced[0]), dest)
     return np.asarray(Image.open(dest).convert("L"))

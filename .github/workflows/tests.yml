@@ -2,8 +2,8 @@
 # remote. Son premier run est donc lui-meme une mesure, et il peut rougir pour une raison
 # qui n'est pas une regression: les thresholds ont ete lus sous tesseract 5.5.1 en local, et
 # ubuntu-latest en fournit une autre version. Si un check de texte bouge ici et nulle part
-# ailleurs, la cause est la version d'OCR et pas un seuil. Ne deplacer aucune value de
-# thresholds.json pour verdir ce fichier: un seuil se deplace parce que la grid le dit.
+# ailleurs, la cause est la version d'OCR et pas un threshold. Ne deplacer aucune value de
+# thresholds.json pour verdir ce fichier: un threshold se deplace parce que la grid le dit.
 name: tests
 
 on:
