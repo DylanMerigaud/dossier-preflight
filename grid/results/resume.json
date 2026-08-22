@@ -4230,7 +4230,7 @@
     }
   },
   "resolution": {
-    "settings_text": "aucun settings",
+    "settings_text": "no settings",
     "point": {
       "threshold": -148.5,
       "recall": 1.0,
@@ -4592,7 +4592,7 @@
     "restricted": null,
     "ranking": [
       {
-        "settings": "aucun settings",
+        "settings": "no settings",
         "recall": 1.0,
         "fpr": 0.0,
         "threshold": -110.99
@@ -4880,7 +4880,7 @@
     }
   },
   "cropped_page": {
-    "settings_text": "aucun settings",
+    "settings_text": "no settings",
     "point": {
       "threshold": 0.08794999999999997,
       "recall": 1.0,
@@ -5228,7 +5228,7 @@
     "restricted": null,
     "ranking": [
       {
-        "settings": "aucun settings",
+        "settings": "no settings",
         "recall": 1.0,
         "fpr": 0.0,
         "threshold": 0.08794999999999997
@@ -5490,7 +5490,7 @@
     }
   },
   "rotated_page": {
-    "settings_text": "aucun settings",
+    "settings_text": "no settings",
     "point": {
       "threshold": 0.35855,
       "recall": 1.0,
@@ -5838,7 +5838,7 @@
     "restricted": null,
     "ranking": [
       {
-        "settings": "aucun settings",
+        "settings": "no settings",
         "recall": 1.0,
         "fpr": 0.0,
         "threshold": 0.35855

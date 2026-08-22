@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
-"""Mesure de SUIVI sur la seule cell du domain nominal ou l'outil manque quelque chose.
+"""FOLLOW-UP measurement on the only cell of the nominal domain where the tool misses something.
 
-HORS PROTOCOLE, et il faut le dire avant les chiffres. La grid publie ses thresholds selon une
-regle stricte: deux graines calibrent, la troisieme n'est jamais regardee avant que le chiffre
-soit ecrit. Ces graines-ci ont ete tirees APRES avoir vu ou l'outil manquait, sur une cell
-choisie parce qu'elle manquait. Elles ne peuvent donc pas deplacer un threshold ni entrer dans un
-chiffre publie: elles repondent a une seule question, celle de la taille d'echantillon.
+OUTSIDE THE PROTOCOL, and that has to be said before the numbers. The grid publishes its
+thresholds under a strict rule: two seeds calibrate, the third is never looked at before the
+number is written. These seeds were drawn AFTER seeing where the tool was missing, on a cell
+chosen because it was missing. They therefore cannot move a threshold nor enter any published
+figure: they answer one question only, the one about sample size.
 
-    n=18 sur les graines d'origin donnait 0,833, avec un intervalle si large qu'on ne pouvait
-    pas dire si le check manquait vraiment ou si trois tirages malheureux s'etaient suivis.
+    n=18 on the original seeds gave 0.833, with an interval so wide that nobody could say
+    whether the check really missed or three unlucky draws had simply followed each other.
 
-Deux sets, douze graines neuves chacun, une seule chose qui change entre eux:
-    corner    300 dpi, JPEG 95, bruit 12
-    control  300 dpi, JPEG 30, bruit 12
-Le control est ce qui fait la difference entre "mes graines sont dures" et "c'est la
-compression". Sans lui, les douze graines neuves ne prouvent rien.
+Two sets, twelve new seeds each, one single thing changing between them:
+    corner   300 dpi, JPEG 95, noise 12
+    control  300 dpi, JPEG 30, noise 12
+The control is what separates "my seeds are hard" from "it is the compression". Without it the
+twelve new seeds prove nothing.
 
-    python3 grid/corner_followup.py    # ecrit grid/resultats/suivi.json
+    python3 grid/corner_followup.py    # writes grid/results/followup.json
 """
 import collections
 import json
@@ -32,18 +32,18 @@ from preflight.reference import load_reference
 from preflight.thresholds import load_thresholds
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CONTROLE = "forbidden_value"
-CORNER = (300, 95, 12.0)          # dpi, qualite JPEG, bruit sigma
-MARCHE_ANGLE = 0.5              # l'angle a partir duquel le recall decroche
+CHECK = "forbidden_value"
+CORNER = (300, 95, 12.0)          # dpi, JPEG quality, noise sigma
+ANGLE_STEP = 0.5                  # the angle at which recall drops off
 
 
-def recalls(dossiers, ref, reg, threshold, cibles, var):
-    """Retour: (tp, n, par angle)."""
+def recalls(dossiers, ref, settings, threshold, targets, var):
+    """Returns (tp, n, per angle)."""
     by_angle = collections.defaultdict(lambda: [0, 0])
     tp = n = 0
     for key, dossier in dossiers.items():
-        sc = target_scores(dossier[var.name], ref, CONTROLE, reg)
-        pos = {k: v for k, v in sc.items() if k in cibles} or sc
+        scores = target_scores(dossier[var.name], ref, CHECK, settings)
+        pos = {k: v for k, v in scores.items() if k in targets} or scores
         for x in pos.values():
             n += 1
             tp += x > threshold
@@ -55,50 +55,51 @@ def recalls(dossiers, ref, reg, threshold, cibles, var):
 
 def main():
     ref = load_reference()
-    threshold = load_thresholds()[CONTROLE]
-    reg = measured_settings()[CONTROLE]
-    var = next(v for v in VARIANTS if v.check == CONTROLE)
-    cibles = damaged_targets(var, ref)
-    base = os.path.join(ROOT, "grid", "mesures")
+    threshold = load_thresholds()[CHECK]
+    settings = measured_settings()[CHECK]
+    var = next(v for v in VARIANTS if v.check == CHECK)
+    targets = damaged_targets(var, ref)
+    base = os.path.join(ROOT, "grid", "measurements")
 
     sets = {}
-    principal = complete_dossiers(load(os.path.join(base, "mesures.jsonl")))
-    sets["origin"] = {k: v for k, v in principal.items() if (k[1], k[2], k[3]) == CORNER}
-    for name, fichier in (("corner", "suivi/mesures-corner.jsonl"),
-                         ("control", "suivi/mesures-control.jsonl")):
-        sets[name] = complete_dossiers(load(os.path.join(base, fichier)))
+    main_set = complete_dossiers(load(os.path.join(base, "measurements.jsonl")))
+    sets["original"] = {k: v for k, v in main_set.items() if (k[1], k[2], k[3]) == CORNER}
+    for name, path in (("corner", "followup/corner.jsonl"),
+                       ("control", "followup/control.jsonl")):
+        sets[name] = complete_dossiers(load(os.path.join(base, path)))
 
-    out = {"check": CONTROLE, "threshold": threshold, "settings": reg.text_sensor,
+    out = {"check": CHECK, "threshold": threshold, "settings": settings.text_sensor,
            "corner": {"dpi": CORNER[0], "jpeg": CORNER[1], "sigma": CORNER[2]},
-           "outside_protocol": "graines tirees apres avoir vu ou l'outil manquait; "
-                             "ne deplacent aucun threshold et n'entrent dans aucun chiffre publie",
+           "outside_protocol": "seeds drawn after seeing where the tool was missing; they move "
+                               "no threshold and enter no published figure",
            "sets": {}}
     for name, d in sets.items():
-        tp, n, by_angle = recalls(d, ref, reg, threshold, cibles, var)
-        bas = [g for a, g in by_angle.items() if a < MARCHE_ANGLE]
-        haut = [g for a, g in by_angle.items() if a >= MARCHE_ANGLE]
+        tp, n, by_angle = recalls(d, ref, settings, threshold, targets, var)
+        below = [g for a, g in by_angle.items() if a < ANGLE_STEP]
+        above = [g for a, g in by_angle.items() if a >= ANGLE_STEP]
         out["sets"][name] = {
             "n_pairs": len(d), "tp": tp, "n": n, "recall": tp / max(1, n),
             "ci": list(wilson(tp, n)),
             "by_angle": {str(a): list(g) for a, g in by_angle.items()},
-            "angle_below_step": [sum(g[0] for g in bas), sum(g[1] for g in bas)],
-            "angle_above_step": [sum(g[0] for g in haut), sum(g[1] for g in haut)],
+            "angle_below_step": [sum(g[0] for g in below), sum(g[1] for g in below)],
+            "angle_above_step": [sum(g[0] for g in above), sum(g[1] for g in above)],
         }
-    o, c = out["sets"]["origin"], out["sets"]["corner"]
+    o, c = out["sets"]["original"], out["sets"]["corner"]
     tp, n = o["tp"] + c["tp"], o["n"] + c["n"]
-    bas = [o["angle_below_step"][i] + c["angle_below_step"][i] for i in (0, 1)]
-    haut = [o["angle_above_step"][i] + c["angle_above_step"][i] for i in (0, 1)]
+    below = [o["angle_below_step"][i] + c["angle_below_step"][i] for i in (0, 1)]
+    above = [o["angle_above_step"][i] + c["angle_above_step"][i] for i in (0, 1)]
     out["combined"] = {"tp": tp, "n": n, "recall": tp / n, "ci": list(wilson(tp, n)),
-                     "angle_below_step": bas + [bas[0] / bas[1]],
-                     "angle_above_step": haut + [haut[0] / haut[1]],
-                     "angle_step": MARCHE_ANGLE}
-    dest = os.path.join(ROOT, "grid", "resultats", "suivi.json")
+                       "angle_below_step": below + [below[0] / below[1]],
+                       "angle_above_step": above + [above[0] / above[1]],
+                       "angle_step": ANGLE_STEP}
+    dest = os.path.join(ROOT, "grid", "results", "followup.json")
     json.dump(out, open(dest, "w"), indent=2)
-    print(f"corner q95   {c['tp']}/{c['n']} = {c['recall']:.4f} {[round(x,3) for x in c['ci']]}")
+    print(f"corner q95  {c['tp']}/{c['n']} = {c['recall']:.4f} {[round(x, 3) for x in c['ci']]}")
     print(f"control q30 {out['sets']['control']['tp']}/{out['sets']['control']['n']} = "
           f"{out['sets']['control']['recall']:.4f}")
-    print(f"CUMULE     {tp}/{n} = {tp/n:.4f} {[round(x, 3) for x in out['combined']['ci']]}")
-    print(f"  angle < {MARCHE_ANGLE}: {bas[0]}/{bas[1]}   angle >= {MARCHE_ANGLE}: {haut[0]}/{haut[1]}")
+    print(f"COMBINED    {tp}/{n} = {tp/n:.4f} {[round(x, 3) for x in out['combined']['ci']]}")
+    print(f"  angle < {ANGLE_STEP}: {below[0]}/{below[1]}   "
+          f"angle >= {ANGLE_STEP}: {above[0]}/{above[1]}")
     print(f"-> {dest}")
     return 0
 

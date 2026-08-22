@@ -17,7 +17,7 @@ that their dossier has a defect.
     64  usage error (EX_USAGE), so it cannot be confused with 2
 
 The resolution check sits on the SCAN side and not the DOSSIER side, and that is not a matter
-of taste: LIMITES.md already says so for that check alone, it answers "I cannot read this
+of taste: LIMITS.md already says so for that check alone, it answers "I cannot read this
 page" and not "this page is at fault". Filing it under defects would return 1 on a possibly
 perfect dossier that was badly scanned. Abstention has exactly the same condition as that
 check firing (both read the same floor), so a code reserved for abstention alone would never
@@ -33,7 +33,7 @@ scan. On a PDF that already contains an image, asking for 300 here does not recr
 information the scanner never captured: the page is rendered larger, and the resolution check
 then estimates the resolution of the RENDER. Rasterising high therefore does not push a bad
 scan past the floor, it moves the question. The default is CANON_DPI, the resolution of the
-canonical frame, and it is the value under which every figure in LIMITES.md was measured.
+canonical frame, and it is the value under which every figure in LIMITS.md was measured.
 """
 import argparse
 import datetime as dt
@@ -152,7 +152,7 @@ def _text(findings, ref, clock_name, dpi, supplied, missing, show_all):
         l += ["No check fires.",
               "THIS IS NOT A GUARANTEE. The recall and false positive rate of every check, the",
               "domain where they hold, and what the measurement does not cover are all in",
-              "LIMITES.md. In particular: the measurement rests on ONE fictional dossier of",
+              "LIMITS.md. In particular: the measurement rests on ONE fictional dossier of",
               "three forms degraded SYNTHETICALLY, and no real scan ever entered it."]
     return "\n".join(l)
 

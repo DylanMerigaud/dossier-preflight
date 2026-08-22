@@ -136,7 +136,7 @@ def read_piece(piece, deg):
     added = {id(m) for m in added_words(all_read, blank_words, PREPRINTED_RADIUS)}
     # Only words falling inside a DECLARED, expanded zone are kept. Without that filter the
     # grid writes 500 MB of JSONL for 36 KB of useful words per page, and the price is written
-    # in plain sight in LIMITES.md: a forbidden value reappearing OUTSIDE any declared field
+    # in plain sight in LIMITS.md: a forbidden value reappearing OUTSIDE any declared field
     # will not be seen.
     boxes = [z.expanded(ZONE_MARGIN) for z in zones.values()]
     out = Reading(piece.id, piece.template.name, round(prep.angle, 3), prep.quarter_turns,

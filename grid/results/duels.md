@@ -1,15 +1,15 @@
-# Duels entre sensors concurrents
+# Duels between competing sensors
 
-Chaque concurrent est juge a SON propre point de fonctionnement, celui qui tient
-le budget de faux positifs de 0.2%. Comparer deux sensors a un threshold
-commun comparerait une scale et pas un capteur. Les intervalles sont des
-intervalles de Wilson a 95%: a trois graines par cell, l'intervalle normal ment.
+Each contender is judged at ITS OWN operating point, the one that holds the
+false positive budget of 0.2%. Comparing two sensors at a common
+threshold would compare a scale and not a sensor. The intervals are 95% Wilson
+intervals: at three seeds per cell, the normal interval lies.
 
 ## consistency
 
-| settings | threshold | recall global | fpr global | recall 150 dpi | recall 200 dpi | recall 300 dpi |
+| settings | threshold | global recall | global fpr | recall 150 dpi | recall 200 dpi | recall 300 dpi |
 |---|---|---|---|---|---|---|
-| min_conf=0.0, text_sensor=zone **(retenu)** | 0.3939 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
+| min_conf=0.0, text_sensor=zone **(retained)** | 0.3939 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | min_conf=0.0, text_sensor=union | 0.4416 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | min_conf=10.0, text_sensor=zone | 0.3939 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | min_conf=10.0, text_sensor=union | 0.4416 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
@@ -28,13 +28,13 @@ intervalles de Wilson a 95%: a trois graines par cell, l'intervalle normal ment.
 | min_conf=80.0, text_sensor=zone | 2 | 0.000 | 0.0000 | 0.000 [0.00, 0.01] | 0.000 [0.00, 0.01] | 0.000 [0.00, 0.01] |
 | min_conf=80.0, text_sensor=union | 1.8 | 0.000 | 0.0000 | 0.000 [0.00, 0.01] | 0.000 [0.00, 0.01] | 0.000 [0.00, 0.01] |
 
-Meme gagnant a tous les dpi: min_conf=0.0, text_sensor=zone.
+Same winner at every dpi: min_conf=0.0, text_sensor=zone.
 
 ## expiry
 
-| settings | threshold | recall global | fpr global | recall 150 dpi | recall 200 dpi | recall 300 dpi |
+| settings | threshold | global recall | global fpr | recall 150 dpi | recall 200 dpi | recall 300 dpi |
 |---|---|---|---|---|---|---|
-| min_conf=0.0, text_sensor=page **(retenu)** | -207.5 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
+| min_conf=0.0, text_sensor=page **(retained)** | -207.5 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | min_conf=0.0, text_sensor=zone | -207.5 | 1.000 | 0.0000 | 1.000 [0.98, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | min_conf=0.0, text_sensor=union | -207.5 | 1.000 | 0.0000 | 1.000 [0.98, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | min_conf=10.0, text_sensor=page | -207.5 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
@@ -53,13 +53,13 @@ Meme gagnant a tous les dpi: min_conf=0.0, text_sensor=zone.
 | min_conf=80.0, text_sensor=zone | -207.5 | 1.000 | 0.0000 | 1.000 [0.98, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | min_conf=80.0, text_sensor=union | -207.5 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 
-EGALITE, non departage: 18 reglages rendent exactement le meme recall (1.000) et le meme rate de faux positifs (0.0000) sur l'overall du domain. Ce corpus et cette grid ne les distinguent pas. Le settings retenu est le premier de la liste, et ce choix n'est appuye par aucune mesure: min_conf=0.0, text_sensor=page, min_conf=0.0, text_sensor=zone, min_conf=0.0, text_sensor=union, min_conf=10.0, text_sensor=page.
+TIE, not broken: 18 settings return exactly the same recall (1.000) and the same false positive rate (0.0000) over the whole domain. This corpus and this grid do not tell them apart. The retained setting is the first of the list, and that choice is backed by no measurement: min_conf=0.0, text_sensor=page, min_conf=0.0, text_sensor=zone, min_conf=0.0, text_sensor=union, min_conf=10.0, text_sensor=page.
 
 ## forbidden_value
 
-| settings | threshold | recall global | fpr global | recall 150 dpi | recall 200 dpi | recall 300 dpi |
+| settings | threshold | global recall | global fpr | recall 150 dpi | recall 200 dpi | recall 300 dpi |
 |---|---|---|---|---|---|---|
-| min_conf=0.0, text_sensor=page **(retenu)** | 0.7214 | 0.991 | 0.0009 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 0.979 [0.96, 0.99] |
+| min_conf=0.0, text_sensor=page **(retained)** | 0.7214 | 0.991 | 0.0009 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 0.979 [0.96, 0.99] |
 | min_conf=0.0, text_sensor=zone | 0.7214 | 0.991 | 0.0009 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 0.979 [0.96, 0.99] |
 | min_conf=0.0, text_sensor=union | 0.7214 | 0.991 | 0.0009 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 0.979 [0.96, 0.99] |
 | min_conf=10.0, text_sensor=page | 0.7434 | 0.917 | 0.0009 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 0.740 [0.69, 0.79] |
@@ -78,13 +78,13 @@ EGALITE, non departage: 18 reglages rendent exactement le meme recall (1.000) et
 | min_conf=80.0, text_sensor=zone | 0.8237 | 0.686 | 0.0000 | 0.965 [0.94, 0.98] | 0.403 [0.35, 0.46] | 0.694 [0.64, 0.74] |
 | min_conf=80.0, text_sensor=union | 0.8237 | 0.686 | 0.0000 | 0.965 [0.94, 0.98] | 0.403 [0.35, 0.46] | 0.694 [0.64, 0.74] |
 
-EGALITE, non departage: 3 reglages rendent exactement le meme recall (0.991) et le meme rate de faux positifs (0.0009) sur l'overall du domain. Ce corpus et cette grid ne les distinguent pas. Le settings retenu est le premier de la liste, et ce choix n'est appuye par aucune mesure: min_conf=0.0, text_sensor=page, min_conf=0.0, text_sensor=zone, min_conf=0.0, text_sensor=union.
+TIE, not broken: 3 settings return exactly the same recall (0.991) and the same false positive rate (0.0009) over the whole domain. This corpus and this grid do not tell them apart. The retained setting is the first of the list, and that choice is backed by no measurement: min_conf=0.0, text_sensor=page, min_conf=0.0, text_sensor=zone, min_conf=0.0, text_sensor=union.
 
 ## required_checkbox
 
-| settings | threshold | recall global | fpr global | recall 150 dpi | recall 200 dpi | recall 300 dpi |
+| settings | threshold | global recall | global fpr | recall 150 dpi | recall 200 dpi | recall 300 dpi |
 |---|---|---|---|---|---|---|
-| disc_ratio=0.3, ink_threshold=128 **(retenu)** | -14.38 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
+| disc_ratio=0.3, ink_threshold=128 **(retained)** | -14.38 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | disc_ratio=0.3, ink_threshold=160 | -15.42 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | disc_ratio=0.3, ink_threshold=190 | -16.88 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | disc_ratio=0.42, ink_threshold=128 | -7.622 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
@@ -97,14 +97,14 @@ EGALITE, non departage: 3 reglages rendent exactement le meme recall (0.991) et 
 | disc_ratio=0.7, ink_threshold=160 | 0.7475 | 0.611 | 0.0000 | 0.833 [0.79, 0.87] | 0.000 [0.00, 0.01] | 1.000 [0.99, 1.00] |
 | disc_ratio=0.7, ink_threshold=190 | 5.057 | 0.156 | 0.0006 | 0.476 [0.42, 0.53] | 0.000 [0.00, 0.01] | 0.000 [0.00, 0.01] |
 
-Meme gagnant a tous les dpi: disc_ratio=0.3, ink_threshold=128.
+Same winner at every dpi: disc_ratio=0.3, ink_threshold=128.
 
 ## required_field
 
-| settings | threshold | recall global | fpr global | recall 150 dpi | recall 200 dpi | recall 300 dpi |
+| settings | threshold | global recall | global fpr | recall 150 dpi | recall 200 dpi | recall 300 dpi |
 |---|---|---|---|---|---|---|
 | text_sensor=union, min_conf=0.0 | -1 | 1.000 | 0.0003 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
-| text_sensor=ink, ink_threshold=128 **(retenu)** | -0.345 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
+| text_sensor=ink, ink_threshold=128 **(retained)** | -0.345 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | text_sensor=ink, ink_threshold=160 | -0.59 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | text_sensor=ink, ink_threshold=190 | -0.5895 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | text_sensor=page, min_conf=0.0 | 1 | 0.000 | 0.0000 | 0.000 [0.00, 0.01] | 0.000 [0.00, 0.01] | 0.000 [0.00, 0.01] |
@@ -125,18 +125,18 @@ Meme gagnant a tous les dpi: disc_ratio=0.3, ink_threshold=128.
 | text_sensor=union, min_conf=60.0 | 1 | 0.000 | 0.0000 | 0.000 [0.00, 0.01] | 0.000 [0.00, 0.01] | 0.000 [0.00, 0.01] |
 | text_sensor=union, min_conf=80.0 | 1 | 0.000 | 0.0000 | 0.000 [0.00, 0.01] | 0.000 [0.00, 0.01] | 0.000 [0.00, 0.01] |
 
-Le gagnant CHANGE selon le dpi: 150 dpi -> text_sensor=ink, ink_threshold=128, 200 dpi -> text_sensor=union, min_conf=0.0, 300 dpi -> text_sensor=ink, ink_threshold=128. Le settings retenu est celui qui tient le mieux sur l'overall du domain, pas celui qui gagne une colonne.
+The winner CHANGES with dpi: 150 dpi -> text_sensor=ink, ink_threshold=128, 200 dpi -> text_sensor=union, min_conf=0.0, 300 dpi -> text_sensor=ink, ink_threshold=128. The retained setting is the one that holds best over the whole domain, not the one that wins a column.
 
 ## signature
 
-| settings | threshold | recall global | fpr global | recall 150 dpi | recall 200 dpi | recall 300 dpi |
+| settings | threshold | global recall | global fpr | recall 150 dpi | recall 200 dpi | recall 300 dpi |
 |---|---|---|---|---|---|---|
-| ink_threshold=128, signature_sensor=components **(retenu)** | -342.1 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
+| ink_threshold=128, signature_sensor=components **(retained)** | -342.1 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | ink_threshold=128, signature_sensor=ink | -3.822 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | ink_threshold=160, signature_sensor=components | -342.1 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | ink_threshold=160, signature_sensor=ink | -4.043 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | ink_threshold=190, signature_sensor=components | -342.7 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 | ink_threshold=190, signature_sensor=ink | -4.226 | 1.000 | 0.0000 | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] | 1.000 [0.99, 1.00] |
 
-EGALITE, non departage: 6 reglages rendent exactement le meme recall (1.000) et le meme rate de faux positifs (0.0000) sur l'overall du domain. Ce corpus et cette grid ne les distinguent pas. Le settings retenu est le premier de la liste, et ce choix n'est appuye par aucune mesure: ink_threshold=128, signature_sensor=components, ink_threshold=128, signature_sensor=ink, ink_threshold=160, signature_sensor=components, ink_threshold=160, signature_sensor=ink.
+TIE, not broken: 6 settings return exactly the same recall (1.000) and the same false positive rate (0.0000) over the whole domain. This corpus and this grid do not tell them apart. The retained setting is the first of the list, and that choice is backed by no measurement: ink_threshold=128, signature_sensor=components, ink_threshold=128, signature_sensor=ink, ink_threshold=160, signature_sensor=components, ink_threshold=160, signature_sensor=ink.
 

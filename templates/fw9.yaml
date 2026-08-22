@@ -1,4 +1,4 @@
-# Les noms de fields ne sont pas devines: ils sont DECLARES par l'AcroForm du PDF.
+# Field names are not guessed: they are DECLARED by the PDF's AcroForm.
 #   python3 -c "from preflight.geometry import declared_zones as z; print(sorted(z('corpus/fw9.pdf')))"
 pdf: fw9.pdf
 page: 1
@@ -7,8 +7,8 @@ fields:
   name: f1_01[0]
   address: f1_07[0]
   city: f1_08[0]
-  # Le formulaire declare MaxLen=3 sur f1_11: le number est SPLIT sur trois boxes,
-  # comme le formulaire le prevoit. La liste dit le decoupage, on ne tronque rien.
+  # The form declares MaxLen=3 on f1_11: the number is SPLIT over three boxes, exactly as the
+  # form intends. The list states the split, nothing is truncated.
   tax_id: ["f1_11[0]", "f1_12[0]", "f1_13[0]"]
 boxes:
   status: c1_1[0]

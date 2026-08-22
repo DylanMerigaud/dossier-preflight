@@ -13,7 +13,7 @@ from preflight.reference import load_reference
 
 # The spike's cell: page skewed, noisy, recompressed. A test that only ran on a perfect render
 # would prove nothing about what the tool claims to do.
-# This point is PROVISIONAL until LIMITES.md gives the per-check breakdown floor: it is chosen
+# This point is PROVISIONAL until LIMITS.md gives the per-check breakdown floor: it is chosen
 # above the assumed floor, not measured as being above it.
 CELL = Degradation(angle=0.5, dpi=200, jpeg=55, sigma=6.0, seed=11)
 

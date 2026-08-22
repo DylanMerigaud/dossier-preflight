@@ -1,8 +1,8 @@
-.travail/
+.work/
 __pycache__/
 *.pyc
 
-grid/mesures/
+grid/measurements/
 grid/.fixtures/
 grid/run.log
 grid/analyze.log

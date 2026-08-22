@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dossier-preflight"
 version = "0.1.0"
-description = "Ce dossier va-t-il se faire refuser au filing: conformite mesuree sur ce qui est vraiment imprime"
+description = "Is this dossier going to be rejected at the counter: conformity measured on what is actually printed"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [{ name = "Dylan Merigaud" }]
-keywords = ["ocr", "pdf", "acroform", "conformite", "filing"]
+keywords = ["ocr", "pdf", "acroform", "compliance", "forms"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: MIT License",
@@ -18,8 +18,8 @@ classifiers = [
     "Topic :: Text Processing :: Markup :: PDF",
 ]
 
-# Le coeur, et rien d'autre. matplotlib n'est utilise QUE par grid/analyze.py pour plot
-# les courbes: l'annoncer ici ferait croire a un runtime plus lourd qu'il n'est.
+# The core, and nothing else. matplotlib is used ONLY by grid/analyze.py to plot the curves:
+# declaring it here would suggest a heavier runtime than this actually is.
 dependencies = [
     "numpy>=1.24",
     "pillow>=10",
@@ -29,7 +29,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-grid = ["matplotlib>=3.7"]        # uniquement pour grid/analyze.py
+grid = ["matplotlib>=3.7"]          # only for grid/analyze.py
 dev = ["pytest>=8"]
 
 [project.urls]
@@ -38,18 +38,17 @@ Repository = "https://github.com/DylanMerigaud/dossier-preflight"
 [project.scripts]
 dossier-preflight = "preflight.__main__:main"
 
-# DEUX DEPENDANCES SYSTEME, ET PIP NE LES INSTALLE PAS:
-#   tesseract >= 5, avec les donnees de language eng ET fra (le Cerfa est en francais; sans
-#     tesseract-ocr-fra les fields du Cerfa sortent VIDES, sans message d'erreur, ce qui
-#     ressemble a un defaut de dossier et n'en est pas un)
-#   poppler (pdftoppm), pour rasteriser les PDF
+# TWO SYSTEM DEPENDENCIES, AND PIP INSTALLS NEITHER:
+#   tesseract >= 5, with the eng AND fra language data (the Cerfa is in French; without
+#     tesseract-ocr-fra its fields come out EMPTY, with no error message, which looks like a
+#     dossier defect and is not one)
+#   poppler (pdftoppm), to rasterise the PDFs
 # macOS:  brew install tesseract tesseract-lang poppler
 # Debian: apt-get install tesseract-ocr tesseract-ocr-fra poppler-utils
 #
-# reportlab n'est PAS une dependance et ne doit pas le devenir: le texte et la signature des
-# fixtures sont poses par un flux PDF ecrit a la main et fusionne par pypdf, precisement pour
-# ne pas l'ajouter.
+# reportlab is NOT a dependency and must not become one: the fixtures' text and signature are
+# laid down by a hand-written PDF stream merged by pypdf, precisely to avoid adding it.
 
 [tool.setuptools]
-# `grid/` n'est pas empaquete: c'est le banc de mesure, il se lance from_dict un clone.
+# `grid/` is not packaged: it is the measurement rig, it runs from a clone.
 packages = ["preflight"]

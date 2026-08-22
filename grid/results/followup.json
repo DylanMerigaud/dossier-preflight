@@ -7,9 +7,9 @@
     "jpeg": 95,
     "sigma": 12.0
   },
-  "outside_protocol": "graines tirees apres avoir vu ou l'outil manquait; ne deplacent aucun threshold et n'entrent dans aucun chiffre publie",
+  "outside_protocol": "seeds drawn after seeing where the tool was missing; they move no threshold and enter no published figure",
   "sets": {
-    "origin": {
+    "original": {
       "n_pairs": 18,
       "tp": 15,
       "n": 18,

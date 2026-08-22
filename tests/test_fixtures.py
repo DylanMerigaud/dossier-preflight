@@ -23,7 +23,7 @@ from preflight.fixtures import VARIANTS
 # ink no longer fits inside the outline. This check does not read, so it does not abstain, and
 # extending abstention to every coordinate-based check would disable it between 96 and 148 dpi
 # where the grid nevertheless measures it at 1.000 recall. The tolerance is therefore the right
-# place to carry that remainder, and its figure is in LIMITES.md.
+# place to carry that remainder, and its figure is in LIMITS.md.
 #
 # The fixture cell is one of the 270 out of 288 where this firing does not happen: the test
 # would pass even without this line, and that is exactly why the line must be written. A test

@@ -1,9 +1,9 @@
-# CETTE CI N'A JAMAIS TOURNE au moment ou elle est ecrite: le depot venait d'acquerir un
-# remote. Son premier run est donc lui-meme une mesure, et il peut rougir pour une raison
-# qui n'est pas une regression: les thresholds ont ete lus sous tesseract 5.5.1 en local, et
-# ubuntu-latest en fournit une autre version. Si un check de texte bouge ici et nulle part
-# ailleurs, la cause est la version d'OCR et pas un threshold. Ne deplacer aucune value de
-# thresholds.json pour verdir ce fichier: un threshold se deplace parce que la grid le dit.
+# THIS CI HAD NEVER RUN when it was written: the repo had only just acquired a remote. Its
+# first run is therefore itself a measurement, and it may go red for a reason that is not a
+# regression: the thresholds were read under tesseract 5.5.1 locally, and ubuntu-latest ships
+# a different version. If a text check moves here and nowhere else, the cause is the OCR
+# version and not a threshold. Never move a value in thresholds.json to make this file green:
+# a threshold moves because the grid says so.
 name: tests
 
 on:
@@ -23,30 +23,30 @@ jobs:
         with:
           python-version: "3.12"
 
-      # tesseract-ocr seul ne fournit que l'anglais. Sans -fra, les fields du Cerfa sortent
-      # VIDES et les tests echouent de facon illisible, sans jamais dire "language manquante".
-      - name: dependances systeme
+      # tesseract-ocr alone only ships English. Without -fra the Cerfa's fields come out EMPTY
+      # and the tests fail unreadably, never once saying "missing language".
+      - name: system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y tesseract-ocr tesseract-ocr-eng tesseract-ocr-fra poppler-utils
           tesseract --version
           pdftoppm -v
 
-      - name: installer
+      - name: install
         run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
 
-      - name: le manifeste de corpus tient
+      - name: the corpus manifest holds
         run: python -m pytest tests/test_corpus.py -q
 
-      - name: la suite
+      - name: the suite
         run: python -m pytest -q
 
-      - name: le premier cas vert
+      - name: the first green case
         run: python spike/proof.py
 
-      # `pip install -e .` a pose un script console: verifier qu'il existe vraiment, sinon
-      # le point d'entree n'est un point d'entree que from_dict un clone.
-      - name: le script console est installe
+      # `pip install -e .` laid down a console script: check it really exists, otherwise the
+      # entry point is only an entry point from a clone.
+      - name: the console script is installed
         run: dossier-preflight --help
 
-# grid/run.py n'est PAS ici et ne doit pas y venir: deux heures sur treize processus.
+# grid/run.py is NOT here and must not come here: two hours on thirteen workers.

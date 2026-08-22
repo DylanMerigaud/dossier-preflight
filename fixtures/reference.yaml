@@ -1,14 +1,14 @@
-# REFERENTIEL FICTIONAL. Personnes inventees, adresses inventees, dates calees sur un faux depot.
-# Rien ici ne designe une person reelle, et aucun document delivre a quiconque n'entre dans
-# ce depot: le corpus est fait de formulaires VIERGES tels que l'administration les publie.
+# FICTIONAL REFERENCE. Invented people, invented addresses, dates set against a fake filing.
+# Nothing here designates a real person, and no document ever issued to anybody enters this
+# repo: the corpus is made of BLANK forms exactly as the administration publishes them.
 
 dossier: DP-2026-0417
 
-# DEUX HORLOGES. La meme piece peut etre bonne pour un dossier et perimee pour l'autre au
-# meme instant. Un outil qui n'a qu'une clock se trompe la moitie du temps.
+# TWO CLOCKS. The same piece can be good for one dossier and expired for another at the very
+# same instant. A tool with only one clock is wrong half the time.
 clocks:
-  filing: 2026-08-21        # la date qui refuse
-  admissibility: 2026-02-10   # une autre date de reference, ou la meme piece passe
+  filing: 2026-08-21          # the date that rejects
+  admissibility: 2026-02-10   # another reference date, where the same piece passes
 
 person:
   name: QUISPE VARGAS
@@ -25,15 +25,15 @@ person:
     postal_code: "03600"
     city: COMMENTRY
 
-# Ce qui ne doit JAMAIS reapparaitre sur une piece. Le premier est le number d'exemple
-# imprime dans la notice du formulaire: le recopier est un motif de refus classique.
+# What must NEVER reappear on a piece. The first is the example number printed in the form's
+# own instructions: copying it out is a classic rejection reason.
 forbidden_values:
   - 999-99-9999
   - A COMPLETER
 
 expiry:
-  # Date portee par la piece employment. Saine, elle depasse les deux clocks. Perimee, elle
-  # tombe ENTRE les deux: refusee au filing, acceptee a la date de admissibility.
+  # The date carried by the employment piece. Valid, it is past both clocks. Expired, it falls
+  # BETWEEN them: rejected at filing, accepted at the admissibility date.
   valid_expiry_date: 31/12/2027
   expired_expiry_date: 31/05/2026
 
@@ -45,7 +45,7 @@ pieces:
   - id: identity
     template: cerfa14011
 
-# Meme data, deux pieces. Si elles divergent, le filing refuse les deux.
+# The same data, two pieces. If they diverge, the counter rejects both.
 consistencies:
   - data: street_name
     readings:
