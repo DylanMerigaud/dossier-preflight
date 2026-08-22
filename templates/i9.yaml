@@ -1,0 +1,23 @@
+pdf: i-9.pdf
+page: 1
+language: eng
+fields:
+  name: Last Name (Family Name)
+  first_name: First Name Given Name
+  address: Address Street Number and Name
+  city: City or Town
+  postal_code: ZIP Code
+  birth_date: Date of Birth mmddyyyy
+  ssn: US Social Security Number
+  expiry_date: Exp Date mmddyyyy
+  signature_date: Today's Date mmddyyy
+boxes:
+  status: CB_4
+signatures:
+  employee: Signature of Employee
+required: [name, first_name, address, city, postal_code, birth_date, signature_date]
+required_boxes: [status]
+required_signatures: [employee]
+dates:
+  expiry_date: expiration
+date_format: us

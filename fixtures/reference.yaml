@@ -1,0 +1,53 @@
+# FICTIONAL REFERENCE. Invented people, invented addresses, dates set against a fake filing.
+# Nothing here designates a real person, and no document ever issued to anybody enters this
+# repo: the corpus is made of BLANK forms exactly as the administration publishes them.
+
+dossier: DP-2026-0417
+
+# TWO CLOCKS. The same piece can be good for one dossier and expired for another at the very
+# same instant. A tool with only one clock is wrong half the time.
+clocks:
+  filing: 2026-08-21          # the date that rejects
+  admissibility: 2026-02-10   # another reference date, where the same piece passes
+
+person:
+  name: QUISPE VARGAS
+  first_name: MARISOL
+  birth_date: 14/03/1991
+  birth_city: COMMENTRY
+  tax_id: 412-88-7305
+  ssn: 461-72-9058
+  card_number: AB1234567
+  address:
+    number: "128"
+    street_type: RUE
+    street_name: DES ACACIAS
+    postal_code: "03600"
+    city: COMMENTRY
+
+# What must NEVER reappear on a piece. The first is the example number printed in the form's
+# own instructions: copying it out is a classic rejection reason.
+forbidden_values:
+  - 999-99-9999
+  - A COMPLETER
+
+expiry:
+  # The date carried by the employment piece. Valid, it is past both clocks. Expired, it falls
+  # BETWEEN them: rejected at filing, accepted at the admissibility date.
+  valid_expiry_date: 31/12/2027
+  expired_expiry_date: 31/05/2026
+
+pieces:
+  - id: tax
+    template: fw9
+  - id: employment
+    template: i9
+  - id: identity
+    template: cerfa14011
+
+# The same data, two pieces. If they diverge, the counter rejects both.
+consistencies:
+  - data: street_name
+    readings:
+      - {piece: tax, field: address}
+      - {piece: identity, field: street_name}

@@ -1,63 +1,62 @@
-"""Chaque variante porte UN defaut: le controle vise doit crier, les autres doivent se taire.
+"""Each variant carries ONE defect: the targeted check must fire, the others must stay silent.
 
-La seconde moitie de cette phrase est celle qui compte. Un controle qui crie sur la variante
-du voisin est un faux positif, et un faux positif coute la credibilite de toute la gate: une
-regle qui crie au loup fait survoler celles d'a cote.
+The second half of that sentence is the one that matters. A check that fires on its
+neighbour's variant is a false positive, and a false positive costs the credibility of the
+whole gate: a rule that cries wolf makes every rule next to it get skimmed.
 """
 import pytest
 
-from preflight.controles import CONTROLES, evaluer
-from preflight.fixtures import VARIANTES
+from preflight.checks import CHECKS, evaluate
+from preflight.fixtures import VARIANTS
 
-# Une seule tolerance, et elle est CHIFFREE par la grille, pas supposee.
+# One single tolerance, and it is MEASURED by the grid, not assumed.
 #
-# Elle couvrait autrefois champ_requis et coherence sur la variante a 72 dpi. Les deux sont
-# sorties, chacune pour une raison mesuree:
-#   champ_requis: la grille a retenu le capteur d'ENCRE, qui ne demande pas a lire. Diaphonie
-#     mesuree sur resolution_basse: 0/864 dossiers du domaine.
-#   coherence: les controles qui LISENT s'abstiennent desormais sur une piece sous le
-#     plancher, au lieu de comparer des jetons qu'ils n'ont pas su lire. Avant cette regle,
-#     456/864. Apres, 0/864.
+# It used to cover required_field and consistency on the 72 dpi variant. Both left, each for a
+# measured reason:
+#   required_field: the grid retained the INK sensor, which does not ask to read anything.
+#     Crosstalk measured on low_resolution: 0/864 dossiers of the domain.
+#   consistency: checks that READ now abstain on a piece below the floor, instead of comparing
+#     tokens they failed to read. Before that rule, 456/864. After it, 0/864.
 #
-# Reste case_obligatoire, 18/864 soit 2,1%. La piece fiscal de cette variante est rendue a
-# 72 dpi: la case c1_1[0] y fait huit pixels de cote, et le disque central qui mesure son
-# encre ne tient plus dans le trait. Ce controle ne lit pas, donc il ne s'abstient pas, et
-# etendre l'abstention a tout controle par coordonnees le desactiverait entre 96 et 148 dpi
-# ou la grille le mesure pourtant a 1,000 de rappel. La tolerance est donc le bon endroit
-# pour porter ce reste, et son chiffre est dans LIMITES.md.
+# What remains is required_checkbox, 18/864, that is 2.1%. This variant's tax piece is rendered
+# at 72 dpi: box c1_1[0] is eight pixels across there, and the central disc that measures its
+# ink no longer fits inside the outline. This check does not read, so it does not abstain, and
+# extending abstention to every coordinate-based check would disable it between 96 and 148 dpi
+# where the grid nevertheless measures it at 1.000 recall. The tolerance is therefore the right
+# place to carry that remainder, and its figure is in LIMITS.md.
 #
-# La cellule des fixtures est l'une des 270 sur 288 ou ce declenchement ne se produit pas: le
-# test passerait meme sans cette ligne, et c'est precisement pourquoi il faut l'ecrire. Un
-# test vert par chance de tirage encode une affirmation que la grille contredit ailleurs.
-TOLERE = {"resolution_basse": {"case_obligatoire"}}
+# The fixture cell is one of the 270 out of 288 where this firing does not happen: the test
+# would pass even without this line, and that is exactly why the line must be written. A test
+# that is green by luck of the draw encodes a claim the grid contradicts elsewhere.
+TOLERATED = {"low_resolution": {"required_checkbox"}}
 
 
-def declenches(lectures, referentiel, nom, horloge="guichet"):
-    """Aucun reglage n'est passe: on veut le chemin de PRODUCTION, celui qui lit seuils.json.
+def fired(readings, reference, name, clock="filing"):
+    """No settings are passed: we want the PRODUCTION path, the one that reads thresholds.json.
 
-    Un test qui passerait Reglages() court-circuiterait les capteurs et les seuils mesures par
-    la grille et testerait les valeurs de spike, c'est-a-dire pas le produit.
+    A test passing Settings() would short-circuit the sensors and thresholds the grid measured
+    and would test the spike values instead, which is to say not the product.
     """
-    cons = evaluer(lectures[nom], referentiel, horloge)
-    return {c for c in CONTROLES if any(x.declenche for x in cons if x.controle == c)}
+    findings = evaluate(readings[name], reference, clock)
+    return {c for c in CHECKS if any(x.fires for x in findings if x.check == c)}
 
 
-def test_le_dossier_sain_ne_declenche_rien(lectures, referentiel):
-    assert declenches(lectures, referentiel, "sain") == set()
+def test_a_clean_dossier_fires_nothing(readings, reference):
+    assert fired(readings, reference, "clean") == set()
 
 
-@pytest.mark.parametrize("variante", [v for v in VARIANTES if v.controle], ids=lambda v: v.nom)
-def test_le_controle_vise_se_declenche(lectures, referentiel, variante):
-    assert variante.controle in declenches(lectures, referentiel, variante.nom)
+@pytest.mark.parametrize("variant", [v for v in VARIANTS if v.check], ids=lambda v: v.name)
+def test_the_targeted_check_fires(readings, reference, variant):
+    assert variant.check in fired(readings, reference, variant.name)
 
 
-@pytest.mark.parametrize("variante", [v for v in VARIANTES if v.controle], ids=lambda v: v.nom)
-def test_les_autres_controles_se_taisent(lectures, referentiel, variante):
-    autres = declenches(lectures, referentiel, variante.nom) - {variante.controle}
-    assert autres <= TOLERE.get(variante.nom, set()), f"diaphonie: {sorted(autres)}"
+@pytest.mark.parametrize("variant", [v for v in VARIANTS if v.check], ids=lambda v: v.name)
+def test_the_other_checks_stay_silent(readings, reference, variant):
+    others = fired(readings, reference, variant.name) - {variant.check}
+    assert others <= TOLERATED.get(variant.name, set()), f"crosstalk: {sorted(others)}"
 
 
-def test_chaque_controle_est_couvert_par_une_variante():
-    """Un controle sans variante n'a ni vrai positif ni faux negatif mesurable."""
-    vises = {v.controle for v in VARIANTES if v.controle}
-    assert vises == set(CONTROLES)
+def test_every_check_is_covered_by_a_variant():
+    """A check with no variant has neither a measurable true positive nor a false negative."""
+    targeted = {v.check for v in VARIANTS if v.check}
+    assert targeted == set(CHECKS)

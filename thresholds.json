@@ -1,0 +1,167 @@
+{
+  "_": "Chaque threshold porte son ORIGINE. 'spike' = value de mise au point choisie a la main sur un exemple. 'grid' = point de fonctionnement LU sur une curve precision/recall, avec le rate de faux positifs tenu. Tant qu'une ligne dit 'spike', ce check n'est pas mesure.",
+  "direction": "Le score est oriente: plus haut = plus de raison de refuser. Le check se fires quand score > value.",
+  "thresholds": {
+    "required_field": {
+      "value": -0.345,
+      "origin": "grid",
+      "reading": "fires if the zone carries less than 0.345% ink ADDED relative to the blank (ink threshold 128)",
+      "settings": "text_sensor=ink, ink_threshold=128",
+      "measured_settings": {
+        "text_sensor": "ink",
+        "ink_threshold": 128
+      },
+      "recall": 1.0,
+      "false_positives": 0.0,
+      "measured_with": "seed 37, never used to choose the threshold",
+      "curve": "grid/results/pr_required_field.csv",
+      "cells_under_floor": "0/288",
+      "nominal_domain_dpi": 150
+    },
+    "required_checkbox": {
+      "value": -14.375,
+      "origin": "grid",
+      "reading": "fires if the ink delta of the central disc (radius 0.3 of the side, ink threshold 128) is below +14.38",
+      "settings": "disc_ratio=0.3, ink_threshold=128",
+      "measured_settings": {
+        "disc_ratio": 0.3,
+        "ink_threshold": 128
+      },
+      "recall": 1.0,
+      "false_positives": 0.0,
+      "measured_with": "seed 37, never used to choose the threshold",
+      "curve": "grid/results/pr_required_checkbox.csv",
+      "cells_under_floor": "0/288",
+      "nominal_domain_dpi": 150
+    },
+    "signature": {
+      "value": -342.05,
+      "origin": "grid",
+      "reading": "fires if the largest added component is less than 342 px of canonical diagonal",
+      "settings": "ink_threshold=128, signature_sensor=components",
+      "measured_settings": {
+        "ink_threshold": 128,
+        "signature_sensor": "components"
+      },
+      "recall": 1.0,
+      "false_positives": 0.0,
+      "measured_with": "seed 37, never used to choose the threshold",
+      "curve": "grid/results/pr_signature.csv",
+      "cells_under_floor": "0/288",
+      "nominal_domain_dpi": 150
+    },
+    "expiry": {
+      "value": 0.0,
+      "origin": "definition",
+      "reading": "fires as soon as the date read has passed at the chosen clock",
+      "why_frozen": "Ce threshold encode le SENS du mot perime, il n'est pas un parametre. Laisse libre, la grid l'avait porte a -207,5 jours parce que la piece saine du reference expire en 2027 et que tout threshold entre -497 et -110 separe alors parfaitement les donnees. L'outil aurait declare une piece perimee sept mois avant qu'elle le soit.",
+      "recall": 1.0,
+      "false_positives": 0.0,
+      "measured_with": "seed 37, never used to choose the threshold",
+      "settings": "min_conf=0.0, text_sensor=page",
+      "measured_settings": {
+        "min_conf": 0.0,
+        "text_sensor": "page"
+      },
+      "curve": "grid/results/pr_expiry.csv",
+      "cells_under_floor": "0/288",
+      "nominal_domain_dpi": 150
+    },
+    "consistency": {
+      "value": 0.3939,
+      "origin": "grid",
+      "reading": "fires if the worst token of the smaller reading is less than 0.606 similar to the best token of the other piece",
+      "settings": "min_conf=0.0, text_sensor=zone",
+      "measured_settings": {
+        "min_conf": 0.0,
+        "text_sensor": "zone"
+      },
+      "recall": 1.0,
+      "false_positives": 0.0,
+      "measured_with": "seed 37, never used to choose the threshold",
+      "curve": "grid/results/pr_consistency.csv",
+      "cells_under_floor": "0/288",
+      "nominal_domain_dpi": 150
+    },
+    "forbidden_value": {
+      "value": 0.7214,
+      "origin": "grid",
+      "reading": "fires if a run of added words is more than 0.721 similar to a forbidden value",
+      "settings": "min_conf=0.0, text_sensor=page",
+      "measured_settings": {
+        "min_conf": 0.0,
+        "text_sensor": "page"
+      },
+      "recall": 0.9965,
+      "false_positives": 0.00058,
+      "measured_with": "seed 37, never used to choose the threshold",
+      "curve": "grid/results/pr_forbidden_value.csv",
+      "cells_under_floor": "6/288",
+      "nominal_domain_dpi": 150
+    },
+    "resolution": {
+      "value": -148.5,
+      "origin": "grid",
+      "reading": "fires below 148.5 estimated dpi, that is the floor of 150 dpi minus a margin of 1.0%; the floor is read off the recall of the checks that depend on OCR and not off this check's own curve, and the margin covers ten times the maximum measured error of the estimator (0.0133%)",
+      "settings": "no settings",
+      "measured_settings": {},
+      "recall": 1.0,
+      "false_positives": 0.0,
+      "measured_with": "seed 37, never used to choose the threshold",
+      "curve": "grid/results/pr_resolution.csv",
+      "cells_under_floor": "0/288",
+      "nominal_domain_dpi": 150,
+      "own_curve_threshold": -110.99,
+      "dependent_recall_by_dpi": {
+        "required_field": {
+          "150": 1.0,
+          "200": 1.0,
+          "300": 1.0
+        },
+        "expiry": {
+          "150": 1.0,
+          "200": 1.0,
+          "300": 1.0
+        },
+        "consistency": {
+          "150": 1.0,
+          "200": 1.0,
+          "300": 1.0
+        },
+        "forbidden_value": {
+          "150": 1.0,
+          "200": 1.0,
+          "300": 0.979
+        }
+      }
+    },
+    "cropped_page": {
+      "value": 0.0879,
+      "origin": "grid",
+      "reading": "fires if more than 8.79% of the blank's ink falls outside the scan's frame",
+      "settings": "no settings",
+      "measured_settings": {},
+      "recall": 1.0,
+      "false_positives": 0.0,
+      "measured_with": "seed 37, never used to choose the threshold",
+      "curve": "grid/results/pr_cropped_page.csv",
+      "cells_under_floor": "0/288",
+      "nominal_domain_dpi": 150
+    },
+    "rotated_page": {
+      "value": 0.3585,
+      "origin": "grid",
+      "reading": "fires if a quarter turn beats the original quarter by more than 0.359 of correlation",
+      "settings": "no settings",
+      "measured_settings": {},
+      "recall": 1.0,
+      "false_positives": 0.0,
+      "measured_with": "seed 37, never used to choose the threshold",
+      "curve": "grid/results/pr_rotated_page.csv",
+      "cells_under_floor": "0/288",
+      "nominal_domain_dpi": 150
+    }
+  },
+  "measured_on": "2026-08-21",
+  "false_positive_budget": 0.002
+}

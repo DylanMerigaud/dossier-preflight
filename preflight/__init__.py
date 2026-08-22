@@ -1,18 +1,22 @@
-"""dossier-preflight: ce dossier va-t-il se faire refuser au guichet.
+"""dossier-preflight: is this dossier going to be rejected at the counter.
 
-Trois proprietes portent tout le design, et elles viennent du spike:
+A "dossier" is a set of supporting documents filed together with an administration, and a
+"piece" is one document in it. Both words are kept untranslated throughout: they are the
+subject, and "file" and "document" lose the relation between the two.
 
-  1. TOUT controle par coordonnees exige un REDRESSEMENT avant. L'encre brute lue dans une
-     zone d'un scan tourne a annonce 8 cases cochees alors que rien n'etait coche.
-  2. L'encre est le mauvais capteur pour du TEXTE. Un champ vide lit encore +2,44% d'encre
-     contre +4,5 pour un champ rempli: separable, mais fragile. Les positions de mots OCR
-     sont nettes (0 mot contre 3).
-  3. Le formulaire vierge n'est pas une fixture, c'est l'IMAGE DE REFERENCE. Chaque controle
-     est un differentiel contre lui, les mots pre-imprimes lus sur le vierge sont soustraits,
-     et on n'affirme jamais que sur ce qui a ete AJOUTE.
+Three properties carry the whole design, and all three came out of the spike:
 
-Le repere canonique est le vierge rendu a CANON_DPI. Un scan y est ramene par recalage
-(orientation, echelle, translation) avant qu'aucune coordonnee ne soit lue. Aucune coordonnee
-n'est mesuree a la main: les AcroForm DECLARENT leurs zones.
+  1. ANY coordinate-based check needs DESKEWING first. Raw ink measured inside a zone of a
+     rotated scan reported 8 ticked boxes when nothing was ticked at all.
+  2. Ink is the wrong sensor for TEXT. An empty field still reads +2.44% ink against +4.5%
+     for a filled one: separable, but fragile. OCR word positions are clean (0 words
+     against 3).
+  3. The blank form is not just a fixture, it is the REFERENCE IMAGE. Every check is a
+     differential against it, the pre-printed words read on the blank are subtracted, and
+     the tool therefore only ever asserts something about what was ADDED.
+
+The canonical frame is the blank rendered at CANON_DPI. A scan is brought into that frame by
+registration (orientation, scale, translation) before a single coordinate is read. No
+coordinate is measured by hand anywhere: AcroForm PDFs DECLARE their zones.
 """
 CANON_DPI = 200

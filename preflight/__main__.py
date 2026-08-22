@@ -1,40 +1,39 @@
-"""Lancer les controles sur un VRAI dossier: des scans a soi, pas des fixtures.
+"""Run the checks on a REAL dossier: your own scans, not fixtures.
 
-    python -m preflight fixtures/referentiel.yaml \
-        --horloge guichet \
-        --piece fiscal=scans/w9.pdf --piece emploi=scans/i9.pdf
+    python -m preflight fixtures/reference.yaml \
+        --clock filing \
+        --piece tax=scans/w9.pdf --piece employment=scans/i9.pdf
 
-TROIS VERDICTS ET PAS DEUX, et c'est le resultat de mesure le plus recent du depot. Un
-controle qui LIT s'abstient sur une piece sous le plancher de resolution: son constat porte
-un score None qui vaut INDECIDABLE, jamais "conforme". Les deux appellent des gestes opposes
-au guichet: un defaut dit REFAIS LE DOSSIER, une page illisible dit REFAIS LE SCAN. Ecraser
-les deux dans un meme code de sortie dirait "ton dossier a un defaut" a quelqu'un dont le
-dossier est peut-etre parfait et le scan mauvais.
+THREE VERDICTS AND NOT TWO, and that is the most recent measurement result in this repo. A
+check that READS abstains on a piece below the resolution floor: its finding carries a score
+of None, which means UNDECIDABLE and never "compliant". The two call for opposite actions at
+the counter: a defect says REDO THE DOSSIER, an unreadable page says REDO THE SCAN. Collapsing
+both into one exit code would tell someone whose dossier may be perfect and whose scan is bad
+that their dossier has a defect.
 
-    0   aucun constat
-    1   au moins un DEFAUT DE DOSSIER, c'est-a-dire un controle autre que resolution
-    2   aucun defaut de dossier, mais l'outil ne sait pas lire: resolution se declenche
-        et/ou des controles se sont abstenus
-    64  erreur d'usage (EX_USAGE), pour ne pas se confondre avec 2
+    0   no finding
+    1   at least one DOSSIER DEFECT, that is, any check other than resolution
+    2   no dossier defect, but the tool cannot read: resolution fired and/or checks abstained
+    64  usage error (EX_USAGE), so it cannot be confused with 2
 
-Le controle de resolution est du cote SCAN et pas du cote DOSSIER, et ce n'est pas un choix
-de gout: LIMITES.md le dit deja pour lui seul, il repond "je ne sais pas lire cette page" et
-pas "cette page est fautive". Ranger son declenchement parmi les defauts ferait sortir 1 sur
-un dossier peut-etre parfait mal numerise. L'abstention a exactement la meme condition que
-son declenchement (les deux lisent le meme plancher), donc un code reserve au seul indecidable
-ne se produirait jamais: les deux partagent le code 2, et le texte les distingue.
+The resolution check sits on the SCAN side and not the DOSSIER side, and that is not a matter
+of taste: LIMITS.md already says so for that check alone, it answers "I cannot read this
+page" and not "this page is at fault". Filing it under defects would return 1 on a possibly
+perfect dossier that was badly scanned. Abstention has exactly the same condition as that
+check firing (both read the same floor), so a code reserved for abstention alone would never
+occur: the two share code 2, and the text tells them apart.
 
-L'HORLOGE EST OBLIGATOIRE, et ce n'est pas de la ceremonie. La meme piece est bonne pour un
-dossier et perimee pour l'autre au meme instant: le referentiel declare ses horloges par nom
-(guichet, recevabilite) et un outil qui prendrait la date du jour en silence jetterait la
-seule propriete que ce depot outille et que les autres n'outillent pas.
+THE CLOCK IS MANDATORY, and that is not ceremony. The same piece is good for one dossier and
+expired for another at the very same instant: the reference declares its clocks by name
+(filing, admissibility) and a tool that silently took today's date would throw away the one
+property this repo tools and others do not.
 
-LIMITE CONNUE DE --dpi. C'est le dpi de RASTERISATION du PDF, pas le dpi de capture du scan.
-Sur un PDF qui contient deja une image, demander 300 ici ne recree pas l'information que le
-scanner n'a pas prise: la page est rendue plus grande, et le controle de resolution estime
-alors la resolution du RENDU. Rasteriser haut ne fait donc pas passer le plancher a un mauvais
-scan, il deplace la question. Le defaut est CANON_DPI, la resolution du repere canonique, et
-c'est la valeur sous laquelle tous les chiffres de LIMITES.md ont ete mesures.
+KNOWN LIMIT OF --dpi. This is the RASTERISATION dpi of the PDF, not the capture dpi of the
+scan. On a PDF that already contains an image, asking for 300 here does not recreate
+information the scanner never captured: the page is rendered larger, and the resolution check
+then estimates the resolution of the RENDER. Rasterising high therefore does not push a bad
+scan past the floor, it moves the question. The default is CANON_DPI, the resolution of the
+canonical frame, and it is the value under which every figure in LIMITS.md was measured.
 """
 import argparse
 import datetime as dt
@@ -44,170 +43,169 @@ import sys
 from dataclasses import dataclass, replace
 
 from . import CANON_DPI
-from .controles import CONTROLES, evaluer
+from .checks import CHECKS, evaluate
 from .degradation import Degradation
-from .gabarits import RACINE
-from .lecture import lire, vierge
-from .referentiel import charger_referentiel
+from .templates import ROOT
+from .reading import read_piece, blank
+from .reference import load_reference
 
 
 @dataclass(frozen=True)
-class PieceScannee:
-    """Le minimum que `lire()` demande. Volontairement pas la PieceMaterielle de fixtures.py:
-    le chemin de production ne doit pas dependre du generateur de dossiers synthetiques,
-    sinon le point d'entree ne saurait tourner que sur des dossiers fabriques et aurait l'air
-    de marcher sur un vrai."""
+class ScannedPiece:
+    """The minimum `read_piece()` asks for. Deliberately not the BuiltPiece of fixtures.py:
+    the production path must not depend on the synthetic dossier generator, or the entry point
+    would only ever run on manufactured dossiers while looking like it works on a real one."""
     id: str
-    gabarit: object
+    template: object
     pdf: str
 
 
-# Aucune degradation: ni rotation, ni bruit, ni flou, ni recompression. `appliquer()` rend
-# alors la page telle qu'elle a ete rasterisee. La grille degrade, la production non.
-INTACT = Degradation(angle=0.0, jpeg=100, sigma=0.0, flou=0.0)
+# No degradation at all: no rotation, no noise, no blur, no recompression. `apply()` then
+# returns the page exactly as it was rasterised. The grid degrades, production does not.
+PRISTINE = Degradation(angle=0.0, jpeg=100, sigma=0.0, blur=0.0)
 
-# Le seul controle qui, en se declenchant, parle du SCAN et non du DOSSIER.
-COTE_SCAN = "resolution"
+# The only check that, by firing, talks about the SCAN and not the DOSSIER.
+SCAN_SIDE = "resolution"
 
 
-class Analyseur(argparse.ArgumentParser):
+class Parser(argparse.ArgumentParser):
     def error(self, message):
-        """argparse sort 2 par defaut, or 2 veut dire "je ne sais pas lire" ici."""
+        """argparse exits 2 by default, and 2 means "I cannot read" here."""
         self.print_usage(sys.stderr)
-        sys.stderr.write(f"{self.prog}: erreur: {message}\n")
+        sys.stderr.write(f"{self.prog}: error: {message}\n")
         sys.exit(64)
 
 
-def _horloge(ref, valeur):
-    """Un nom declare par le referentiel, ou une date ISO. Jamais la date du jour implicite."""
-    if valeur in ref.horloges:
-        return ref, valeur
+def _clock(ref, value):
+    """A name declared by the reference, or an ISO date. Never an implicit today."""
+    if value in ref.clocks:
+        return ref, value
     try:
-        date = dt.date.fromisoformat(valeur)
+        date = dt.date.fromisoformat(value)
     except ValueError:
-        connues = ", ".join(sorted(ref.horloges)) or "aucune"
-        raise SystemExit(f"horloge inconnue {valeur!r}. Horloges declarees: {connues}. "
-                         f"Sinon donner une date ISO (AAAA-MM-JJ).")
-    return replace(ref, horloges={**ref.horloges, valeur: date}), valeur
+        known = ", ".join(sorted(ref.clocks)) or "none"
+        raise SystemExit(f"unknown clock {value!r}. Declared clocks: {known}. "
+                         f"Otherwise give an ISO date (YYYY-MM-DD).")
+    return replace(ref, clocks={**ref.clocks, value: date}), value
 
 
-def _pieces(ref, couples):
-    """id=chemin, valide contre ce que le referentiel declare."""
-    declarees = dict(ref.pieces)
+def _pieces(ref, pairs):
+    """id=path, validated against what the reference declares."""
+    declared = dict(ref.pieces)
     out = {}
-    for c in couples:
+    for c in pairs:
         if "=" not in c:
-            raise SystemExit(f"--piece attend id=chemin, recu {c!r}")
-        pid, chemin = c.split("=", 1)
-        if pid not in declarees:
-            raise SystemExit(f"piece {pid!r} non declaree par le referentiel. "
-                             f"Declarees: {', '.join(declarees)}")
-        if not os.path.exists(chemin):
-            raise SystemExit(f"piece {pid!r}: fichier introuvable {chemin!r}")
-        out[pid] = PieceScannee(pid, ref.gabarits[declarees[pid]], os.path.abspath(chemin))
+            raise SystemExit(f"--piece expects id=path, got {c!r}")
+        pid, path = c.split("=", 1)
+        if pid not in declared:
+            raise SystemExit(f"piece {pid!r} is not declared by the reference. "
+                             f"Declared: {', '.join(declared)}")
+        if not os.path.exists(path):
+            raise SystemExit(f"piece {pid!r}: file not found {path!r}")
+        out[pid] = ScannedPiece(pid, ref.templates[declared[pid]], os.path.abspath(path))
     return out
 
 
-def trier(constats):
-    """Trois tas: defaut de dossier, page illisible, et le reste."""
-    defauts = [c for c in constats if c.declenche and c.controle != COTE_SCAN]
-    illisible = [c for c in constats
-                 if (c.declenche and c.controle == COTE_SCAN) or c.score is None]
-    muets = [c for c in constats if not c.declenche and c.score is not None]
-    return defauts, illisible, muets
+def sort_findings(findings):
+    """Three piles: dossier defect, unreadable page, and the rest."""
+    defects = [c for c in findings if c.fires and c.check != SCAN_SIDE]
+    unreadable = [c for c in findings
+                  if (c.fires and c.check == SCAN_SIDE) or c.score is None]
+    silent = [c for c in findings if not c.fires and c.score is not None]
+    return defects, unreadable, silent
 
 
-def _lignes(constats):
-    return [f"  {c.controle:17s} {c.piece:12s} {str(c.cible)[:26]:28s} {c.detail}"
-            for c in sorted(constats, key=lambda c: (c.piece, c.controle))]
+def _lines(findings):
+    return [f"  {c.check:17s} {c.piece:12s} {str(c.target)[:26]:28s} {c.detail}"
+            for c in sorted(findings, key=lambda c: (c.piece, c.check))]
 
 
-def _texte(constats, ref, nom_horloge, dpi, fournies, manquantes, tout):
-    defauts, illisible, muets = trier(constats)
-    l = [f"dossier {ref.dossier}, horloge {nom_horloge} ({ref.horloge(nom_horloge)}), "
-         f"{len(fournies)} piece(s) rendue(s) a {dpi} dpi"]
-    if manquantes:
-        l += ["", "PIECES NON FOURNIES, donc NON JUGEES (aucun constat ne les concerne): "
-              + ", ".join(sorted(manquantes))]
-    if defauts:
-        l += ["", f"DEFAUTS DE DOSSIER ({len(defauts)}). Le guichet refuserait, "
-              "refaire le DOSSIER:"] + _lignes(defauts)
-        if {c.controle for c in defauts} & {"page_coupee", "page_tournee"}:
-            l += ["", "Une page coupee ou tournee peut venir du SCAN et pas du dossier. Ces "
-                  "deux controles sont ranges du cote dossier parce que la grille les mesure "
-                  "sur des pages vraiment abimees, pas parce qu'on sait d'ou vient l'abimage."]
-    if illisible:
-        abstenus = [c for c in illisible if c.score is None]
-        l += ["", f"L'OUTIL NE SAIT PAS LIRE ({len(illisible)}). Ce n'est PAS \"conforme\", "
-              "refaire le SCAN:"] + _lignes(illisible)
-        if abstenus:
-            l += ["", f"{len(abstenus)} de ces constats sont des ABSTENTIONS: le controle a "
-                  "refuse de se prononcer sur une piece sous le plancher de resolution. "
-                  "Indecidable ne veut pas dire conforme."]
-        if defauts:
-            l += ["", "ATTENTION: des controles se sont tus faute de pouvoir lire. La liste "
-                  "des defauts ci-dessus n'est donc pas complete."]
-    if tout:
-        l += ["", f"NE SE DECLENCHENT PAS ({len(muets)}):"] + _lignes(muets)
+def _text(findings, ref, clock_name, dpi, supplied, missing, show_all):
+    defects, unreadable, silent = sort_findings(findings)
+    l = [f"dossier {ref.dossier}, clock {clock_name} ({ref.clock(clock_name)}), "
+         f"{len(supplied)} piece(s) rendered at {dpi} dpi"]
+    if missing:
+        l += ["", "PIECES NOT SUPPLIED, therefore NOT JUDGED (no finding concerns them): "
+              + ", ".join(sorted(missing))]
+    if defects:
+        l += ["", f"DOSSIER DEFECTS ({len(defects)}). The counter would reject this, "
+              "REDO THE DOSSIER:"] + _lines(defects)
+        if {c.check for c in defects} & {"cropped_page", "rotated_page"}:
+            l += ["", "A cropped or rotated page can come from the SCAN and not from the "
+                  "dossier. These two checks sit on the dossier side because the grid measures "
+                  "them on genuinely damaged pages, not because we know what damaged them."]
+    if unreadable:
+        abstained = [c for c in unreadable if c.score is None]
+        l += ["", f"THE TOOL CANNOT READ ({len(unreadable)}). This is NOT \"compliant\", "
+              "REDO THE SCAN:"] + _lines(unreadable)
+        if abstained:
+            l += ["", f"{len(abstained)} of these findings are ABSTENTIONS: the check refused "
+                  "to rule on a piece below the resolution floor. Undecidable does not mean "
+                  "compliant."]
+        if defects:
+            l += ["", "WARNING: some checks stayed silent because they could not read. The "
+                  "list of defects above is therefore not complete."]
+    if show_all:
+        l += ["", f"DID NOT FIRE ({len(silent)}):"] + _lines(silent)
     l.append("")
-    if not defauts and not illisible:
-        l += ["Aucun controle ne se declenche.",
-              "CE N'EST PAS UNE GARANTIE. Le rappel et les faux positifs de chaque controle,",
-              "le domaine ou ils tiennent et ce que la mesure ne couvre pas sont dans",
-              "LIMITES.md. En particulier: la mesure porte sur UN dossier fictif de trois",
-              "formulaires degrades SYNTHETIQUEMENT, aucun scan reel n'y est entre."]
+    if not defects and not unreadable:
+        l += ["No check fires.",
+              "THIS IS NOT A GUARANTEE. The recall and false positive rate of every check, the",
+              "domain where they hold, and what the measurement does not cover are all in",
+              "LIMITS.md. In particular: the measurement rests on ONE fictional dossier of",
+              "three forms degraded SYNTHETICALLY, and no real scan ever entered it."]
     return "\n".join(l)
 
 
 def main(argv=None):
-    ap = Analyseur(prog="python -m preflight",
-                   description="Les controles de refus de guichet, sur des scans a soi.",
-                   epilog="Codes de sortie: 0 aucun constat, 1 defaut de dossier, "
-                          "2 page illisible ou controle abstenu, 64 erreur d'usage.")
-    ap.add_argument("referentiel", help="YAML decrivant le dossier attendu et ses pieces")
-    ap.add_argument("--piece", action="append", default=[], metavar="ID=CHEMIN",
-                    help="le scan d'une piece declaree par le referentiel, repetable")
-    ap.add_argument("--horloge", required=True, metavar="NOM|AAAA-MM-JJ",
-                    help="OBLIGATOIRE: un nom d'horloge du referentiel, ou une date ISO. "
-                         "Une piece bonne a une date est perimee a l'autre.")
+    ap = Parser(prog="python -m preflight",
+                description="Counter rejection checks, run on your own scans.",
+                epilog="Exit codes: 0 no finding, 1 dossier defect, "
+                       "2 unreadable page or abstaining check, 64 usage error.")
+    ap.add_argument("reference", help="YAML describing the expected dossier and its pieces")
+    ap.add_argument("--piece", action="append", default=[], metavar="ID=PATH",
+                    help="the scan of a piece declared by the reference, repeatable")
+    ap.add_argument("--clock", required=True, metavar="NAME|YYYY-MM-DD",
+                    help="MANDATORY: a clock name from the reference, or an ISO date. "
+                         "A piece that is good at one date is expired at another.")
     ap.add_argument("--dpi", type=int, default=CANON_DPI,
-                    help=f"dpi de rasterisation du PDF, pas de capture du scan "
-                         f"(defaut {CANON_DPI})")
-    ap.add_argument("--racine", default=RACINE,
-                    help="dossier contenant gabarits/ et corpus/ (defaut: la racine du depot)")
-    ap.add_argument("--tout", action="store_true",
-                    help="lister aussi les controles qui ne se declenchent pas")
-    ap.add_argument("--json", action="store_true", help="sortie machine")
+                    help=f"rasterisation dpi of the PDF, not the capture dpi of the scan "
+                         f"(default {CANON_DPI})")
+    ap.add_argument("--root", default=ROOT,
+                    help="directory holding templates/ and corpus/ (default: the repo root)")
+    ap.add_argument("--all", action="store_true", dest="show_all",
+                    help="also list the checks that do not fire")
+    ap.add_argument("--json", action="store_true", help="machine readable output")
     a = ap.parse_args(argv)
 
     if not a.piece:
-        raise SystemExit("aucune piece fournie. Donner au moins un --piece ID=CHEMIN. "
-                         "Ce point d'entree lit des scans reels, il ne genere pas de fixture.")
-    ref = charger_referentiel(a.referentiel, racine=a.racine)
-    ref, nom_horloge = _horloge(ref, a.horloge)
+        raise SystemExit("no piece supplied. Give at least one --piece ID=PATH. This entry "
+                         "point reads real scans, it does not generate a fixture.")
+    ref = load_reference(a.reference, root=a.root)
+    ref, clock_name = _clock(ref, a.clock)
     pieces = _pieces(ref, a.piece)
-    manquantes = {p for p, _ in ref.pieces} - set(pieces)
+    missing = {p for p, _ in ref.pieces} - set(pieces)
 
-    for _, nom_gab in ref.pieces:
-        vierge(ref.gabarits[nom_gab])
-    lectures = {pid: lire(p, replace(INTACT, dpi=a.dpi)) for pid, p in pieces.items()}
-    constats = evaluer(lectures, ref, nom_horloge)
-    defauts, illisible, _ = trier(constats)
+    for _, template_name in ref.pieces:
+        blank(ref.templates[template_name])
+    readings = {pid: read_piece(p, replace(PRISTINE, dpi=a.dpi)) for pid, p in pieces.items()}
+    findings = evaluate(readings, ref, clock_name)
+    defects, unreadable, _ = sort_findings(findings)
 
     if a.json:
         print(json.dumps({
-            "dossier": ref.dossier, "horloge": nom_horloge,
-            "date_horloge": str(ref.horloge(nom_horloge)), "dpi_rendu": a.dpi,
-            "pieces_jugees": sorted(pieces), "pieces_non_fournies": sorted(manquantes),
-            "controles": list(CONTROLES),
-            "verdict": "defaut" if defauts else ("illisible" if illisible else "aucun_constat"),
-            "constats": [{"controle": c.controle, "piece": c.piece, "cible": str(c.cible),
-                          "score": c.score, "declenche": c.declenche,
-                          "indecidable": c.score is None, "detail": c.detail}
-                         for c in constats]}, ensure_ascii=False, indent=2))
+            "dossier": ref.dossier, "clock": clock_name,
+            "clock_date": str(ref.clock(clock_name)), "render_dpi": a.dpi,
+            "pieces_judged": sorted(pieces), "pieces_not_supplied": sorted(missing),
+            "checks": list(CHECKS),
+            "verdict": "defect" if defects else ("unreadable" if unreadable else "no_finding"),
+            "findings": [{"check": c.check, "piece": c.piece, "target": str(c.target),
+                          "score": c.score, "fires": c.fires,
+                          "undecidable": c.score is None, "detail": c.detail}
+                         for c in findings]}, ensure_ascii=False, indent=2))
     else:
-        print(_texte(constats, ref, nom_horloge, a.dpi, pieces, manquantes, a.tout))
-    return 1 if defauts else (2 if illisible else 0)
+        print(_text(findings, ref, clock_name, a.dpi, pieces, missing, a.show_all))
+    return 1 if defects else (2 if unreadable else 0)
 
 
 if __name__ == "__main__":

@@ -1,11 +1,11 @@
-.travail/
+.work/
 __pycache__/
 *.pyc
 
-grille/mesures/
-grille/.fixtures/
-grille/lancement.log
-grille/analyse.log
+grid/measurements/
+grid/.fixtures/
+grid/run.log
+grid/analyze.log
 
 *.egg-info/
 build/
