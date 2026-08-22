@@ -25,8 +25,8 @@ sys.path.insert(0, os.path.join(HERE, "src"))
 
 import numpy as np
 
-import parasite
 import preflight.reading as PL
+from preflight import parasite
 from preflight.checks import Settings, evaluate
 from preflight.degradation import Degradation
 from preflight.fixtures import build

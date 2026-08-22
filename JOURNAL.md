@@ -181,10 +181,17 @@ thinned and the new one is crossed fully against what remains:
 cells at parasite=none, on the same three seeds, produced by the same code. Reusing them costs
 zero and keeps the comparison exact.
 
-    108 cells x 3 new levels x 3 seeds x 12 readings = 11,664 readings
-    11,664 x 6.8 / 13 / 60 = 102 minutes, about 1 h 45
+    108 cells x 3 new levels x 3 seeds x 13 readings = 12,636 readings
+    12,636 x 6.8 / 13 / 60 = 110 minutes, about 1 h 50
 
     analysis set: 108 x 4 x 3 = 1,296 dossiers, against 864 today
+
+**Revised for the fourth piece.** The Spanish W-9 makes a dossier 13 readings instead of 12, so
+the figures above went from 11,664 to 12,636 readings and from 102 to 110 minutes. It also made
+every task of the existing 13,824-reading file one reading short: exactly 1,152 readings missing
+(384 cells x 3 seeds x the one new piece). Re-running those tasks whole would have cost two hours
+to reproduce readings that already exist and are deterministic, so `--backfill` produces only what
+is missing, for about ten minutes. The cost model predicted ten and the run confirmed it.
 
 **Placement.** One parasite per piece per dossier, its shape drawn from the seed among the probe's
 three (speck, fold shadow, neighbouring stroke), its position drawn among that piece's DECLARED

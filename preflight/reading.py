@@ -116,13 +116,20 @@ def blank(template):
     return _BLANK_MEMO[key]
 
 
-def read_piece(piece, deg):
+def read_piece(piece, deg, parasite=None):
     """Render, degrade, deskew, register, measure. Returns a Reading.
 
     Nothing here compares against a reference and nothing crosses a threshold: deliberately.
+
+    `parasite` is an optional callable (grey, dpi) -> grey, applied BETWEEN the clean render and
+    the degradation so that whatever it lays down goes through the same rotation, noise, blur
+    and compression as the page itself. That order is the whole point: foreign ink that had not
+    been through the scanner chain would not be foreign ink, it would be a drawing.
     """
     blank_img, blank_words, zones, _ = blank(piece.template)
     raw = render(piece.pdf, dpi=deg.dpi, page=piece.template.page)
+    if parasite is not None:
+        raw = parasite(raw, deg.dpi)
     prep = prepare(apply(raw, deg), blank_img)
     frame, scan, framed_blank = prep.frame, prep.frame.scan, prep.frame.blank
     scale = frame.scale

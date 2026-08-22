@@ -19,7 +19,7 @@ rotation, noise and compression as the rest of the page:
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
-CANON_DPI = 200
+from . import CANON_DPI
 
 
 def _zone_scan(zone, dpi):
