@@ -44,14 +44,23 @@ Une cellule est declaree HORS DOMAINE quand le rappel y passe sous 95%.
 - Les degradations sont SYNTHETIQUES. Un vrai scanner ajoute des artefacts que cette
   grille n'imite pas: courbure de page, ombre de reliure, poussiere sur la vitre,
   moire de retramage. La grille borne le domaine, elle ne le prouve pas.
-- CONSEQUENCE DIRECTE SUR LE CAPTEUR D'ENCRE, et elle est genante parce que ce capteur
-  gagne son duel: aucune degradation de cette grille n'AJOUTE d'encre etrangere dans
-  une zone. Un tampon, une ombre de pliure, un trait de stylo qui deborde du champ
-  voisin feraient dire a ce capteur qu'un champ vide est rempli, c'est-a-dire un faux
-  negatif, le cote cher de l'asymetrie. Il gagne ici sur un terrain qui lui est
-  favorable, et le dire fait partie du resultat. Le capteur de mots, lui, ne confond
-  pas une tache avec une valeur, et son point de fonctionnement mesure est juste a
-  cote (voir le duel).
+- CONSEQUENCE DIRECTE SUR LE CAPTEUR D'ENCRE, et elle n'est plus une hypothese:
+  aucune degradation de cette grille n'AJOUTE d'encre etrangere dans une zone, et le
+  capteur retenu pour les champs requis gagne donc son duel sur un terrain qui lui
+  est favorable. Une sonde de 528 lectures a mis des le 2026-08-21 un chiffre sur ce
+  que ce terrain cachait (sonde-encre-parasite/CONSTAT-ENCRE-PARASITE.md): des qu'au
+  moins 0,5% d'encre etrangere entre dans la zone, ce capteur declare REMPLI un champ
+  VIDE dans 1,000 des cas [0,975, 1,000] sur n=151, contre 0,272 pour l'union des
+  capteurs de mots, 0,185 pleine page et 0,106 en zone. Ce sont des faux negatifs, le
+  cote cher de l'asymetrie. La bascule est une falaise posee sur le seuil publie de
+  0,345%: 96 declenchements sur 96 sous 0,32% d'encre ajoutee, 0 sur 167 au-dessus de
+  0,38%. Pour ce champ, 0,35% vaut une tache de 9 x 8 px a 200 dpi, une poussiere sur
+  la vitre; un trait de stylo qui deborde a peine du champ voisin ajoute deja 0,61%.
+  LE CAPTEUR ET LE SEUIL N'ONT PAS ETE CHANGES, et c'est la bonne decision tant que
+  la mesure est une sonde: un champ, deux cellules, trois formes de parasite. Elle
+  montre qu'un choix a ete tranche sur un terrain biaise, elle ne suffit pas a fixer
+  un seuil. Le changer demande de rejouer cette grille avec l'encre parasite en
+  CINQUIEME FACTEUR, et c'est le premier chantier de mesure qui reste ouvert.
 - La precision depend de la prevalence. Les courbes la donnent a 10% de dossiers fautifs, valeur SUPPOSEE et non mesuree.
 
 ## Suivi hors protocole: la seule cellule ou l'outil manque quelque chose

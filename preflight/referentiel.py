@@ -40,15 +40,23 @@ class Referentiel:
 
 
 def charger_referentiel(chemin=None, racine=RACINE):
+    """`dossier`, `horloges` et `pieces` sont requis, le reste ne l'est pas.
+
+    `personne` et `validite` ne servent qu'a REMPLIR des fixtures, jamais a evaluer: aucun
+    controle ne les lit. Les exiger obligerait quelqu'un qui veut juger ses propres scans a
+    inventer une identite pour satisfaire le chargeur, ce qui est exactement l'inverse de ce
+    que ce depot promet. `valeurs_interdites` et `coherences`, eux, sont lus par les controles
+    mais un dossier peut legitimement n'en declarer aucun.
+    """
     chemin = chemin or os.path.join(racine, "fixtures", "referentiel.yaml")
     d = yaml.safe_load(open(chemin, encoding="utf-8"))
     pieces = tuple((p["id"], p["gabarit"]) for p in d["pieces"])
     return Referentiel(
         dossier=d["dossier"],
         horloges={k: _date(v) for k, v in d["horloges"].items()},
-        personne=d["personne"],
-        valeurs_interdites=tuple(str(v) for v in d["valeurs_interdites"]),
-        validite={k: _date(v) for k, v in d["validite"].items()},
+        personne=d.get("personne") or {},
+        valeurs_interdites=tuple(str(v) for v in (d.get("valeurs_interdites") or ())),
+        validite={k: _date(v) for k, v in (d.get("validite") or {}).items()},
         pieces=pieces,
         coherences=tuple(d.get("coherences") or ()),
         gabarits={g: charger(g, racine) for _, g in pieces},

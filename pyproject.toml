@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dossier-preflight"
+version = "0.1.0"
+description = "Ce dossier va-t-il se faire refuser au guichet: conformite mesuree sur ce qui est vraiment imprime"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Dylan Merigaud" }]
+keywords = ["ocr", "pdf", "acroform", "conformite", "guichet"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Text Processing :: Markup :: PDF",
+]
+
+# Le coeur, et rien d'autre. matplotlib n'est utilise QUE par grille/analyser.py pour tracer
+# les courbes: l'annoncer ici ferait croire a un runtime plus lourd qu'il n'est.
+dependencies = [
+    "numpy>=1.24",
+    "pillow>=10",
+    "pypdf>=4",
+    "pyyaml>=6",
+    "scipy>=1.10",
+]
+
+[project.optional-dependencies]
+grille = ["matplotlib>=3.7"]        # uniquement pour grille/analyser.py
+dev = ["pytest>=8"]
+
+[project.urls]
+Repository = "https://github.com/DylanMerigaud/dossier-preflight"
+
+[project.scripts]
+dossier-preflight = "preflight.__main__:main"
+
+# DEUX DEPENDANCES SYSTEME, ET PIP NE LES INSTALLE PAS:
+#   tesseract >= 5, avec les donnees de langue eng ET fra (le Cerfa est en francais; sans
+#     tesseract-ocr-fra les champs du Cerfa sortent VIDES, sans message d'erreur, ce qui
+#     ressemble a un defaut de dossier et n'en est pas un)
+#   poppler (pdftoppm), pour rasteriser les PDF
+# macOS:  brew install tesseract tesseract-lang poppler
+# Debian: apt-get install tesseract-ocr tesseract-ocr-fra poppler-utils
+#
+# reportlab n'est PAS une dependance et ne doit pas le devenir: le texte et la signature des
+# fixtures sont poses par un flux PDF ecrit a la main et fusionne par pypdf, precisement pour
+# ne pas l'ajouter.
+
+[tool.setuptools]
+# `grille/` n'est pas empaquete: c'est le banc de mesure, il se lance depuis un clone.
+packages = ["preflight"]

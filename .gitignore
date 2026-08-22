@@ -6,3 +6,7 @@ grille/mesures/
 grille/.fixtures/
 grille/lancement.log
 grille/analyse.log
+
+*.egg-info/
+build/
+dist/

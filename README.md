@@ -25,6 +25,16 @@ et 23; le chiffre ci-dessous est celui de la graine 37, jamais regardee avant.
 | page_coupee | une page tronquee | couverture de l'encre du vierge | 0.088 | 1.000 | 0.00000 |
 | page_tournee | une page a l'envers | marge de correlation par quart de tour | 0.359 | 1.000 | 0.00000 |
 
+**CE QUE CE TABLEAU NE COUVRE PAS, ET IL FAUT LE LIRE AVEC LUI.** Les 1152 dossiers, ce sont
+UN dossier fictif de trois formulaires (W-9, I-9, Cerfa 14011, page 1 pour chacun), UNE
+personne inventee, UN seul defaut par controle, rendus 1152 fois a travers un modele de bruit
+SYNTHETIQUE. Aucun scan reel n'est entre dans cette mesure. Les 1152 mesurent donc le modele
+de bruit et pas le monde: un rappel de 1,000 est celui du meme defaut revu 864 fois, pas celui
+de 864 defauts differents. Ce que ces chiffres ne disent pas: ce que l'outil fait sur un autre
+formulaire, sur une autre facon de rater le meme controle, ou sur une vraie vitre de scanner
+avec sa poussiere, son ombre de reliure et sa courbure de page. `LIMITES.md` detaille chacun
+de ces trous, et l'un d'eux touche le capteur qui a gagne son duel.
+
 Le chiffre qu'un utilisateur ressent n'est pas celui de la colonne de droite, c'est celui du
 dossier entier: **4 dossiers sur 864 entierement sains portent au moins une alarme, soit
 0,46%**, et les quatre viennent du controle des valeurs interdites.
@@ -85,9 +95,34 @@ tesseract. A confiance 40, ce champ REMPLI etait declare vide. A confiance 0, l'
 egalite avec l'encre.
 
 L'encre gagne quand meme, et il faut dire pourquoi elle gagne ici: aucune degradation de cette
-grille n'AJOUTE d'encre etrangere dans une zone. Un tampon, une ombre de pliure, un trait qui
-deborde du champ voisin feraient dire a ce capteur qu'un champ vide est rempli, c'est-a-dire un
-faux negatif, le cote cher de l'asymetrie. Elle gagne sur un terrain qui lui est favorable.
+grille n'AJOUTE d'encre etrangere dans une zone. Elle gagne sur un terrain qui lui est
+favorable.
+
+**Et voila ce que ce terrain cachait, mesure a part.** Une sonde de 528 lectures a pose de
+l'encre etrangere (tache, ombre de pliure, trait du champ voisin) sur la page AVANT les
+degradations. Des qu'au moins 0,5% d'encre etrangere entre dans la zone, sur un champ VIDE:
+
+| capteur | faux negatifs, un champ vide declare rempli | faux positifs, un champ rempli declare vide |
+|---|---|---|
+| encre, seuil 128 (RETENU) | **1.000** [0.975, 1.000] | 0.000 [0.000, 0.014] |
+| union, confiance 0 | 0.272 [0.207, 0.347] | 0.030 [0.015, 0.059] |
+| OCR pleine page | 0.185 [0.132, 0.255] | 0.136 [0.100, 0.183] |
+| OCR de zone | 0.106 [0.066, 0.165] | 0.114 [0.081, 0.158] |
+
+Le capteur retenu rate **100% des champs vides** dans ces conditions, et ce sont des faux
+negatifs, le cote cher de l'asymetrie declaree plus haut: le guichet refuse le dossier et
+l'outil n'a rien dit. La bascule est une falaise posee exactement sur le seuil publie de
+0,345%: 96 declenchements sur 96 sous 0,32% d'encre ajoutee, 0 sur 167 au-dessus de 0,38%,
+une seule lecture entre les deux. Pour ce champ de 15 770 pixels canoniques, 0,35% vaut une
+tache de 9 x 8 px a 200 dpi, c'est-a-dire une poussiere sur la vitre du scanner. Un trait de
+stylo qui deborde a peine du champ voisin ajoute deja 0,61%.
+
+Le seuil et le capteur n'ont PAS ete changes, et c'est deliberé: cette sonde porte sur un
+seul champ, deux cellules et trois formes de parasite dessinees a la main, n=151. Elle suffit
+a montrer qu'un choix de conception a ete tranche sur un terrain biaise; elle ne suffit pas a
+fixer un seuil. Le faire demanderait de rejouer la grille entiere avec l'encre parasite en
+cinquieme facteur. En attendant, la ligne du tableau du duel qui dit 0,0000 de faux positifs
+pour l'encre reste vraie, et elle ne dit rien de ce que coute son unique mode d'echec.
 
 Pour "cette signature est-elle absente", encre differentielle contre composantes connexes:
 **egalite**. Les six reglages rendent exactement 1,000 de rappel et 0,0000 de faux positifs a
@@ -119,15 +154,62 @@ recalee sur le vierge par correlation croisee, ce qui donne gratuitement l'orien
 resolution source estimee et la couverture de page. Sans redressement, l'encre lue dans les
 zones d'un scan tourne de 0,45 degre annonce 8 cases cochees sur 8 alors que rien n'est coche.
 
-## Lancer
+## Installer
+
+Deux dependances sont SYSTEME et pip ne les installe pas: tesseract, avec les donnees de
+langue `eng` ET `fra` (le Cerfa est en francais, et sans `fra` ses champs sortent VIDES sans
+message d'erreur, ce qui ressemble a un defaut de dossier et n'en est pas un), et poppler pour
+`pdftoppm`.
+
+    brew install tesseract tesseract-lang poppler          # macOS
+    apt-get install tesseract-ocr tesseract-ocr-fra poppler-utils   # Debian
+
+    pip install -e .            # le coeur
+    pip install -e ".[dev]"     # avec pytest
+    pip install -e ".[grille]"  # avec matplotlib, seulement pour tracer les courbes
+
+Mesure et tests sur Python 3.12.8, tesseract 5.5.1, poppler 26.04. Le plancher declare est
+3.10 et n'a pas ete teste.
+
+## Lancer sur un dossier a soi
+
+    python3 -m preflight fixtures/referentiel.yaml \
+        --horloge guichet \
+        --piece fiscal=scans/w9.pdf \
+        --piece emploi=scans/i9.pdf \
+        --piece identite=scans/cerfa.pdf
+
+L'horloge est obligatoire. C'est la seule propriete de ce depot que rien d'autre n'outille:
+la meme piece est bonne pour un dossier et perimee pour l'autre au meme instant, et un outil
+qui prendrait la date du jour en silence la jetterait. Passer un nom declare par le
+referentiel (`guichet`, `recevabilite`) ou une date ISO.
+
+Trois verdicts et pas deux, parce que deux appellent des gestes opposes:
+
+| code | verdict | quoi faire |
+|---|---|---|
+| 0 | aucun constat | rien, et ce n'est pas une garantie: voir `LIMITES.md` |
+| 1 | defaut de dossier | refaire le DOSSIER |
+| 2 | l'outil ne sait pas lire | refaire le SCAN |
+| 64 | erreur d'usage | corriger la ligne de commande |
+
+Le code 2 couvre deux choses de la meme famille: le controle de resolution qui se declenche,
+et les controles qui se sont ABSTENUS sur une piece sous le plancher. Une abstention porte un
+score nul qui vaut indecidable, jamais conforme. Le controle de resolution est du cote scan et
+pas du cote dossier parce que c'est deja ce qu'il repond, "je ne sais pas lire cette page" et
+pas "cette page est fautive".
+
+`--json` pour une sortie machine, `--tout` pour voir aussi les controles qui se taisent.
+
+## Lancer le banc de mesure
 
     python3 spike/preuve.py                    # le premier cas vert, autonome
-    python3 -m pytest tests/ -q                # 55 tests
+    python3 -m pytest tests/ -q                # 64 tests, environ 2 min 20 (ils rendent et OCRisent)
     python3 grille/lancer.py                   # la grille, ~2 h sur 13 processus, reprenable
     python3 grille/analyser.py --publier       # lit les seuils sur les courbes, ecrit LIMITES.md
+    python3 grille/suivi_coin.py               # le suivi hors protocole d'une cellule
 
-Outillage local uniquement: tesseract, pdftoppm, pypdf, PIL, numpy, scipy, matplotlib. Aucun
-service distant, aucune depense.
+Outillage local uniquement. Aucun service distant, aucune depense.
 
 ## Le corpus
 
