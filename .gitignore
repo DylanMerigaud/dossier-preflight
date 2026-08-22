@@ -5,8 +5,7 @@ __pycache__/
 
 grid/measurements/
 grid/.fixtures/
-grid/run.log
-grid/analyze.log
+grid/*.log
 
 *.egg-info/
 build/
