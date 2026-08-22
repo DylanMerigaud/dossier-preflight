@@ -40,6 +40,14 @@ expiry:
 pieces:
   - id: tax
     template: fw9
+  # The Spanish W-9, present to BREAK A CONFOUND and not for realism. Nobody files a W-9 twice.
+  # In the previous corpus all 4 false alarms out of 864 clean dossiers landed on the Cerfa, and
+  # "French" and "boxed layout" were the same thing there, so nothing could say which one the
+  # tool struggles with. This piece varies the language while holding the layout. It carries no
+  # variant: it only ever appears clean, so it strengthens the false positive measurement without
+  # touching what recall means.
+  - id: tax_es
+    template: fw9sp
   - id: employment
     template: i9
   - id: identity

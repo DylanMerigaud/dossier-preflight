@@ -242,7 +242,7 @@ def _values(ref, tpl, var, piece_id):
         elif role == "address":
             a = ref.person["address"]
             v = f"{a['number']} {a['street_type']} {a['street_name']}"
-        elif role == "city" and tpl.name == "fw9":
+        elif role == "city" and tpl.name in ("fw9", "fw9sp"):
             a = ref.person["address"]
             v = f"{a['city']}, FR {a['postal_code']}"
         else:

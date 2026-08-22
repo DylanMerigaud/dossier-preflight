@@ -1,0 +1,19 @@
+# The Spanish W-9, published by the IRS itself. Same 23 declared zones as fw9.yaml and the same
+# comb split on the tax number, so what differs against fw9 is the LANGUAGE and not the layout.
+# Field names are not guessed: they are DECLARED by the PDF's AcroForm, and note that this
+# edition does NOT zero-pad them (f1_1 where the English one says f1_01).
+pdf: fw9sp.pdf
+page: 1
+language: spa
+fields:
+  name: f1_1[0]
+  address: f1_7[0]
+  city: f1_8[0]
+  # MaxLen 3, 2 and 4, identical to the English edition.
+  tax_id: ["f1_11[0]", "f1_12[0]", "f1_13[0]"]
+boxes:
+  status: c1_1[0]
+signatures: {}
+required: [name, address, city, tax_id]
+required_boxes: [status]
+date_format: us
