@@ -112,8 +112,10 @@ degradations. Des qu'au moins 0,5% d'encre etrangere entre dans la zone, sur un 
 Le capteur retenu rate **100% des champs vides** dans ces conditions, et ce sont des faux
 negatifs, le cote cher de l'asymetrie declaree plus haut: le guichet refuse le dossier et
 l'outil n'a rien dit. La bascule est une falaise posee exactement sur le seuil publie de
-0,345%: 96 declenchements sur 96 sous 0,32% d'encre ajoutee, 0 sur 167 au-dessus de 0,38%,
-une seule lecture entre les deux. Pour ce champ de 15 770 pixels canoniques, 0,35% vaut une
+0,345%, et les deux populations ne se chevauchent PAS D'UNE SEULE LECTURE: le capteur se
+declenche 97 fois sur 97 jusqu'a 0,323% d'encre ajoutee, et 0 fois sur 167 a partir de
+0,380%. Il n'y a pas de zone grise, il y a une marche. Pour ce champ de 15 770 pixels
+canoniques, 0,35% vaut une
 tache de 9 x 8 px a 200 dpi, c'est-a-dire une poussiere sur la vitre du scanner. Un trait de
 stylo qui deborde a peine du champ voisin ajoute deja 0,61%.
 

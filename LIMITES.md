@@ -53,9 +53,11 @@ Une cellule est declaree HORS DOMAINE quand le rappel y passe sous 95%.
   VIDE dans 1,000 des cas [0,975, 1,000] sur n=151, contre 0,272 pour l'union des
   capteurs de mots, 0,185 pleine page et 0,106 en zone. Ce sont des faux negatifs, le
   cote cher de l'asymetrie. La bascule est une falaise posee sur le seuil publie de
-  0,345%: 96 declenchements sur 96 sous 0,32% d'encre ajoutee, 0 sur 167 au-dessus de
-  0,38%. Pour ce champ, 0,35% vaut une tache de 9 x 8 px a 200 dpi, une poussiere sur
-  la vitre; un trait de stylo qui deborde a peine du champ voisin ajoute deja 0,61%.
+  0,345%, et les deux populations ne se chevauchent pas d'une seule lecture: le
+  capteur se declenche 97 fois sur 97 jusqu'a 0,323% d'encre ajoutee et 0 fois sur
+  167 a partir de 0,380%. Pas de zone grise, une marche. Pour ce champ, 0,35% vaut
+  une tache de 9 x 8 px a 200 dpi, une poussiere sur la vitre; un trait de stylo qui
+  deborde a peine du champ voisin ajoute deja 0,61%.
   LE CAPTEUR ET LE SEUIL N'ONT PAS ETE CHANGES, et c'est la bonne decision tant que
   la mesure est une sonde: un champ, deux cellules, trois formes de parasite. Elle
   montre qu'un choix a ete tranche sur un terrain biaise, elle ne suffit pas a fixer
