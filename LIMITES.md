@@ -54,6 +54,59 @@ Une cellule est declaree HORS DOMAINE quand le rappel y passe sous 95%.
   cote (voir le duel).
 - La precision depend de la prevalence. Les courbes la donnent a 10% de dossiers fautifs, valeur SUPPOSEE et non mesuree.
 
+## Suivi hors protocole: la seule cellule ou l'outil manque quelque chose
+
+HORS PROTOCOLE, et il faut le dire avant les chiffres. Les seuils publies sortent
+d'une regle stricte: deux graines calibrent, la troisieme n'est jamais regardee
+avant que le chiffre soit ecrit. Les graines de ce suivi ont ete tirees APRES
+avoir vu ou l'outil manquait, sur une cellule choisie parce qu'elle manquait.
+Elles ne deplacent aucun seuil et n'entrent dans aucun chiffre publie ailleurs.
+Elles repondent a une seule question: n=18 suffisait-il pour conclure.
+
+Cellule: 300 dpi, JPEG 95, bruit sigma 12.0, controle valeur_interdite, seuil publie 0.7214.
+
+| jeu | rappel | IC 95% | positifs |
+|---|---|---|---|
+| graines d'origine (11, 23, 37) | 0.8333 | [0.608, 0.942] | 18 |
+| 12 graines neuves | 0.9028 | [0.813, 0.952] | 72 |
+| CUMULE | 0.8889 | [0.807, 0.939] | 90 |
+
+Le point estime remonte de 0.833 a 0.889, retour a la moyenne attendu d'un n=18, mais la borne HAUTE
+reste a 0.939, sous le plancher de 95%. Ce n'est
+pas du bruit d'echantillon: le controle manque vraiment quelque chose ici.
+
+TEMOIN, et c'est lui qui rend les douze graines interpretables. Meme cellule,
+memes douze graines, seule la compression change:
+
+- JPEG 95: 65/72 = 0.9028
+- JPEG 30: 71/72 = 0.9861
+
+Les graines neuves ne sont donc pas plus dures, c'est la compression. Une
+compression FORTE efface le grain du capteur; une compression legere le garde, et
+a haute resolution ce grain est assez fin pour se faire lire comme de la
+structure de caractere. Cette partie du mecanisme est MESUREE.
+
+LA FORME REELLE EST UNE CONJONCTION DE QUATRE FACTEURS, pas de deux:
+
+- angle sous 0.5 deg: 30/30 = 1.0000
+- angle a 0.5 deg ou plus: 50/60 = 0.8333
+
+Une marche, pas une pente. La cellule fautive est donc 300 dpi ET JPEG 95 ET
+bruit 12.0 ET angle >= 0.5 deg. Le balayage a deux
+facteurs ci-dessous ne peut pas la voir telle quelle: chaque paire moyenne sur
+les deux facteurs restants, donc elle n'en montre que l'ombre. Il sert a la
+TROUVER; c'est la liste des pires cellules, qui est deja a quatre facteurs, qui
+la NOMME.
+
+Reserve sur le mecanisme: la partie compression est mesuree par le temoin, la
+partie angle est SUPPOSEE. L'hypothese est que c'est l'ampleur du
+reechantillonnage qui compte et non sa presence, un redressement au-dela d'un
+demi-degre etalant le grain fin dans l'epaisseur des traits. Elle n'est pas
+testee. Le redressement applique bien une rotation bicubique des 0,25 deg aussi,
+donc l'explication paresseuse (pas de reechantillonnage sous 0,5 deg) est fausse.
+
+Reproduire: `python3 grille/suivi_coin.py`.
+
 ## Diaphonie: qui crie sur le defaut du voisin
 
 Chaque case donne la part des dossiers ou le controle de la LIGNE se declenche

@@ -425,12 +425,21 @@ def pires_conjonctions(par_cellule, seuil, combien=3):
 
     Une lecture marginale peut mentir par omission. Sur les valeurs interdites, le rappel dit
     0,979 a 300 dpi, 0,981 en JPEG 95 et 0,977 a sigma 12: aucune de ces trois valeurs ne
-    franchit le plancher, et on conclut que le controle va bien partout. Croisees, ces trois
-    valeurs font une cellule a 0,833 dont la borne HAUTE de l'intervalle est sous le plancher.
-    Le signe est a l'envers de l'intuition, et c'est ce qui le rend interessant: le rappel
-    baisse quand la qualite MONTE, parce qu'une compression forte efface le grain du capteur
-    alors qu'une compression legere le garde, et qu'a haute resolution ce grain est assez fin
-    pour se faire lire comme de la structure de caractere.
+    franchit le plancher, et on conclut que le controle va bien partout. Croisees, elles font
+    une cellule sous le plancher. Le signe est a l'envers de l'intuition, et c'est ce qui le
+    rend interessant: le rappel baisse quand la qualite MONTE, parce qu'une compression forte
+    efface le grain du capteur alors qu'une compression legere le garde, et qu'a haute
+    resolution ce grain est assez fin pour se faire lire comme de la structure de caractere.
+    Cette partie du mecanisme est mesuree par temoin, voir grille/suivi_coin.py.
+
+    CE BALAYAGE NE VOIT QUE L'OMBRE DE LA CELLULE, et il faut le savoir en le lisant. La forme
+    reelle de ce defaut-la est une conjonction de QUATRE facteurs (300 dpi ET JPEG 95 ET bruit
+    12 ET angle superieur ou egal a 0,5 deg: 30/30 en dessous de cet angle, 50/60 au-dessus).
+    Une paire moyenne sur les deux facteurs restants, donc elle attenue toujours ce qu'elle
+    montre. Aller a trois et quatre facteurs ferait exploser le nombre de cases et tomber n a
+    15 par case, ce qui rendrait les intervalles inutilisables. Le balayage a deux facteurs
+    sert donc a TROUVER la cellule; c'est la liste des pires cellules, deja a quatre facteurs,
+    qui la NOMME.
     """
     out = {}
     for i, a in enumerate(AXES):
@@ -1022,6 +1031,61 @@ def ecrire_limites(resultats, chemin, n_couples, domaine, n_retenus, essais, cro
          "- La precision depend de la prevalence. Les courbes la donnent a "
          f"{PREVALENCE:.0%} de dossiers fautifs, valeur SUPPOSEE et non mesuree.",
          ""]
+    suivi = os.path.join(RACINE, "grille", "resultats", "suivi.json")
+    if os.path.exists(suivi):
+        d = json.load(open(suivi))
+        c, t, cu = d["jeux"]["coin"], d["jeux"]["temoin"], d["cumule"]
+        co = d["coin"]
+        l += ["## Suivi hors protocole: la seule cellule ou l'outil manque quelque chose", "",
+              "HORS PROTOCOLE, et il faut le dire avant les chiffres. Les seuils publies sortent",
+              "d'une regle stricte: deux graines calibrent, la troisieme n'est jamais regardee",
+              "avant que le chiffre soit ecrit. Les graines de ce suivi ont ete tirees APRES",
+              "avoir vu ou l'outil manquait, sur une cellule choisie parce qu'elle manquait.",
+              "Elles ne deplacent aucun seuil et n'entrent dans aucun chiffre publie ailleurs.",
+              "Elles repondent a une seule question: n=18 suffisait-il pour conclure.", "",
+              f"Cellule: {co['dpi']} dpi, JPEG {co['jpeg']}, bruit sigma {co['sigma']}, controle "
+              f"{d['controle']}, seuil publie {d['seuil']}.", "",
+              "| jeu | rappel | IC 95% | positifs |",
+              "|---|---|---|---|",
+              f"| graines d'origine (11, 23, 37) | {d['jeux']['origine']['rappel']:.4f} | "
+              f"[{d['jeux']['origine']['ic'][0]:.3f}, {d['jeux']['origine']['ic'][1]:.3f}] | "
+              f"{d['jeux']['origine']['n']} |",
+              f"| 12 graines neuves | {c['rappel']:.4f} | [{c['ic'][0]:.3f}, "
+              f"{c['ic'][1]:.3f}] | {c['n']} |",
+              f"| CUMULE | {cu['rappel']:.4f} | [{cu['ic'][0]:.3f}, {cu['ic'][1]:.3f}] | "
+              f"{cu['n']} |", "",
+              f"Le point estime remonte de {d['jeux']['origine']['rappel']:.3f} a "
+              f"{cu['rappel']:.3f}, retour a la moyenne attendu d'un n=18, mais la borne HAUTE",
+              f"reste a {cu['ic'][1]:.3f}, sous le plancher de {RAPPEL_PLANCHER:.0%}. Ce n'est",
+              "pas du bruit d'echantillon: le controle manque vraiment quelque chose ici.", "",
+              "TEMOIN, et c'est lui qui rend les douze graines interpretables. Meme cellule,",
+              "memes douze graines, seule la compression change:", "",
+              f"- JPEG {co['jpeg']}: {c['tp']}/{c['n']} = {c['rappel']:.4f}",
+              f"- JPEG 30: {t['tp']}/{t['n']} = {t['rappel']:.4f}", "",
+              "Les graines neuves ne sont donc pas plus dures, c'est la compression. Une",
+              "compression FORTE efface le grain du capteur; une compression legere le garde, et",
+              "a haute resolution ce grain est assez fin pour se faire lire comme de la",
+              "structure de caractere. Cette partie du mecanisme est MESUREE.", "",
+              "LA FORME REELLE EST UNE CONJONCTION DE QUATRE FACTEURS, pas de deux:", "",
+              f"- angle sous {cu['marche_angle']} deg: {cu['angle_sous_marche'][0]}/"
+              f"{cu['angle_sous_marche'][1]} = {cu['angle_sous_marche'][2]:.4f}",
+              f"- angle a {cu['marche_angle']} deg ou plus: {cu['angle_sur_marche'][0]}/"
+              f"{cu['angle_sur_marche'][1]} = {cu['angle_sur_marche'][2]:.4f}", "",
+              "Une marche, pas une pente. La cellule fautive est donc "
+              f"{co['dpi']} dpi ET JPEG {co['jpeg']} ET",
+              f"bruit {co['sigma']} ET angle >= {cu['marche_angle']} deg. Le balayage a deux",
+              "facteurs ci-dessous ne peut pas la voir telle quelle: chaque paire moyenne sur",
+              "les deux facteurs restants, donc elle n'en montre que l'ombre. Il sert a la",
+              "TROUVER; c'est la liste des pires cellules, qui est deja a quatre facteurs, qui",
+              "la NOMME.", "",
+              "Reserve sur le mecanisme: la partie compression est mesuree par le temoin, la",
+              "partie angle est SUPPOSEE. L'hypothese est que c'est l'ampleur du",
+              "reechantillonnage qui compte et non sa presence, un redressement au-dela d'un",
+              "demi-degre etalant le grain fin dans l'epaisseur des traits. Elle n'est pas",
+              "testee. Le redressement applique bien une rotation bicubique des 0,25 deg aussi,",
+              "donc l'explication paresseuse (pas de reechantillonnage sous 0,5 deg) est fausse.",
+              "", "Reproduire: `python3 grille/suivi_coin.py`.", ""]
+
     if croise:
         noms = [v.nom for v in VARIANTES if v.controle]
         l += ["## Diaphonie: qui crie sur le defaut du voisin", "",

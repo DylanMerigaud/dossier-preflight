@@ -36,9 +36,11 @@ declaree: rappel le plus haut tenable sous 0,2% de faux positifs par cible.
 
 ## Le domaine, et ce qui se passe dehors
 
-**Numerisation a 150 dpi ou plus.** En dessous, le controle des valeurs interdites tombe a
-0,042 de rappel et la coherence declenchait sur 84% des dossiers sains avant qu'elle
-n'apprenne a se taire.
+**Numerisation a 150 dpi ou plus.** En dessous, capteurs bruts, le controle des valeurs
+interdites tombe a 0,042 de rappel et la coherence se declenche sur 84% des dossiers sains.
+Ces deux chiffres ne decrivent pas le produit, ils justifient la regle qui suit: ils sont
+mesures SANS l'abstention, parce qu'une mesure ne peut pas dependre du comportement qu'elle
+sert a regler.
 
 Sous le plancher, l'outil ne devine pas: le controle de resolution se declenche, et **tout
 controle qui LIT s'abstient sur la piece concernee**, avec un verdict "indecidable" qui n'est
@@ -51,8 +53,17 @@ controle doit poser n'est pas "cette page est-elle a 72 dpi", c'est "cette page 
 nette pour que les AUTRES tiennent". Il est donc pose au plancher, moins 1% de marge, la marge
 valant dix fois l'erreur maximale mesuree de l'estimateur de resolution (0,0133%).
 
+Dans ce domaine, l'outil manque quelque chose a un seul endroit, et il est nomme: le controle
+des valeurs interdites descend a **0,889 de rappel [0,807, 0,939] sur 90 positifs** dans la
+conjonction 300 dpi ET JPEG 95 ET bruit 12 ET redressement de 0,5 degre ou plus. Sous ce demi
+degre, 30 sur 30. La borne haute de l'intervalle reste sous le plancher de 95%, donc ce n'est
+pas du bruit d'echantillon. Un temoin a la meme cellule en JPEG 30 rend 0,986: c'est bien la
+compression, une compression forte effacant le grain du capteur qu'une compression legere
+garde. La part du mecanisme qui tient a l'angle reste une hypothese non testee.
+
 `LIMITES.md` donne le detail par controle: rappel par facteur, pires cellules, pires
-croisements de deux facteurs, matrice de diaphonie, et ce que la mesure ne couvre pas.
+croisements de deux facteurs, matrice de diaphonie, le suivi hors protocole de cette cellule,
+et ce que la mesure ne couvre pas.
 
 ## Les deux duels entre capteurs
 

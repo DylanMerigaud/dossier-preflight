@@ -81,11 +81,17 @@ capteur mais son plancher de confiance a 40, qui jetait des champs remplis mais 
 
 ### Ce qui reste
 
-- **Le coin (300 dpi, JPEG 95, bruit 12) des valeurs interdites** est a 0,833 de rappel sur 18
-  positifs seulement, borne haute de l'intervalle sous le plancher. Le signe est a l'envers de
-  l'intuition: une compression forte efface le grain du capteur, une compression legere le
-  garde, et a haute resolution ce grain se fait lire comme de la structure de caractere. La
-  suite est plus de graines sur ce coin, pas un seuil qui bouge.
+- **Le coin des valeurs interdites est tranche, et il est REEL.** 12 graines neuves plus les 3
+  d'origine, n=90: 0,889 de rappel [0,807, 0,939]. Le point estime remonte de 0,833 (retour a
+  la moyenne d'un n=18) mais la borne haute reste sous le plancher. Un temoin a JPEG 30 sur les
+  memes graines rend 0,986, donc c'est bien la compression et pas des graines dures. Et la
+  forme reelle est une conjonction de QUATRE facteurs, pas de deux: 300 dpi ET JPEG 95 ET bruit
+  12 ET angle superieur ou egal a 0,5 deg, avec une marche nette (30/30 en dessous, 50/60
+  au-dessus). Le balayage a deux facteurs n'en voyait que l'ombre. Reste a faire: tester
+  l'hypothese sur l'angle, qui suppose que c'est l'AMPLEUR du reechantillonnage qui compte et
+  non sa presence (le redressement applique une rotation bicubique des 0,25 deg, donc
+  l'explication paresseuse est deja exclue). Mesure hors protocole, elle ne deplace aucun
+  seuil: `python3 grille/suivi_coin.py`.
 - **Le duel de la signature n'est pas tranche.** Il faudrait une degradation qui separe les
   deux capteurs, par exemple un trait parasite dans la zone.
 - **Aucune degradation de la grille n'ajoute d'encre etrangere.** C'est le terrain favorable du
