@@ -87,7 +87,12 @@ def combinations(check):
 
 
 def load(path):
-    """index[(angle, dpi, jpeg, sigma, seed)][variant][piece] = Reading"""
+    """index[(angle, dpi, jpeg, sigma, seed, parasite)][variant][piece] = Reading
+
+    The parasite level goes LAST and the seed stays at index 4 on purpose: split() isolates the
+    validation seed on k[4], and moving it would have silently mixed the held-out seed back into
+    calibration. Readings written before the fifth factor existed carry no level and read as 0.0.
+    """
     index = collections.defaultdict(lambda: collections.defaultdict(dict))
     with open(path, encoding="utf-8") as f:
         for line in f:
@@ -95,7 +100,8 @@ def load(path):
             if not line:
                 continue
             d = json.loads(line)
-            key = (d["angle"], d["dpi"], d["jpeg"], d["sigma"], d["seed"])
+            key = (d["angle"], d["dpi"], d["jpeg"], d["sigma"], d["seed"],
+                   d.get("parasite", 0.0))
             index[key][d["variant"]][d["piece"]] = Reading.from_dict(d["reading"])
     return index
 
@@ -379,11 +385,24 @@ def settings_summary(per_cell):
     return pts, chosen_point(pts)
 
 
+# The five factors and where each one sits in the cell key. An explicit table, because the
+# parasite is at index 5 and not 4: the seed keeps index 4 so that split() goes on holding the
+# validation seed out. Deriving the index from the position in this tuple would put the parasite
+# on the seed and quietly poison the calibration/validation split.
+AXIS_INDEX = {"angle": 0, "dpi": 1, "jpeg": 2, "sigma": 3, "parasite": 5}
+AXES = tuple(AXIS_INDEX)
+
+
+def cell_of(key):
+    """A cell is the five factors, seed excluded. Never key[:4], which silently drops the
+    parasite and would make the frontier compare 5-tuples against 4-tuples."""
+    return tuple(key[i] for i in AXIS_INDEX.values())
+
+
 def by_factor(per_cell, threshold):
     """Recall and false positives per value of each factor, at the retained threshold."""
-    axes = {"angle": 0, "dpi": 1, "jpeg": 2, "sigma": 3}
     out = {}
-    for name, i in axes.items():
+    for name, i in AXIS_INDEX.items():
         groups = collections.defaultdict(lambda: [0, 0, 0, 0, 0, 0])
         for key, v in per_cell.items():
             g = groups[key[i]]
@@ -407,16 +426,13 @@ def floor(per_cell, threshold, minimum=RECALL_FLOOR):
     A tool that does not say where it stops working is not measured, it is narrated.
     """
     groups = collections.defaultdict(lambda: [0, 0])
-    for (a, d, q, s, _), v in per_cell.items():
-        g = groups[(a, d, q, s)]
+    for key, v in per_cell.items():
+        g = groups[cell_of(key)]
         g[0] += sum(1 for x in v["pos"].values() if x > threshold)
         g[1] += len(v["pos"])
     fallen_cells = {c: (g[0] / max(1, g[1]), g[1]) for c, g in groups.items()
                if g[0] / max(1, g[1]) < minimum}
     return fallen_cells, len(groups)
-
-
-AXES = ("angle", "dpi", "jpeg", "sigma")
 
 
 def worst_conjunctions(per_cell, threshold, how_many=3):
@@ -441,7 +457,7 @@ def worst_conjunctions(per_cell, threshold, how_many=3):
     out = {}
     for i, a in enumerate(AXES):
         for b in AXES[i + 1:]:
-            ia, ib = AXES.index(a), AXES.index(b)
+            ia, ib = AXIS_INDEX[a], AXIS_INDEX[b]
             groups = collections.defaultdict(lambda: [0, 0])
             for key, v in per_cell.items():
                 g = groups[(key[ia], key[ib])]
@@ -456,9 +472,8 @@ def worst_conjunctions(per_cell, threshold, how_many=3):
 
 def frontier(fallen_cells, all_cells):
     """The readable frontier: per factor, the value at which things start falling."""
-    axes = ["angle", "dpi", "jpeg", "sigma"]
     out = {}
-    for i, name in enumerate(axes):
+    for i, name in enumerate(AXES):
         count = collections.Counter(c[i] for c in fallen_cells)
         total = collections.Counter(c[i] for c in all_cells)
         out[name] = {v: (count.get(v, 0), total[v]) for v in sorted(total)}
@@ -543,7 +558,10 @@ def crosstalk(dossiers, ref, results):
 def dpi_estimator_error(dossiers):
     """The maximum relative error of the dpi estimator, measured on the clean dossiers."""
     worst = 0.0
-    for (_, dpi, _, _, _), d in dossiers.items():
+    for key, d in dossiers.items():
+        # key[1] and not a positional unpack: the cell key grew a sixth element when the
+        # parasite became a factor, and an unpack would have raised where an index just works.
+        dpi = key[1]
         for reading in d["clean"].values():
             worst = max(worst, abs(reading.source_dpi - dpi) / dpi)
     return worst
@@ -568,7 +586,7 @@ def remeasure(r, threshold):
               "factors": by_factor(pc, threshold),
               "conjunctions": worst_conjunctions(pc, threshold),
               "fallen_cells": fallen_cells, "n_cells": n_cel,
-              "frontier": frontier(fallen_cells, {c[:4] for c in pc}),
+              "frontier": frontier(fallen_cells, {cell_of(c) for c in pc}),
               "noisy_targets": noisy_targets(pc, threshold)})
     return r
 
@@ -683,7 +701,8 @@ def analyze_check(by_settings, check, output=None):
         "overall": measure(per_cell, threshold),
         "curves": [(settings_name(r, check), p, r == reg) for r, _, p, _ in ranking],
         "factors": by_factor(per_cell, threshold),
-        "fallen_cells": fallen_cells, "frontier": frontier(fallen_cells, {c[:4] for c in per_cell}),
+        "fallen_cells": fallen_cells,
+        "frontier": frontier(fallen_cells, {cell_of(c) for c in per_cell}),
         "noisy_targets": noisy_targets(per_cell, threshold),
         "threshold_frozen_by_definition": frozen,
         "uncertifiable_targets": [(f"{a} / {b}", round(t, 4)) for (a, b), t in excluded.items()],
@@ -697,6 +716,50 @@ def analyze_check(by_settings, check, output=None):
         "_per_cell": per_cell,
         "conjunctions": worst_conjunctions(per_cell, threshold),
     }
+
+
+def unparasited(by_settings):
+    """The level-0 subset of a sweep.
+
+    THE OPERATING POINT IS CHOSEN HERE AND NOWHERE ELSE, and that is a declared methodological
+    choice rather than an oversight. The fifth factor produces its four levels in equal
+    proportion; choosing a threshold on the pooled set would amount to assuming that three pages
+    in four carry foreign ink, which is far above anything real and would tune the gate for a
+    dirtier world than the one it runs in. Worse, it would push away from the ink sensor and
+    towards a sensor with more false positives on clean dossiers, which is the side that costs
+    credibility.
+
+    So the threshold keeps being read on clean pages, exactly as it was before the fifth factor
+    existed, and the parasite enters as EVIDENCE: the duel by level and the degradation table say
+    what the retained sensor costs when ink does land where it should not. Nothing is recalibrated
+    silently, and yesterday's published numbers stay comparable to today's.
+    """
+    return subgrid(by_settings, lambda k: not k[5])
+
+
+def parasite_ranking(by_settings, check):
+    """The same ranking as analyze_check builds, but over ALL parasite levels.
+
+    Needed for the duel by level: each contender has to be judged at its own operating point over
+    the full range, which is a different population from the one the threshold was chosen on.
+    """
+    out = []
+    for reg, per_cell in by_settings.items():
+        if not per_cell:
+            continue
+        pts, pt = settings_summary(unparasited({reg: per_cell})[reg] or per_cell)
+        out.append((reg, per_cell, pts, pt))
+    return out
+
+
+def by_parasite(per_cell, threshold):
+    """What the retained sensor does at each level of foreign ink, at the published threshold."""
+    out = {}
+    for level in sorted({k[5] for k in per_cell}):
+        m = measure({k: v for k, v in per_cell.items() if k[5] == level}, threshold)
+        out[level] = {"recall": m["recall"], "recall_ci": m["recall_ci"], "fpr": m["fpr"],
+                      "dossier_fpr": m["dossier_fpr"], "n_pos": m["n_pos"], "n_neg": m["n_neg"]}
+    return out
 
 
 def choose_domain(sweeps, checks):
@@ -727,7 +790,7 @@ def choose_domain(sweeps, checks):
             continue
         worst = 1.0
         for c in needed:
-            r = analyze_check(subgrid(sweeps[c], lambda k: k[1] >= dpi_min), c)
+            r = analyze_check(unparasited(subgrid(sweeps[c], lambda k: k[1] >= dpi_min)), c)
             worst = min(worst, 0.0 if r is None else r["validation"]["recall"])
         attempts.append((dpi_min, worst))
         if worst >= RECALL_FLOOR:
@@ -827,7 +890,7 @@ def main():
     ref = load_reference()
     index = load(a.measurements)
     dossiers = complete_dossiers(index)
-    cells = {c[:4] for c in dossiers}
+    cells = {cell_of(c) for c in dossiers}
     print(f"{len(dossiers)} complete cell/seed pairs, {len(cells)} distinct cells")
 
     sweeps = {}
@@ -848,11 +911,16 @@ def main():
 
     results = {}
     for check in a.checks:
-        r = analyze_check(subgrid(sweeps[check], lambda k: k[1] >= domain), check, a.output)
+        in_domain = subgrid(sweeps[check], lambda k: k[1] >= domain)
+        r = analyze_check(unparasited(in_domain), check, a.output)
         if r is None:
             print(f"  {check:17s} NO usable measurement")
             continue
         r["domain"] = domain
+        # The fifth factor, measured at the threshold just chosen on clean pages.
+        r["_full_per_cell"] = in_domain[r["settings"]]
+        r["_parasite_ranking"] = parasite_ranking(in_domain, check)
+        r["by_parasite"] = by_parasite(r["_full_per_cell"], r["threshold"])
         outside = subgrid(sweeps[check], lambda k: k[1] < domain)[r["settings"]]
         r["outside_domain"] = measure(outside, r["threshold"]) if outside else None
         results[check] = r
@@ -878,7 +946,7 @@ def main():
         return 1
     plot(results, os.path.join(a.output, "curves.png"))
     json.dump({c: {k: _jsonable(v) for k, v in r.items()
-                   if k not in ("curves", "settings", "_ranking", "_per_cell")}
+                   if not k.startswith("_") and k not in ("curves", "settings")}
                for c, r in results.items()},
               open(os.path.join(a.output, "resume.json"), "w"), indent=2, default=str)
     write_duels(results, os.path.join(a.output, "duels.md"))
@@ -894,26 +962,27 @@ def main():
     return 0
 
 
-def duel_by_dpi(ranking, check):
-    """Does the winner change with dpi. It is the only honest way to settle a duel.
+def duel_by(ranking, check, axis="dpi"):
+    """Does the winner change along one factor. It is the only honest way to settle a duel.
 
     Each contender is judged at ITS OWN operating point (the one that holds the false positive
     budget), not at the neighbour's threshold: comparing two sensors at a common threshold
     compares a scale, not a sensor.
     """
-    dpis = sorted({c[1] for _, pc, _, _ in ranking for c in pc})
+    i = AXIS_INDEX[axis]
+    values = sorted({c[i] for _, pc, _, _ in ranking for c in pc})
     lines = []
     for reg, per_cell, _, pt in ranking:
         if pt is None:
             continue
         line = {"settings": settings_name(reg, check), "threshold": pt["threshold"],
                  "global": (pt["recall"], pt["fpr"])}
-        for dpi in dpis:
-            subset = {k: v for k, v in per_cell.items() if k[1] == dpi}
+        for v in values:
+            subset = {k: x for k, x in per_cell.items() if k[i] == v}
             m = measure(subset, pt["threshold"])
-            line[dpi] = (m["recall"], m["fpr"], m["recall_ci"])
+            line[v] = (m["recall"], m["fpr"], m["recall_ci"])
         lines.append(line)
-    return dpis, sorted(lines, key=lambda l: -l["global"][0])
+    return values, sorted(lines, key=lambda l: -l["global"][0])
 
 
 def write_duels(results, path):
@@ -927,7 +996,7 @@ def write_duels(results, path):
         r = results[check]
         if not NUISANCES[check]:
             continue
-        dpis, table = duel_by_dpi(r["_ranking"], check)
+        dpis, table = duel_by(r["_ranking"], check, "dpi")
         if not table:
             continue
         lines += [f"## {check}", "",
@@ -939,6 +1008,25 @@ def write_duels(results, path):
             mark = " **(retained)**" if l["settings"] == r["settings_text"] else ""
             lines.append(f"| {l['settings']}{mark} | {l['threshold']:.4g} | "
                          f"{l['global'][0]:.3f} | {l['global'][1]:.4f} | {cells} |")
+        # THE SAME DUEL ALONG THE FIFTH FACTOR, and for the ink sensor it is the whole point.
+        # A sensor can win on average and lose everywhere it matters: the dpi table above never
+        # showed that, because no degradation in the old grid added foreign ink.
+        levels, ptable = duel_by(r.get("_parasite_ranking") or r["_ranking"], check, "parasite")
+        if len(levels) > 1 and ptable:
+            lines += ["", "By parasite level (fraction of foreign ink laid in a watched zone "
+                      "before degradation):", "",
+                      "| settings | " + " | ".join(f"recall @ {v}" for v in levels) + " |",
+                      "|---|" + "---|" * len(levels)]
+            for l in ptable:
+                cells = " | ".join(f"{l[v][0]:.3f} [{l[v][2][0]:.2f}, {l[v][2][1]:.2f}]"
+                                   for v in levels)
+                mark = " **(retained)**" if l["settings"] == r["settings_text"] else ""
+                lines.append(f"| {l['settings']}{mark} | {cells} |")
+            clean, dirty = levels[0], levels[-1]
+            drops = sorted(((l["settings"], l[clean][0] - l[dirty][0]) for l in ptable),
+                           key=lambda t: -t[1])
+            lines += ["", f"Recall lost between level {clean} and level {dirty}: "
+                      + ", ".join(f"{n} {d:+.3f}" for n, d in drops[:4]) + "."]
         # Ties at equal recall are broken by false positive rate, otherwise the "winner" is
         # simply the first of the list, which means nothing.
         winners = {d: max(table, key=lambda l: (l[d][0], -l[d][1]))["settings"] for d in dpis}
@@ -996,6 +1084,31 @@ def write_limits(results, path, n_pairs, domain, n_retained, attempts, crossed=N
          "its recall on the same draws always overestimates it.",
          "",
          f"A cell is declared OUTSIDE THE DOMAIN when recall there drops below {RECALL_FLOOR:.0%}.",
+         "",
+         "## The fifth factor: foreign ink", "",
+         "The first four factors move, blur or dirty the ink already on the page. None of them",
+         "ADDS any, and that is the ground the ink sensor won its required-field duel on. A",
+         "528-reading probe measured what that ground was hiding, so the grid now carries the",
+         "parasite as a fifth axis: a speck, a fold shadow or a neighbouring pen stroke, laid on",
+         "the CLEAN render before degradation so it goes through the same rotation, noise, blur",
+         "and compression as the page.",
+         "",
+         "Placement is drawn deterministically and STRATIFIED BY CHECK: among the zones a check",
+         "actually watches, with the check family rotated so the rare ones get their share.",
+         "Drawn uniformly among the DECLARED zones instead, 26 placements out of 36 landed where",
+         "nothing is measured and neither a signature nor an expiry date was ever touched. The",
+         "placement does not vary with the cell, on purpose: if it did, a cell's recall could",
+         "differ because of where the speck fell rather than because of the cell.",
+         "",
+         "THE OPERATING POINT IS STILL CHOSEN ON CLEAN PAGES, and that is a declared choice. The",
+         "four levels are produced in equal proportion, so picking a threshold on the pooled set",
+         "would assume three pages in four carry foreign ink, far above anything real, and would",
+         "tune the gate for a dirtier world than the one it runs in. It would also push away from",
+         "the ink sensor and towards one with more false positives on clean dossiers, which is",
+         "the side that costs credibility. So the threshold is read exactly as it was before this",
+         "factor existed, and the parasite enters as EVIDENCE: the per-level tables below and the",
+         "duel by level in duels.md say what the retained sensor costs when ink does land where",
+         "it should not. Nothing was recalibrated silently.",
          "",
          "## What the measurement does not cover", "",
          "- A single set of three forms (W-9, I-9, Cerfa 14011), page 1 of each. The figures do",
@@ -1154,6 +1267,23 @@ def write_limits(results, path, n_pairs, domain, n_retained, attempts, crossed=N
                   f"only asked about the {rr['kept_targets']} targets out of {rr['total_targets']}",
                   f"it can certify, it holds a recall of {rr['recall']:.3f} at {rr['fpr']:.4f}",
                   "false positives per target.", ""]
+        bp = r.get("by_parasite") or {}
+        if len(bp) > 1:
+            clean = bp[min(bp)]
+            l += ["At the published threshold, by level of foreign ink laid in a watched zone:",
+                  "", "| parasite | recall | 95% CI | false positives per target | per clean "
+                  "dossier | positives |", "|---|---|---|---|---|---|"]
+            for lv, m in sorted(bp.items()):
+                l.append(f"| {lv} | {m['recall']:.3f} | [{m['recall_ci'][0]:.3f}, "
+                         f"{m['recall_ci'][1]:.3f}] | {m['fpr']:.4f} | "
+                         f"{m['dossier_fpr']:.4f} | {m['n_pos']} |")
+            worst_lv = min(bp, key=lambda k: bp[k]["recall"])
+            drop = clean["recall"] - bp[worst_lv]["recall"]
+            l += ["", f"Recall lost between a clean page and the worst level ({worst_lv}): "
+                  f"{drop:+.3f}." + ("" if drop <= 0.01 else
+                  " This check is measurably degraded by foreign ink, and the figure above is "
+                  "the one to weigh against whatever the scans in question actually look like."),
+                  ""]
         conj = r.get("conjunctions") or {}
         worst = sorted(((k, c[0]) for k, c in conj.items() if c), key=lambda t: t[1]["recall"])
         if worst and worst[0][1]["recall"] < 1.0:
@@ -1218,10 +1348,18 @@ def write_thresholds(results, path):
         pt = r["point"]
         if pt is None:
             continue
+        # THE CONDITION TRAVELS WITH THE NUMBER, in the same object and not in a note. B's single
+        # failure mode is keeping a flattering 1.000 at the top and leaving the weakness under
+        # foreign ink in a file next door; that would be loosening a threshold, only politer.
+        under_ink = {str(lv): round(m["recall"], 4)
+                     for lv, m in sorted((r.get("by_parasite") or {}).items()) if lv}
         measurements = {
             "recall": round(r["validation"]["recall"], 4),
             "false_positives": round(r["validation"]["fpr"], 5),
             "measured_with": "seed 37, never used to choose the threshold",
+            "chosen_on": "clean pages only (parasite level 0). See recall_under_foreign_ink for "
+                         "what this recall becomes when ink lands where it should not.",
+            "recall_under_foreign_ink": under_ink,
             "settings": r["settings_text"],
             "measured_settings": _useful_settings(r["settings"], check),
             "curve": f"grid/results/pr_{check}.csv",
@@ -1244,6 +1382,9 @@ def write_thresholds(results, path):
             "recall": round(r["validation"]["recall"], 4),
             "false_positives": round(r["validation"]["fpr"], 5),
             "measured_with": "seed 37, never used to choose the threshold",
+            "chosen_on": "clean pages only (parasite level 0). See recall_under_foreign_ink for "
+                         "what this recall becomes when ink lands where it should not.",
+            "recall_under_foreign_ink": under_ink,
             "curve": f"grid/results/pr_{check}.csv",
             "cells_under_floor": f"{len(r['fallen_cells'])}/{r['n_cells']}",
             "nominal_domain_dpi": r.get("domain"),
