@@ -11,8 +11,8 @@ import hashlib
 import os
 
 ICI = os.path.dirname(os.path.abspath(__file__))
-RACINE = os.path.dirname(ICI)
-CORPUS_DIR = os.path.join(RACINE, "corpus")
+ROOT = os.path.dirname(ICI)
+CORPUS_DIR = os.path.join(ROOT, "corpus")
 MANIFESTE = os.path.join(CORPUS_DIR, "CORPUS.md")
 
 

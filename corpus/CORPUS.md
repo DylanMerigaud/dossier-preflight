@@ -2,7 +2,7 @@
 
 Un formulaire VIERGE tel que son administration le publie. Jamais un document delivre a
 quelqu'un: un document delivre ne se caviarde pas completement (code-barres qui encode
-l'identite, couche de texte intacte sous le rectangle noir, metadonnees XMP, historique
+l'identity, couche de texte intacte sous le rectangle noir, metadonnees XMP, historique
 d'incremental update, empreinte du scanner).
 
 | fichier | producteur | source | recupere | licence | sha256 |

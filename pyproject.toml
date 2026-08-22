@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dossier-preflight"
 version = "0.1.0"
-description = "Ce dossier va-t-il se faire refuser au guichet: conformite mesuree sur ce qui est vraiment imprime"
+description = "Ce dossier va-t-il se faire refuser au filing: conformite mesuree sur ce qui est vraiment imprime"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [{ name = "Dylan Merigaud" }]
-keywords = ["ocr", "pdf", "acroform", "conformite", "guichet"]
+keywords = ["ocr", "pdf", "acroform", "conformite", "filing"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: MIT License",
@@ -18,7 +18,7 @@ classifiers = [
     "Topic :: Text Processing :: Markup :: PDF",
 ]
 
-# Le coeur, et rien d'autre. matplotlib n'est utilise QUE par grille/analyser.py pour tracer
+# Le coeur, et rien d'autre. matplotlib n'est utilise QUE par grid/analyze.py pour plot
 # les courbes: l'annoncer ici ferait croire a un runtime plus lourd qu'il n'est.
 dependencies = [
     "numpy>=1.24",
@@ -29,7 +29,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-grille = ["matplotlib>=3.7"]        # uniquement pour grille/analyser.py
+grid = ["matplotlib>=3.7"]        # uniquement pour grid/analyze.py
 dev = ["pytest>=8"]
 
 [project.urls]
@@ -39,8 +39,8 @@ Repository = "https://github.com/DylanMerigaud/dossier-preflight"
 dossier-preflight = "preflight.__main__:main"
 
 # DEUX DEPENDANCES SYSTEME, ET PIP NE LES INSTALLE PAS:
-#   tesseract >= 5, avec les donnees de langue eng ET fra (le Cerfa est en francais; sans
-#     tesseract-ocr-fra les champs du Cerfa sortent VIDES, sans message d'erreur, ce qui
+#   tesseract >= 5, avec les donnees de language eng ET fra (le Cerfa est en francais; sans
+#     tesseract-ocr-fra les fields du Cerfa sortent VIDES, sans message d'erreur, ce qui
 #     ressemble a un defaut de dossier et n'en est pas un)
 #   poppler (pdftoppm), pour rasteriser les PDF
 # macOS:  brew install tesseract tesseract-lang poppler
@@ -51,5 +51,5 @@ dossier-preflight = "preflight.__main__:main"
 # ne pas l'ajouter.
 
 [tool.setuptools]
-# `grille/` n'est pas empaquete: c'est le banc de mesure, il se lance depuis un clone.
+# `grid/` n'est pas empaquete: c'est le banc de mesure, il se lance from_dict un clone.
 packages = ["preflight"]

@@ -1,9 +1,9 @@
 # CETTE CI N'A JAMAIS TOURNE au moment ou elle est ecrite: le depot venait d'acquerir un
 # remote. Son premier run est donc lui-meme une mesure, et il peut rougir pour une raison
-# qui n'est pas une regression: les seuils ont ete lus sous tesseract 5.5.1 en local, et
-# ubuntu-latest en fournit une autre version. Si un controle de texte bouge ici et nulle part
-# ailleurs, la cause est la version d'OCR et pas un seuil. Ne deplacer aucune valeur de
-# seuils.json pour verdir ce fichier: un seuil se deplace parce que la grille le dit.
+# qui n'est pas une regression: les thresholds ont ete lus sous tesseract 5.5.1 en local, et
+# ubuntu-latest en fournit une autre version. Si un check de texte bouge ici et nulle part
+# ailleurs, la cause est la version d'OCR et pas un seuil. Ne deplacer aucune value de
+# thresholds.json pour verdir ce fichier: un seuil se deplace parce que la grid le dit.
 name: tests
 
 on:
@@ -23,8 +23,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      # tesseract-ocr seul ne fournit que l'anglais. Sans -fra, les champs du Cerfa sortent
-      # VIDES et les tests echouent de facon illisible, sans jamais dire "langue manquante".
+      # tesseract-ocr seul ne fournit que l'anglais. Sans -fra, les fields du Cerfa sortent
+      # VIDES et les tests echouent de facon illisible, sans jamais dire "language manquante".
       - name: dependances systeme
         run: |
           sudo apt-get update
@@ -42,11 +42,11 @@ jobs:
         run: python -m pytest -q
 
       - name: le premier cas vert
-        run: python spike/preuve.py
+        run: python spike/proof.py
 
       # `pip install -e .` a pose un script console: verifier qu'il existe vraiment, sinon
-      # le point d'entree n'est un point d'entree que depuis un clone.
+      # le point d'entree n'est un point d'entree que from_dict un clone.
       - name: le script console est installe
         run: dossier-preflight --help
 
-# grille/lancer.py n'est PAS ici et ne doit pas y venir: deux heures sur treize processus.
+# grid/run.py n'est PAS ici et ne doit pas y venir: deux heures sur treize processus.

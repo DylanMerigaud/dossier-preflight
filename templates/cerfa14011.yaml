@@ -1,0 +1,20 @@
+pdf: cerfa_14011.pdf
+page: 1
+language: fra
+fields:
+  name: FamilyName[0]
+  first_name: GivenName[0]
+  birth_date: DateNaissance[0]
+  birth_city: CityName[0]
+  number: BuildingNumber[0]
+  street_type: RoadType[0]
+  street_name: StreetName[0]
+  postal_code: Postcode2[0]
+  city: CityName2[0]
+  card_number: NoCarteID[0]
+boxes:
+  loss: "Case_\xE0_cocher1[0]"
+signatures: {}
+required: [name, first_name, birth_date, street_name, postal_code, city, card_number]
+required_boxes: [loss]
+date_format: fr

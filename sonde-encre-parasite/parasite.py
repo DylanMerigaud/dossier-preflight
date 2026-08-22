@@ -1,20 +1,20 @@
-"""Encre ETRANGERE dans une zone: le terrain que la grille n'a jamais fait subir a ses capteurs.
+"""Encre ETRANGERE dans une zone: le terrain que la grid n'a jamais fait subir a ses sensors.
 
-La grille croise angle, resolution, compression et bruit. Aucune de ces quatre degradations
-n'AJOUTE d'encre dans une zone: elles deplacent, floutent ou salissent celle qui y est deja.
-Or le capteur retenu pour "ce champ requis est-il vide" est justement un capteur d'encre, qui
+La grid croise angle, resolution, compression et bruit. Aucune de ces quatre degradations
+n'AJOUTE d'ink dans une zone: elles deplacent, floutent ou salissent celle qui y est deja.
+Or le capteur retenu pour "ce field required est-il vide" est justement un capteur d'ink, qui
 ne sait pas ce qui est ecrit mais seulement qu'il y a quelque chose de plus sombre qu'avant.
 Il a donc gagne son duel sur un terrain qui lui est favorable, et c'est ce que ce module
-mesure: de combien d'encre etrangere a-t-on besoin pour qu'un champ VIDE passe pour rempli.
+mesure: de combien d'ink etrangere a-t-on besoin pour qu'un field VIDE passe pour rempli.
 
-Le sens de l'erreur compte: un champ vide declare rempli est un FAUX NEGATIF, le guichet
-refuse le dossier et personne n'a ete prevenu. C'est le cote cher de l'asymetrie.
+Le sens de l'erreur compte: un field vide declare rempli est un FAUX NEGATIF, le filing
+refuse le dossier et person n'a ete prevenu. C'est le cote cher de l'asymetrie.
 
 Trois formes, toutes physiques, toutes posees AVANT la degradation pour qu'elles subissent la
 meme rotation, le meme bruit et la meme compression que le reste de la page:
-  tache    un depot d'encre localise, dont on balaie la surface
+  tache    un depot d'ink localise, dont on balaie la surface
   pliure   l'ombre d'un pli, bande sombre en travers de la page
-  trait    un trait de stylo parti du champ voisin et qui deborde
+  trait    un trait de stylo parti du field voisin et qui deborde
 """
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
@@ -23,13 +23,13 @@ CANON_DPI = 200
 
 
 def _zone_scan(zone, dpi):
-    """Une zone canonique ramenee aux pixels du rendu propre, avant degradation."""
+    """Une zone canonique ramenee aux pixels du render propre, avant degradation."""
     e = dpi / CANON_DPI
     return (int(zone.x0 * e), int(zone.y0 * e), int(zone.x1 * e), int(zone.y1 * e))
 
 
 def tache(gris, zone, dpi, fraction, rng, noirceur=45):
-    """Un depot d'encre couvrant `fraction` de la surface de la zone."""
+    """Un depot d'ink couvrant `fraction` de la surface de la zone."""
     x0, y0, x1, y1 = _zone_scan(zone, dpi)
     aire = max(1.0, (x1 - x0) * (y1 - y0) * fraction)
     ry = np.sqrt(aire / (np.pi * 1.6))

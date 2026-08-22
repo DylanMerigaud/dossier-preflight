@@ -1,23 +1,23 @@
 """Un dossier SAIN, puis N variantes portant chacune UN SEUL defaut connu.
 
-C'est la contrepartie de la grille: sans verite terrain il n'y a ni taux de vrai positif ni
-taux de faux positif, donc pas de courbe, donc pas de seuil lisible. Chaque variante nomme le
-controle qui DOIT crier, et le test exige que les autres se taisent. Un controle qui crie sur
-la variante du voisin est un faux positif, et un faux positif coute cher: une regle qui crie
+C'est la contrepartie de la grid: sans verite terrain il n'y a ni taux de vrai positif ni
+taux de faux positif, donc pas de curve, donc pas de seuil lisible. Chaque variant nomme le
+check qui DOIT crier, et le test exige que les autres se taisent. Un check qui crie sur
+la variant du voisin est un faux positif, et un faux positif coute cher: une regle qui crie
 au loup fait survoler toutes celles d'a cote.
 
-Toutes les valeurs viennent du referentiel FICTIF. Aucune personne reelle, aucune adresse
+Toutes les valeurs viennent du reference FICTIONAL. Aucune person reelle, aucune address
 reelle, aucun document delivre a quiconque.
 
 LE TEXTE EST IMPRIME PAR UN CALQUE, PAS PAR L'APPARENCE ACROFORM, et ce choix a ete paye.
 Deux des trois formulaires du corpus portent une couche XFA (le W-9 et le Cerfa 14011), et
-sur eux la generation d'apparence de pypdf est infidele: trois champs du Cerfa ne
+sur eux la generation d'apparence de pypdf est infidele: trois fields du Cerfa ne
 s'imprimaient pas du tout, MARISOL sortait "SOL", et les valeurs restantes se collaient a la
-bordure du champ au point que l'OCR lisait "|LDES ACACIAS". La grille aurait alors mesure mes
-bugs de remplissage et pas mes capteurs. Le calque pose le texte a la position que l'AcroForm
-DECLARE, en Helvetica, exactement comme une imprimante le ferait. Les cases a cocher, elles,
+bordure du field au point que l'OCR lisait "|LDES ACACIAS". La grid aurait alors mesure mes
+bugs de remplissage et pas mes sensors. Le calque pose le texte a la position que l'AcroForm
+DECLARE, en Helvetica, exactement comme une imprimante le ferait. Les boxes a cocher, elles,
 restent remplies par l'AcroForm: leur apparence est fournie par le formulaire et elle rend
-juste (delta d'encre +21 a +28 sur les trois pieces).
+juste (delta d'ink +21 a +28 sur les trois pieces).
 """
 import datetime as dt
 import os
@@ -29,54 +29,54 @@ from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
 
 
 @dataclass(frozen=True)
-class Variante:
-    """Un defaut, et un seul. `controle` est celui qui doit se declencher."""
-    nom: str
-    controle: str
+class Variant:
+    """Un defaut, et un seul. `check` est celui qui doit se declencher."""
+    name: str
+    check: str
     piece: str = ""
-    vider: tuple = ()
-    decocher: tuple = ()
-    sans_signature: bool = False
-    date_perimee: bool = False
-    remplacer: dict = field(default_factory=dict)     # role -> valeur fausse
+    empty_fields: tuple = ()
+    uncheck: tuple = ()
+    without_signature: bool = False
+    expired_date: bool = False
+    replace: dict = field(default_factory=dict)     # role -> value fausse
     image: dict = field(default_factory=dict)         # surcharge de degradation
 
 
-SAIN = Variante("sain", controle="")
+SAIN = Variant("clean", check="")
 
-VARIANTES = (
+VARIANTS = (
     SAIN,
-    Variante("champ_requis_vide", "champ_requis", piece="emploi", vider=("ville",)),
-    Variante("case_non_cochee", "case_obligatoire", piece="fiscal", decocher=("statut",)),
-    Variante("signature_absente", "signature", piece="emploi", sans_signature=True),
-    Variante("date_perimee", "validite", piece="emploi", date_perimee=True),
-    Variante("adresse_divergente", "coherence", piece="identite",
-             remplacer={"nom_voie": "DES TILLEULS"}),
-    Variante("valeur_interdite", "valeur_interdite", piece="emploi",
-             remplacer={"numero_secu": "999-99-9999"}),
-    # 72 dpi est SOUS le plus bas dpi de la grille (96): sans ca la variante ferait doublon
-    # avec l'axe dpi de la grille et ne mesurerait rien de neuf.
-    Variante("resolution_basse", "resolution", piece="fiscal", image={"dpi": 72}),
-    Variante("page_coupee", "page_coupee", piece="fiscal", image={"rogne": 0.18}),
-    Variante("page_tournee", "page_tournee", piece="fiscal", image={"quart": 1}),
+    Variant("empty_required_field", "required_field", piece="employment", empty_fields=("city",)),
+    Variant("unchecked_box", "required_checkbox", piece="tax", uncheck=("status",)),
+    Variant("missing_signature", "signature", piece="employment", without_signature=True),
+    Variant("expired_date", "expiry", piece="employment", expired_date=True),
+    Variant("diverging_address", "consistency", piece="identity",
+             replace={"street_name": "DES TILLEULS"}),
+    Variant("forbidden_value", "forbidden_value", piece="employment",
+             replace={"ssn": "999-99-9999"}),
+    # 72 dpi est SOUS le plus bas dpi de la grid (96): sans ca la variant ferait doublon
+    # avec l'axe dpi de la grid et ne mesurerait rien de neuf.
+    Variant("low_resolution", "resolution", piece="tax", image={"dpi": 72}),
+    Variant("cropped_page", "cropped_page", piece="tax", image={"crop": 0.18}),
+    Variant("rotated_page", "rotated_page", piece="tax", image={"quarter_turns": 1}),
 )
 
-PAR_NOM = {v.nom: v for v in VARIANTES}
-CONTROLES_VISES = tuple(v.controle for v in VARIANTES if v.controle)
+BY_NAME = {v.name: v for v in VARIANTS}
+TARGETED_CHECKS = tuple(v.check for v in VARIANTS if v.check)
 
 
 @dataclass(frozen=True)
-class PieceMaterielle:
+class BuiltPiece:
     id: str
-    gabarit: object
+    template: object
     pdf: str
-    surcharge_image: dict
+    image_override: dict
 
 
 @dataclass(frozen=True)
 class Dossier:
-    variante: str
-    controle_vise: str
+    variant: str
+    targeted_check: str
     pieces: tuple
 
     def piece(self, ident):
@@ -86,11 +86,11 @@ class Dossier:
         raise KeyError(ident)
 
 
-def _fmt(date, forme):
-    return date.strftime("%m/%d/%Y" if forme == "us" else "%d/%m/%Y")
+def _fmt(date, shape):
+    return date.strftime("%m/%d/%Y" if shape == "us" else "%d/%m/%Y")
 
 
-def _etat_coche(pdf, champ, page):
+def _checked_state(pdf, field, page):
     """L'etat "coche" n'est pas devine: il est declare par l'apparence du widget.
 
     Le W-9 dit /1, le I-9 dit /On. Ecrire l'un des deux en dur casserait l'autre en silence,
@@ -98,7 +98,7 @@ def _etat_coche(pdf, champ, page):
     """
     for an in PdfReader(pdf).pages[page - 1].get("/Annots", []) or []:
         o = an.get_object()
-        if str(o.get("/T")) == champ:
+        if str(o.get("/T")) == field:
             ap = o.get("/AP", {}).get("/N", {})
             etats = [k for k in (ap.keys() if hasattr(ap, "keys") else []) if k != "/Off"]
             if etats:
@@ -106,33 +106,33 @@ def _etat_coche(pdf, champ, page):
     return "/1"
 
 
-def _rect_pdf(pdf, champ, page):
+def _pdf_rect(pdf, field, page):
     for an in PdfReader(pdf).pages[page - 1].get("/Annots", []) or []:
         o = an.get_object()
-        if str(o.get("/T")) == champ:
+        if str(o.get("/T")) == field:
             return [float(v) for v in o["/Rect"]]
-    raise KeyError(champ)
+    raise KeyError(field)
 
 
-def _echapper(t):
+def _escape(t):
     return t.replace("\\", r"\\").replace("(", r"\(").replace(")", r"\)")
 
 
-LARGEUR_GLYPHE = 0.6      # largeur moyenne d'un caractere Helvetica, en em
+GLYPH_WIDTH = 0.6      # largeur moyenne d'un caractere Helvetica, en em
 
 
-def _trace_texte(x0, y0, x1, y1, valeur, peigne=0):
-    """Le texte pose a la position DECLAREE par le champ, comme une imprimante le poserait.
+def _draw_text(x0, y0, x1, y1, value, peigne=0):
+    """Le texte pose a la position DECLAREE par le field, comme une imprimante le poserait.
 
     UN CHAMP PEIGNE S'IMPRIME UNE CASE A LA FOIS, et le formulaire le declare lui-meme
-    (drapeau /Ff bit 25). Le W-9 peigne son numero fiscal, le I-9 son numero de securite
-    sociale, le Cerfa cinq champs dont le numero de carte. Poser la chaine en continu par
-    dessus les separateurs produit un champ qu'aucun OCR ne lit: mesure le 2026-08-21, le
-    numero de carte du Cerfa rendait 0 caractere lisible pleine page et "| | | | | | | |" en
-    OCR de zone, c'est-a-dire les separateurs seuls. La grille aurait mesure cette faute
-    d'impression et conclu, faux, que le controle des champs requis ne tient pas.
+    (drapeau /Ff bit 25). Le W-9 peigne son number tax, le I-9 son number de securite
+    sociale, le Cerfa cinq fields dont le number de carte. Poser la chaine en continu par
+    dessus les separateurs produit un field qu'aucun OCR ne lit: mesure le 2026-08-21, le
+    number de carte du Cerfa rendait 0 caractere lisible pleine page et "| | | | | | | |" en
+    OCR de zone, c'est-a-dire les separateurs seuls. La grid aurait mesure cette faute
+    d'impression et conclu, faux, que le check des fields required ne tient pas.
     """
-    if not valeur:
+    if not value:
         return ""
     haut = y1 - y0
     if peigne:
@@ -140,27 +140,27 @@ def _trace_texte(x0, y0, x1, y1, valeur, peigne=0):
         corps = max(5.0, min(haut * 0.58, case * 1.25))
         base = y0 + (haut - corps) / 2 + corps * 0.22
         ops = []
-        for i, c in enumerate(valeur[:peigne]):
+        for i, c in enumerate(value[:peigne]):
             if c == " ":
                 continue
-            centre = x0 + case * (i + 0.5) - corps * LARGEUR_GLYPHE / 2
+            centre = x0 + case * (i + 0.5) - corps * GLYPH_WIDTH / 2
             ops.append(f"BT /F1 {corps:.1f} Tf 1 0 0 1 {centre:.1f} {base:.1f} Tm "
-                       f"({_echapper(c)}) Tj ET")
+                       f"({_escape(c)}) Tj ET")
         return "\n".join(ops) + "\n"
     corps = max(6.0, min(11.0, haut * 0.58))
     base = y0 + (haut - corps) / 2 + corps * 0.22
     return (f"BT /F1 {corps:.1f} Tf 1 0 0 1 {x0 + 3:.1f} {base:.1f} Tm "
-            f"({_echapper(valeur)}) Tj ET\n")
+            f"({_escape(value)}) Tj ET\n")
 
 
-def _trace_signature(x0, y0, x1, y1, graine=11):
+def _draw_signature(x0, y0, x1, y1, seed=11):
     """Une signature manuscrite: un trait unique, continu, etire.
 
     Dessine en vectoriel dans le PDF, pas peint sur l'image: la fixture reste un PDF, et la
     signature traverse donc la meme chaine de degradation que le reste de la page.
     """
     import random
-    r = random.Random(graine)
+    r = random.Random(seed)
     marge_x, marge_y = (x1 - x0) * 0.12, (y1 - y0) * 0.22
     ax, bx = x0 + marge_x, x1 - marge_x
     cy = (y0 + y1) / 2
@@ -178,7 +178,7 @@ def _trace_signature(x0, y0, x1, y1, graine=11):
     return "\n".join(ops) + "\n"
 
 
-DRAPEAU_PEIGNE = 1 << 24
+COMB_FLAG = 1 << 24
 
 
 def _maxlen(pdf, page):
@@ -190,78 +190,78 @@ def _maxlen(pdf, page):
     return out
 
 
-def _peignes(pdf, page):
-    """Les champs qui se remplissent UNE CASE PAR CARACTERE, tels que le PDF les declare."""
+def _combs(pdf, page):
+    """Les fields qui se remplissent UNE CASE PAR CARACTERE, tels que le PDF les declare."""
     out = {}
     for an in PdfReader(pdf).pages[page - 1].get("/Annots", []) or []:
         o = an.get_object()
         if o.get("/T") is None or o.get("/MaxLen") is None:
             continue
-        if int(o.get("/Ff", 0) or 0) & DRAPEAU_PEIGNE:
+        if int(o.get("/Ff", 0) or 0) & COMB_FLAG:
             out[str(o["/T"])] = int(o["/MaxLen"])
     return out
 
 
-def _poser(vals, champs, valeur, maxlen):
-    """Ecrit une valeur dans un ou plusieurs champs, en respectant le MaxLen DECLARE.
+def _place(vals, fields, value, maxlen):
+    """Ecrit une value dans un ou plusieurs fields, en respectant le MaxLen DECLARE.
 
-    Le formulaire dit lui-meme combien de caracteres il accepte: le W-9 eclate le numero
-    fiscal sur trois cases de 3, 2 et 4, le Cerfa veut une date de naissance en 8 caracteres
+    Le formulaire dit lui-meme combien de caracteres il accepte: le W-9 eclate le number
+    tax sur trois boxes de 3, 2 et 4, le Cerfa veut une date de naissance en 8 caracteres
     sans separateur. Ignorer ce MaxLen fait tronquer silencieusement par pypdf, et la fixture
     porte alors un defaut qu'on n'a pas voulu.
     """
-    if len(champs) > 1:
-        morceaux = re.split(r"[^0-9A-Za-z]+", valeur)
-        for c, m in zip(champs, morceaux):
+    if len(fields) > 1:
+        morceaux = re.split(r"[^0-9A-Za-z]+", value)
+        for c, m in zip(fields, morceaux):
             vals[c] = m
         return
-    c = champs[0]
+    c = fields[0]
     m = maxlen.get(c)
-    if m is not None and len(valeur) > m:
-        valeur = re.sub(r"[^0-9A-Za-z]", "", valeur)[:m]
-    vals[c] = valeur
+    if m is not None and len(value) > m:
+        value = re.sub(r"[^0-9A-Za-z]", "", value)[:m]
+    vals[c] = value
 
 
-def _valeurs(ref, gab, var, piece_id):
-    """Ce que la piece doit porter, defaut de la variante compris."""
+def _values(ref, gab, var, piece_id):
+    """Ce que la piece doit porter, defaut de la variant compris."""
     vals = {}
     maxlen = _maxlen(gab.pdf, gab.page)
-    for role in gab.champs:
-        if var.piece == piece_id and role in var.vider:
+    for role in gab.fields:
+        if var.piece == piece_id and role in var.empty_fields:
             continue
-        if var.piece == piece_id and role in var.remplacer:
-            v = var.remplacer[role]
+        if var.piece == piece_id and role in var.replace:
+            v = var.replace[role]
         elif role in gab.dates and gab.dates[role] == "expiration":
-            perime = var.piece == piece_id and var.date_perimee
-            v = _fmt(ref.validite["date_expiration_perimee" if perime else "date_expiration_saine"],
-                     gab.format_date)
-        elif role == "date_signature":
-            v = _fmt(ref.horloges["guichet"], gab.format_date)
-        elif role == "date_naissance":
-            v = _fmt(dt.datetime.strptime(ref.valeur("date_naissance"), "%d/%m/%Y").date(),
-                     gab.format_date)
-        elif role == "adresse":
-            a = ref.personne["adresse"]
-            v = f"{a['numero']} {a['type_voie']} {a['nom_voie']}"
-        elif role == "ville" and gab.nom == "fw9":
-            a = ref.personne["adresse"]
-            v = f"{a['ville']}, FR {a['code_postal']}"
+            perime = var.piece == piece_id and var.expired_date
+            v = _fmt(ref.expiry["expired_expiry_date" if perime else "valid_expiry_date"],
+                     gab.date_format)
+        elif role == "signature_date":
+            v = _fmt(ref.clocks["filing"], gab.date_format)
+        elif role == "birth_date":
+            v = _fmt(dt.datetime.strptime(ref.value("birth_date"), "%d/%m/%Y").date(),
+                     gab.date_format)
+        elif role == "address":
+            a = ref.person["address"]
+            v = f"{a['number']} {a['street_type']} {a['street_name']}"
+        elif role == "city" and gab.name == "fw9":
+            a = ref.person["address"]
+            v = f"{a['city']}, FR {a['postal_code']}"
         else:
-            v = ref.valeur(role)
-        _poser(vals, gab.champ(role), str(v), maxlen)
+            v = ref.value(role)
+        _place(vals, gab.field(role), str(v), maxlen)
     return vals
 
 
-def _apposer(w, page_no, ops, tampon):
+def _stamp(w, page_no, ops, tampon):
     """Fusionne un calque vectoriel sur la page. Helvetica est une police de base du format
     PDF: rien a embarquer, rien a installer, et poppler la rend partout."""
     page = w.pages[page_no - 1]
     calque = PdfWriter()
-    vierge = calque.add_blank_page(float(page.mediabox.width), float(page.mediabox.height))
+    blank = calque.add_blank_page(float(page.mediabox.width), float(page.mediabox.height))
     flux = DecodedStreamObject()
     flux.set_data(ops.encode("latin-1", "replace"))
-    vierge[NameObject("/Contents")] = calque._add_object(flux)
-    vierge[NameObject("/Resources")] = DictionaryObject({
+    blank[NameObject("/Contents")] = calque._add_object(flux)
+    blank[NameObject("/Resources")] = DictionaryObject({
         NameObject("/Font"): DictionaryObject({
             NameObject("/F1"): DictionaryObject({
                 NameObject("/Type"): NameObject("/Font"),
@@ -272,45 +272,45 @@ def _apposer(w, page_no, ops, tampon):
     os.unlink(tampon)
 
 
-def construire(ref, variante, dest, reutiliser=True):
+def build(ref, variant, dest, reutiliser=True):
     """Materialise le dossier: un PDF rempli par piece, plus les surcharges d'image.
 
-    `reutiliser` sert la grille: les fixtures sont deterministes, le parent les construit une
+    `reutiliser` sert la grid: les fixtures sont deterministes, le parent les construit une
     fois et les douze processus se contentent de les relire. Sans ca les processus se
     marchent dessus sur le fichier de calque temporaire.
     """
-    var = PAR_NOM[variante] if isinstance(variante, str) else variante
+    var = BY_NAME[variant] if isinstance(variant, str) else variant
     os.makedirs(dest, exist_ok=True)
     pieces = []
     for piece_id, nom_gab in ref.pieces:
-        gab = ref.gabarits[nom_gab]
-        chemin = os.path.join(dest, f"{var.nom}-{piece_id}.pdf")
+        gab = ref.templates[nom_gab]
+        chemin = os.path.join(dest, f"{var.name}-{piece_id}.pdf")
         if reutiliser and os.path.exists(chemin):
-            pieces.append(PieceMaterielle(piece_id, gab, chemin,
+            pieces.append(BuiltPiece(piece_id, gab, chemin,
                                           dict(var.image) if var.piece == piece_id else {}))
             continue
-        vals = _valeurs(ref, gab, var, piece_id)
-        for role, champ in gab.cases.items():
-            if not (var.piece == piece_id and role in var.decocher):
-                vals[champ] = _etat_coche(gab.pdf, champ, gab.page)
-        cases = {c: v for c, v in vals.items() if c in gab.cases.values()}
+        vals = _values(ref, gab, var, piece_id)
+        for role, field in gab.boxes.items():
+            if not (var.piece == piece_id and role in var.uncheck):
+                vals[field] = _checked_state(gab.pdf, field, gab.page)
+        boxes = {c: v for c, v in vals.items() if c in gab.boxes.values()}
         w = PdfWriter(clone_from=gab.pdf)
         w.set_need_appearances_writer(True)
-        if cases:
-            w.update_page_form_field_values(w.pages[gab.page - 1], cases, auto_regenerate=True)
-        peignes = _peignes(gab.pdf, gab.page)
-        ops = "".join(_trace_texte(*_rect_pdf(gab.pdf, champ, gab.page), valeur,
-                                   peignes.get(champ, 0))
-                      for champ, valeur in vals.items() if champ not in cases)
-        if gab.signatures and not (var.piece == piece_id and var.sans_signature):
-            ops += "".join(_trace_signature(*_rect_pdf(gab.pdf, champ, gab.page))
-                           for champ in gab.signatures.values())
+        if boxes:
+            w.update_page_form_field_values(w.pages[gab.page - 1], boxes, auto_regenerate=True)
+        peignes = _combs(gab.pdf, gab.page)
+        ops = "".join(_draw_text(*_pdf_rect(gab.pdf, field, gab.page), value,
+                                   peignes.get(field, 0))
+                      for field, value in vals.items() if field not in boxes)
+        if gab.signatures and not (var.piece == piece_id and var.without_signature):
+            ops += "".join(_draw_signature(*_pdf_rect(gab.pdf, field, gab.page))
+                           for field in gab.signatures.values())
         if ops:
-            _apposer(w, gab.page, ops,
-                     os.path.join(dest, f"{var.nom}-{piece_id}-calque-{os.getpid()}.pdf"))
+            _stamp(w, gab.page, ops,
+                     os.path.join(dest, f"{var.name}-{piece_id}-calque-{os.getpid()}.pdf"))
         tampon = chemin + f".{os.getpid()}"
         w.write(tampon)
         os.replace(tampon, chemin)
         surcharge = dict(var.image) if var.piece == piece_id else {}
-        pieces.append(PieceMaterielle(piece_id, gab, chemin, surcharge))
-    return Dossier(var.nom, var.controle, tuple(pieces))
+        pieces.append(BuiltPiece(piece_id, gab, chemin, surcharge))
+    return Dossier(var.name, var.check, tuple(pieces))

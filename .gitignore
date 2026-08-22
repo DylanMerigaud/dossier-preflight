@@ -2,10 +2,10 @@
 __pycache__/
 *.pyc
 
-grille/mesures/
-grille/.fixtures/
-grille/lancement.log
-grille/analyse.log
+grid/mesures/
+grid/.fixtures/
+grid/run.log
+grid/analyze.log
 
 *.egg-info/
 build/
