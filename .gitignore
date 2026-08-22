@@ -1,4 +1,5 @@
 .work/
+spike/.work/
 __pycache__/
 *.pyc
 
@@ -10,3 +11,5 @@ grid/analyze.log
 *.egg-info/
 build/
 dist/
+.task/
+.travail/
