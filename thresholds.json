@@ -14,6 +14,17 @@
       "recall": 1.0,
       "false_positives": 0.0,
       "measured_with": "seed 37, never used to choose the threshold",
+      "chosen_on": "clean pages only (parasite level 0). The two fields below say what this recall becomes when foreign ink is present.",
+      "recall_with_ink_elsewhere": {
+        "0.002": 1.0,
+        "0.01": 1.0,
+        "0.04": 1.0
+      },
+      "recall_with_ink_on_the_damaged_field": {
+        "0.002": 0.3333,
+        "0.01": 0.0,
+        "0.04": 0.0
+      },
       "curve": "grid/results/pr_required_field.csv",
       "cells_under_floor": "0/288",
       "nominal_domain_dpi": 150
@@ -30,6 +41,17 @@
       "recall": 1.0,
       "false_positives": 0.0,
       "measured_with": "seed 37, never used to choose the threshold",
+      "chosen_on": "clean pages only (parasite level 0). The two fields below say what this recall becomes when foreign ink is present.",
+      "recall_with_ink_elsewhere": {
+        "0.002": 1.0,
+        "0.01": 1.0,
+        "0.04": 0.3364
+      },
+      "recall_with_ink_on_the_damaged_field": {
+        "0.002": 1.0,
+        "0.01": 1.0,
+        "0.04": 0.6667
+      },
       "curve": "grid/results/pr_required_checkbox.csv",
       "cells_under_floor": "0/288",
       "nominal_domain_dpi": 150
@@ -46,6 +68,17 @@
       "recall": 1.0,
       "false_positives": 0.0,
       "measured_with": "seed 37, never used to choose the threshold",
+      "chosen_on": "clean pages only (parasite level 0). The two fields below say what this recall becomes when foreign ink is present.",
+      "recall_with_ink_elsewhere": {
+        "0.002": 1.0,
+        "0.01": 1.0,
+        "0.04": 1.0
+      },
+      "recall_with_ink_on_the_damaged_field": {
+        "0.002": 1.0,
+        "0.01": 1.0,
+        "0.04": 0.3333
+      },
       "curve": "grid/results/pr_signature.csv",
       "cells_under_floor": "0/288",
       "nominal_domain_dpi": 150
@@ -65,7 +98,23 @@
       },
       "curve": "grid/results/pr_expiry.csv",
       "cells_under_floor": "0/288",
-      "nominal_domain_dpi": 150
+      "nominal_domain_dpi": 150,
+      "chosen_on": "clean pages only (parasite level 0). The two fields below say what this recall becomes when foreign ink is present.",
+      "recall_under_foreign_ink": {
+        "0.002": 1.0,
+        "0.01": 1.0,
+        "0.04": 1.0
+      },
+      "recall_with_ink_elsewhere": {
+        "0.002": 1.0,
+        "0.01": 1.0,
+        "0.04": 1.0
+      },
+      "recall_with_ink_on_the_damaged_field": {
+        "0.002": 0.8148,
+        "0.01": 0.6667,
+        "0.04": 0.3333
+      }
     },
     "consistency": {
       "value": 0.3939,
@@ -79,6 +128,13 @@
       "recall": 1.0,
       "false_positives": 0.0,
       "measured_with": "seed 37, never used to choose the threshold",
+      "chosen_on": "clean pages only (parasite level 0). The two fields below say what this recall becomes when foreign ink is present.",
+      "recall_with_ink_elsewhere": {
+        "0.002": 1.0,
+        "0.01": 1.0,
+        "0.04": 1.0
+      },
+      "recall_with_ink_on_the_damaged_field": "not measured for this check, see grid/target_parasite.py",
       "curve": "grid/results/pr_consistency.csv",
       "cells_under_floor": "0/288",
       "nominal_domain_dpi": 150
@@ -93,8 +149,15 @@
         "text_sensor": "page"
       },
       "recall": 0.9965,
-      "false_positives": 0.00058,
+      "false_positives": 0.00043,
       "measured_with": "seed 37, never used to choose the threshold",
+      "chosen_on": "clean pages only (parasite level 0). The two fields below say what this recall becomes when foreign ink is present.",
+      "recall_with_ink_elsewhere": {
+        "0.002": 0.9691,
+        "0.01": 0.9877,
+        "0.04": 0.9568
+      },
+      "recall_with_ink_on_the_damaged_field": "not measured for this check, see grid/target_parasite.py",
       "curve": "grid/results/pr_forbidden_value.csv",
       "cells_under_floor": "6/288",
       "nominal_domain_dpi": 150
@@ -108,6 +171,13 @@
       "recall": 1.0,
       "false_positives": 0.0,
       "measured_with": "seed 37, never used to choose the threshold",
+      "chosen_on": "clean pages only (parasite level 0). The two fields below say what this recall becomes when foreign ink is present.",
+      "recall_with_ink_elsewhere": {
+        "0.002": 1.0,
+        "0.01": 1.0,
+        "0.04": 1.0
+      },
+      "recall_with_ink_on_the_damaged_field": "not measured for this check, see grid/target_parasite.py",
       "curve": "grid/results/pr_resolution.csv",
       "cells_under_floor": "0/288",
       "nominal_domain_dpi": 150,
@@ -144,6 +214,13 @@
       "recall": 1.0,
       "false_positives": 0.0,
       "measured_with": "seed 37, never used to choose the threshold",
+      "chosen_on": "clean pages only (parasite level 0). The two fields below say what this recall becomes when foreign ink is present.",
+      "recall_with_ink_elsewhere": {
+        "0.002": 1.0,
+        "0.01": 1.0,
+        "0.04": 1.0
+      },
+      "recall_with_ink_on_the_damaged_field": "not measured for this check, see grid/target_parasite.py",
       "curve": "grid/results/pr_cropped_page.csv",
       "cells_under_floor": "0/288",
       "nominal_domain_dpi": 150
@@ -157,6 +234,13 @@
       "recall": 1.0,
       "false_positives": 0.0,
       "measured_with": "seed 37, never used to choose the threshold",
+      "chosen_on": "clean pages only (parasite level 0). The two fields below say what this recall becomes when foreign ink is present.",
+      "recall_with_ink_elsewhere": {
+        "0.002": 1.0,
+        "0.01": 1.0,
+        "0.04": 1.0
+      },
+      "recall_with_ink_on_the_damaged_field": "not measured for this check, see grid/target_parasite.py",
       "curve": "grid/results/pr_rotated_page.csv",
       "cells_under_floor": "0/288",
       "nominal_domain_dpi": 150

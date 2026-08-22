@@ -139,17 +139,81 @@ order; it is `field_ids()` now. And `cadrer()` and `cadre` both mapped to `frame
 have let a local variable shadow the function inside `prepare()`; a collision check on the
 table's OUTPUTS caught it before it was applied.
 
+## 2026-08-22
+
+### The fifth factor ran, and it settles the ink sensor
+
+27,612 readings now: 14,976 for the four-piece grid plus 12,636 for the parasite axis, 148
+minutes. Plus a 2,592-reading targeted follow-up, 25 minutes. Everything inside the budget that
+was set before launching.
+
+**The nine thresholds did not move.** One number did: the forbidden-value false positive rate
+fell from 0.00058 to 0.00043, and the reason is arithmetic rather than behavioural. The Spanish
+W-9 added clean targets and no false alarms, so the same 4 alarms are now divided by a larger
+denominator.
+
+**The corpus experiment answered its question.** All 4 false alarms still land on the Cerfa and
+none on the Spanish W-9. Since that form varies the language while holding the layout, the cost
+is the Cerfa's character-by-character boxing and not the fact of not being English. That is the
+whole reason the third language went in, and it is the kind of question no amount of extra cells
+could have answered.
+
+**The ink sensor is blind past 1% of foreign ink, and it is now published as such.** On the very
+field a variant emptied, over 27 cells and 3 seeds:
+
+    ink (retained)   1.000 clean, 0.333 at 0.2%, 0.000 at 1%, 0.000 at 4%, and 0.000 false
+                     positives at every level
+    union            1.000 / 0.778 / 0.679 / 0.519, but 0.296 false positives at 4%
+    full-page OCR    1.000 / 1.000 / 1.000 / 0.778, and 0.556 false positives at 4%
+    per zone OCR     1.000 / 0.778 / 0.679 / 0.630, and 0.481 false positives at 4%
+
+The sensor was not changed. The threshold is chosen on clean pages, deliberately: the four levels
+exist in equal proportion for statistical power, and picking a threshold on the pooled set would
+silently assume three pages in four carry foreign ink. On clean pages ink still wins, so ink
+stays, and that is a result rather than an omission. What changed is that the weakness travels
+with the strength: thresholds.json carries `recall_with_ink_on_the_damaged_field` inside the same
+object as `recall`.
+
+### Three things this run taught that are worth more than the numbers
+
+**A verification you do not re-run after fixing only verifies your intention.** The parasite draw
+rotated the check family on an index that counted the zero level, so it stepped by four over a
+four-family piece and index zero never came up: the expiry date got zero placements. I did not
+see it by re-reading the code I had just written. I saw it by re-running the coverage check after
+correcting the first fault. That is the most transportable result of the night.
+
+**A pilot is not a formality, it is a chance to find out the experiment aims elsewhere.** The
+first draw was uniform over the DECLARED zones, which sounded reasonable. A form declares far
+more zones than any check reads: 26 placements out of 36 landed where nothing is measured, and
+neither a signature nor an expiry date was ever touched. Two hours of compute would have answered
+nothing about the signature duel.
+
+**And the corrected plan still aimed slightly beside the question.** Stratified by check, the
+parasite lands on a zone the check watches, but a variant's damaged target is one zone among
+several: for required_field it was never drawn at all. So the grid measures what foreign ink does
+to a check in general and never exercises the masking mechanism, which needs the ink ON the
+emptied field. Found by reading the partial results, not by reading the plan.
+`grid/target_parasite.py` closes exactly that gap, and it is where the 0.000 above comes from.
+
+The same shape of fault appeared once more at publication time: `recall_under_foreign_ink` read
+1.000, because it came from the grid where the parasite rarely lands on the damaged field. A true
+number with a false meaning, next to the very figure it was supposed to qualify. There are now
+two fields with names that say which is which.
+
 ### What is left, in order of importance to the product
 
-1. **The fifth factor: parasitic ink in the grid.** The only thing that would allow changing the
-   required-field sensor properly. Plan and budget below.
-2. **Real scans.** Everything is synthetic. This is the repository's biggest external validity
-   hole and no amount of grid closes it.
-3. **The signature duel, still unsettled** (six settings at 1.000 and 0.0000). The same parasite
-   settles it: a stroke in the signature zone separates ink from connected components, where the
-   current grid cannot tell them apart.
-4. **The angle hypothesis** on the forbidden-value corner. No new grid needed: same cell, same
+1. **Real scans.** Everything is synthetic. This is the repository's biggest external validity
+   hole and no amount of grid closes it. It is now clearly the first thing to do.
+2. **The signature duel is still not settled between the two sensors**, although the parasite did
+   move the check itself: connected components hold 1.000 up to 1% of foreign ink and fall to
+   0.333 at 4%, with zero false alarms throughout. What has not been done is re-running the duel
+   between components and differential ink under the parasite, which is the comparison that would
+   finally separate them.
+3. **The angle hypothesis** on the forbidden-value corner. No new grid needed: same cell, same
    seed, fine deskew disabled, compare at equal rotation.
+4. **A fourth language, or a form without an AcroForm.** The Spanish W-9 broke the
+   language/layout confound; a form whose fields are boxed but written in English would close the
+   other half of it.
 
 ### Experiment plan for the fifth factor, and its budget
 

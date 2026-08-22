@@ -4,8 +4,8 @@ A tool that does not say where it stops working is not measured, it is narrated.
 
 ## Nominal domain: scanning at 150 dpi or more
 
-The operating points are chosen on the 864 pairs of this domain, not on the
-1152 of the whole grid. That is not a way to hand ourselves nice numbers, it is a
+The operating points are chosen on the 1836 pairs of this domain, not on the
+2124 of the whole grid. That is not a way to hand ourselves nice numbers, it is a
 mechanical consequence: a dossier is rejected as soon as ONE required field is empty,
 so the dossier's score is that of its WORST field. Below the floor the Cerfa has fields
 OCR cannot read, the CLEAN dossier then reaches the same score as the faulty one, and
@@ -19,7 +19,7 @@ because hiding it would be lying about it.
 Domains tried, from widest to narrowest, with the worst recall of the checks that
 depend on OCR: dpi >= 96 -> 0.000, dpi >= 150 -> 0.997.
 
-Measured over 1152 cell/seed pairs: angle (0, 0.25, 0.5, 1, 2, 4 deg) x
+Measured over 2124 cell/seed pairs: angle (0, 0.25, 0.5, 1, 2, 4 deg) x
 dpi (96, 150, 200, 300) x JPEG quality (30, 55, 75, 95) x noise sigma (0, 3, 6, 12),
 three seeds per cell. Every check is evaluated at its operating point, chosen as the
 highest recall holding a false positive rate under 0.2%.
@@ -29,6 +29,32 @@ seed 37, never looked at beforehand. Choosing a threshold and reporting
 its recall on the same draws always overestimates it.
 
 A cell is declared OUTSIDE THE DOMAIN when recall there drops below 95%.
+
+## The fifth factor: foreign ink
+
+The first four factors move, blur or dirty the ink already on the page. None of them
+ADDS any, and that is the ground the ink sensor won its required-field duel on. A
+528-reading probe measured what that ground was hiding, so the grid now carries the
+parasite as a fifth axis: a speck, a fold shadow or a neighbouring pen stroke, laid on
+the CLEAN render before degradation so it goes through the same rotation, noise, blur
+and compression as the page.
+
+Placement is drawn deterministically and STRATIFIED BY CHECK: among the zones a check
+actually watches, with the check family rotated so the rare ones get their share.
+Drawn uniformly among the DECLARED zones instead, 26 placements out of 36 landed where
+nothing is measured and neither a signature nor an expiry date was ever touched. The
+placement does not vary with the cell, on purpose: if it did, a cell's recall could
+differ because of where the speck fell rather than because of the cell.
+
+THE OPERATING POINT IS STILL CHOSEN ON CLEAN PAGES, and that is a declared choice. The
+four levels are produced in equal proportion, so picking a threshold on the pooled set
+would assume three pages in four carry foreign ink, far above anything real, and would
+tune the gate for a dirtier world than the one it runs in. It would also push away from
+the ink sensor and towards one with more false positives on clean dossiers, which is
+the side that costs credibility. So the threshold is read exactly as it was before this
+factor existed, and the parasite enters as EVIDENCE: the per-level tables below and the
+duel by level in duels.md say what the retained sensor costs when ink does land where
+it should not. Nothing was recalibrated silently.
 
 ## What the measurement does not cover
 
@@ -65,6 +91,75 @@ A cell is declared OUTSIDE THE DOMAIN when recall there drops below 95%.
   requires replaying this grid with parasitic ink as a FIFTH FACTOR, and that is the
   first measurement job still open.
 - Precision depends on prevalence. The curves give it at 10% faulty dossiers, an ASSUMED value and not a measured one.
+
+## Foreign ink laid ON the field a check must catch
+
+The grid above draws the parasite among the zones a check WATCHES, and a variant's
+damaged target is one zone among several. Checked explicitly: over the 36
+placements of the experiment the draw does hit the damaged target for
+required_checkbox, signature and expiry, and hits it exactly ZERO times for
+required_field. So the grid measures what foreign ink does to a check in general,
+and never once exercises the mechanism the probe found, which needs the ink to land
+ON the emptied field so the ink sensor calls it filled.
+
+That gap was found by reading the partial results, not by reading the plan. This
+section closes it: the parasite goes exactly on the zone the variant damaged, and
+both sides are read at every condition, over 27 cells x 4 levels x 3 seeds.
+
+  recall           the faulty dossier: does the check still catch its own defect
+  false positives  the clean dossier, same parasite, same place: does it now cry
+
+forbidden_value is not here on purpose: its target is a VALUE read anywhere on the
+page, not a zone, so there is no field to aim at and any placement would be
+arbitrary.
+
+### expiry, parasite on `Exp Date mmddyyyy`
+
+| sensor | level | recall | 95% CI | false positives on a clean page |
+|---|---|---|---|---|
+| published | 0.0 | 1.000 | [0.955, 1.000] | 0.000 |
+| published | 0.002 | 0.815 | [0.717, 0.884] | 0.000 |
+| published | 0.01 | 0.667 | [0.559, 0.760] | 0.000 |
+| published | 0.04 | 0.333 | [0.240, 0.441] | 0.025 |
+
+### required_checkbox, parasite on `c1_1[0]`
+
+| sensor | level | recall | 95% CI | false positives on a clean page |
+|---|---|---|---|---|
+| published | 0.0 | 1.000 | [0.955, 1.000] | 0.000 |
+| published | 0.002 | 1.000 | [0.955, 1.000] | 0.000 |
+| published | 0.01 | 1.000 | [0.955, 1.000] | 0.000 |
+| published | 0.04 | 0.667 | [0.559, 0.760] | 0.000 |
+
+### required_field, parasite on `City or Town`
+
+| sensor | level | recall | 95% CI | false positives on a clean page |
+|---|---|---|---|---|
+| ink | 0.0 | 1.000 | [0.955, 1.000] | 0.000 |
+| ink | 0.002 | 0.333 | [0.240, 0.441] | 0.000 |
+| ink | 0.01 | 0.000 | [0.000, 0.045] | 0.000 |
+| ink | 0.04 | 0.000 | [0.000, 0.045] | 0.000 |
+| union | 0.0 | 1.000 | [0.955, 1.000] | 0.000 |
+| union | 0.002 | 0.778 | [0.676, 0.855] | 0.000 |
+| union | 0.01 | 0.679 | [0.571, 0.771] | 0.000 |
+| union | 0.04 | 0.519 | [0.411, 0.624] | 0.296 |
+| page | 0.0 | 1.000 | [0.955, 1.000] | 0.000 |
+| page | 0.002 | 1.000 | [0.955, 1.000] | 0.000 |
+| page | 0.01 | 1.000 | [0.955, 1.000] | 0.000 |
+| page | 0.04 | 0.778 | [0.676, 0.855] | 0.556 |
+| zone | 0.0 | 1.000 | [0.955, 1.000] | 0.000 |
+| zone | 0.002 | 0.778 | [0.676, 0.855] | 0.000 |
+| zone | 0.01 | 0.679 | [0.571, 0.771] | 0.000 |
+| zone | 0.04 | 0.630 | [0.521, 0.727] | 0.481 |
+
+### signature, parasite on `Signature of Employee`
+
+| sensor | level | recall | 95% CI | false positives on a clean page |
+|---|---|---|---|---|
+| published | 0.0 | 1.000 | [0.955, 1.000] | 0.000 |
+| published | 0.002 | 1.000 | [0.955, 1.000] | 0.000 |
+| published | 0.01 | 1.000 | [0.955, 1.000] | 0.000 |
+| published | 0.04 | 0.333 | [0.240, 0.441] | 0.000 |
 
 ## Outside-protocol follow-up: the only cell where the tool misses something
 
@@ -132,17 +227,17 @@ row.
 
 | check \ defect | empty_required | unchecked_box | missing_signat | expired_date | diverging_addr | forbidden_valu | low_resolution | cropped_page | rotated_page |
 |---|---|---|---|---|---|---|---|---|---|
-| consistency | . | . | . | . | . | . | . | . | . |
+| consistency | 0.034 | 0.034 | 0.034 | 0.034 | . | 0.034 | . | 0.034 | 0.033 |
 | cropped_page | . | . | . | . | . | . | . | . | . |
 | expiry | . | . | . | . | . | . | . | . | . |
-| forbidden_value | 0.005 | 0.005 | 0.005 | 0.005 | 0.005 | . | 0.005 | 0.005 | 0.005 |
-| required_checkbox | . | . | . | . | . | . | 0.021 | . | . |
-| required_field | . | . | . | . | . | . | . | . | . |
+| forbidden_value | 0.007 | 0.007 | 0.007 | 0.007 | 0.007 | . | 0.007 | 0.007 | 0.007 |
+| required_checkbox | 0.059 | . | 0.059 | 0.059 | 0.059 | 0.059 | 0.240 | 0.059 | 0.059 |
+| required_field | . | 0.141 | 0.141 | 0.141 | 0.149 | 0.141 | 0.402 | 0.141 | 0.141 |
 | resolution | . | . | . | . | . | . | . | . | . |
 | rotated_page | . | . | . | . | . | . | . | . | . |
 | signature | . | . | . | . | . | . | . | . | . |
 
-A dot means zero firings over 864 dossiers.
+A dot means zero firings over 1836 dossiers.
 
 ## consistency
 
@@ -160,6 +255,17 @@ the gate stays credible.
 
 Cells below the floor: 0 out of 288.
 
+At the published threshold, by level of foreign ink laid in a watched zone:
+
+| parasite | recall | 95% CI | false positives per target | per clean dossier | positives |
+|---|---|---|---|---|---|
+| 0.0 | 1.000 | [0.996, 1.000] | 0.0000 | 0.0000 | 864 |
+| 0.002 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 324 |
+| 0.01 | 1.000 | [0.988, 1.000] | 0.0154 | 0.0154 | 324 |
+| 0.04 | 1.000 | [0.988, 1.000] | 0.1790 | 0.1790 | 324 |
+
+Recall lost between a clean page and the worst level (0.0): +0.000.
+
 Outside the domain (dpi < 150), RAW SENSORS, that is, what the tool
 would do if it had no abstention rule: recall 0.958 [0.929, 0.976], firings on a clean dossier 0.8403 over 288 targets.
 Those figures therefore do not describe the product, they justify the rule: in
@@ -175,6 +281,7 @@ Recall per factor, at the retained threshold:
 - dpi: 150 -> 1.000 [0.99, 1.00], 200 -> 1.000 [0.99, 1.00], 300 -> 1.000 [0.99, 1.00]
 - jpeg: 30 -> 1.000 [0.98, 1.00], 55 -> 1.000 [0.98, 1.00], 75 -> 1.000 [0.98, 1.00], 95 -> 1.000 [0.98, 1.00]
 - sigma: 0.0 -> 1.000 [0.98, 1.00], 3.0 -> 1.000 [0.98, 1.00], 6.0 -> 1.000 [0.98, 1.00], 12.0 -> 1.000 [0.98, 1.00]
+- parasite: 0.0 -> 1.000 [1.00, 1.00]
 
 ## cropped_page
 
@@ -182,9 +289,9 @@ Retained settings: no settings. Threshold 0.08795.
 
 | set | recall | 95% CI | false positives per target | 95% CI | per clean dossier | positives |
 |---|---|---|---|---|---|---|
-| calibration (seeds 11 and 23) | 1.000 | [0.993, 1.000] | 0.0000 | [0.0000, 0.0022] | 0.0000 | 576 |
-| VALIDATION (seed 37, never seen) | 1.000 | [0.987, 1.000] | 0.0000 | [0.0000, 0.0044] | 0.0000 | 288 |
-| overall | 1.000 | [0.996, 1.000] | 0.0000 | [0.0000, 0.0015] | 0.0000 | 864 |
+| calibration (seeds 11 and 23) | 1.000 | [0.993, 1.000] | 0.0000 | [0.0000, 0.0017] | 0.0000 | 576 |
+| VALIDATION (seed 37, never seen) | 1.000 | [0.987, 1.000] | 0.0000 | [0.0000, 0.0033] | 0.0000 | 288 |
+| overall | 1.000 | [0.996, 1.000] | 0.0000 | [0.0000, 0.0011] | 0.0000 | 864 |
 
 The per-dossier rate is the one the user feels: the probability that at least one
 alarm goes off on an entirely clean dossier. It is the one that decides whether
@@ -192,8 +299,19 @@ the gate stays credible.
 
 Cells below the floor: 0 out of 288.
 
+At the published threshold, by level of foreign ink laid in a watched zone:
+
+| parasite | recall | 95% CI | false positives per target | per clean dossier | positives |
+|---|---|---|---|---|---|
+| 0.0 | 1.000 | [0.996, 1.000] | 0.0000 | 0.0000 | 864 |
+| 0.002 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 324 |
+| 0.01 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 324 |
+| 0.04 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 324 |
+
+Recall lost between a clean page and the worst level (0.0): +0.000.
+
 Outside the domain (dpi < 150), RAW SENSORS, that is, what the tool
-would do if it had no abstention rule: recall 1.000 [0.987, 1.000], firings on a clean dossier 0.0000 over 864 targets.
+would do if it had no abstention rule: recall 1.000 [0.987, 1.000], firings on a clean dossier 0.0000 over 1152 targets.
 Those figures therefore do not describe the product, they justify the rule: in
 production a check that READS abstains below the floor instead of producing
 what is read here. They are deliberately raw-sensor measurements, because a
@@ -207,6 +325,7 @@ Recall per factor, at the retained threshold:
 - dpi: 150 -> 1.000 [0.99, 1.00], 200 -> 1.000 [0.99, 1.00], 300 -> 1.000 [0.99, 1.00]
 - jpeg: 30 -> 1.000 [0.98, 1.00], 55 -> 1.000 [0.98, 1.00], 75 -> 1.000 [0.98, 1.00], 95 -> 1.000 [0.98, 1.00]
 - sigma: 0.0 -> 1.000 [0.98, 1.00], 3.0 -> 1.000 [0.98, 1.00], 6.0 -> 1.000 [0.98, 1.00], 12.0 -> 1.000 [0.98, 1.00]
+- parasite: 0.0 -> 1.000 [1.00, 1.00]
 
 ## expiry
 
@@ -224,6 +343,17 @@ the gate stays credible.
 
 Cells below the floor: 0 out of 288.
 
+At the published threshold, by level of foreign ink laid in a watched zone:
+
+| parasite | recall | 95% CI | false positives per target | per clean dossier | positives |
+|---|---|---|---|---|---|
+| 0.0 | 1.000 | [0.996, 1.000] | 0.0000 | 0.0000 | 864 |
+| 0.002 | 1.000 | [0.983, 1.000] | 0.0000 | 0.0000 | 216 |
+| 0.01 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 322 |
+| 0.04 | 1.000 | [0.983, 1.000] | 0.0000 | 0.0000 | 216 |
+
+Recall lost between a clean page and the worst level (0.0): +0.000.
+
 Outside the domain (dpi < 150), RAW SENSORS, that is, what the tool
 would do if it had no abstention rule: recall 1.000 [0.566, 1.000], firings on a clean dossier 0.0000 over 2 targets.
 Those figures therefore do not describe the product, they justify the rule: in
@@ -239,6 +369,7 @@ Recall per factor, at the retained threshold:
 - dpi: 150 -> 1.000 [0.99, 1.00], 200 -> 1.000 [0.99, 1.00], 300 -> 1.000 [0.99, 1.00]
 - jpeg: 30 -> 1.000 [0.98, 1.00], 55 -> 1.000 [0.98, 1.00], 75 -> 1.000 [0.98, 1.00], 95 -> 1.000 [0.98, 1.00]
 - sigma: 0.0 -> 1.000 [0.98, 1.00], 3.0 -> 1.000 [0.98, 1.00], 6.0 -> 1.000 [0.98, 1.00], 12.0 -> 1.000 [0.98, 1.00]
+- parasite: 0.0 -> 1.000 [1.00, 1.00]
 
 ## forbidden_value
 
@@ -246,15 +377,26 @@ Retained settings: min_conf=0.0, text_sensor=page. Threshold 0.7214.
 
 | set | recall | 95% CI | false positives per target | 95% CI | per clean dossier | positives |
 |---|---|---|---|---|---|---|
-| calibration (seeds 11 and 23) | 0.991 | [0.980, 0.996] | 0.0009 | [0.0003, 0.0025] | 0.0052 | 576 |
-| VALIDATION (seed 37, never seen) | 0.997 | [0.981, 0.999] | 0.0006 | [0.0001, 0.0033] | 0.0035 | 288 |
-| overall | 0.993 | [0.985, 0.997] | 0.0008 | [0.0003, 0.0020] | 0.0046 | 864 |
+| calibration (seeds 11 and 23) | 0.991 | [0.980, 0.996] | 0.0007 | [0.0002, 0.0019] | 0.0052 | 576 |
+| VALIDATION (seed 37, never seen) | 0.997 | [0.981, 0.999] | 0.0004 | [0.0001, 0.0025] | 0.0035 | 288 |
+| overall | 0.993 | [0.985, 0.997] | 0.0006 | [0.0002, 0.0015] | 0.0046 | 864 |
 
 The per-dossier rate is the one the user feels: the probability that at least one
 alarm goes off on an entirely clean dossier. It is the one that decides whether
 the gate stays credible.
 
 Cells below the floor: 6 out of 288.
+
+At the published threshold, by level of foreign ink laid in a watched zone:
+
+| parasite | recall | 95% CI | false positives per target | per clean dossier | positives |
+|---|---|---|---|---|---|
+| 0.0 | 0.993 | [0.985, 0.997] | 0.0006 | 0.0046 | 864 |
+| 0.002 | 0.969 | [0.944, 0.983] | 0.0004 | 0.0031 | 324 |
+| 0.01 | 0.988 | [0.969, 0.995] | 0.0004 | 0.0031 | 324 |
+| 0.04 | 0.957 | [0.929, 0.974] | 0.0027 | 0.0216 | 324 |
+
+Recall lost between a clean page and the worst level (0.04): +0.036. This check is measurably degraded by foreign ink, and the figure above is the one to weigh against whatever the scans in question actually look like.
 
 Worst CROSSINGS of two factors. An axis-by-axis reading can lie by omission:
 three marginal values all above the floor can cross into a cell that falls
@@ -270,7 +412,7 @@ Clean targets that fire AT THE RETAINED THRESHOLD, the ones that cost credibilit
 - identity / A COMPLETER: 4 times out of 864
 
 Outside the domain (dpi < 150), RAW SENSORS, that is, what the tool
-would do if it had no abstention rule: recall 0.042 [0.024, 0.071], firings on a clean dossier 0.0000 over 1728 targets.
+would do if it had no abstention rule: recall 0.042 [0.024, 0.071], firings on a clean dossier 0.0000 over 2304 targets.
 Those figures therefore do not describe the product, they justify the rule: in
 production a check that READS abstains below the floor instead of producing
 what is read here. They are deliberately raw-sensor measurements, because a
@@ -282,6 +424,7 @@ Frontier per factor, number of fallen cells over the total:
 - dpi: 150 -> 0/96, 200 -> 0/96, 300 -> 6/96
 - jpeg: 30 -> 0/72, 55 -> 1/72, 75 -> 1/72, 95 -> 4/72
 - sigma: 0.0 -> 0/72, 3.0 -> 0/72, 6.0 -> 1/72, 12.0 -> 5/72
+- parasite: 0.0 -> 6/288
 
 The worst cells (angle, dpi, jpeg, sigma) and their recall:
 
@@ -298,6 +441,7 @@ Recall per factor, at the retained threshold:
 - dpi: 150 -> 1.000 [0.99, 1.00], 200 -> 1.000 [0.99, 1.00], 300 -> 0.979 [0.96, 0.99]
 - jpeg: 30 -> 1.000 [0.98, 1.00], 55 -> 0.995 [0.97, 1.00], 75 -> 0.995 [0.97, 1.00], 95 -> 0.981 [0.95, 0.99]
 - sigma: 0.0 -> 1.000 [0.98, 1.00], 3.0 -> 1.000 [0.98, 1.00], 6.0 -> 0.995 [0.97, 1.00], 12.0 -> 0.977 [0.95, 0.99]
+- parasite: 0.0 -> 0.993 [0.98, 1.00]
 
 ## required_checkbox
 
@@ -305,9 +449,9 @@ Retained settings: disc_ratio=0.3, ink_threshold=128. Threshold -14.38.
 
 | set | recall | 95% CI | false positives per target | 95% CI | per clean dossier | positives |
 |---|---|---|---|---|---|---|
-| calibration (seeds 11 and 23) | 1.000 | [0.993, 1.000] | 0.0000 | [0.0000, 0.0022] | 0.0000 | 576 |
-| VALIDATION (seed 37, never seen) | 1.000 | [0.987, 1.000] | 0.0000 | [0.0000, 0.0044] | 0.0000 | 288 |
-| overall | 1.000 | [0.996, 1.000] | 0.0000 | [0.0000, 0.0015] | 0.0000 | 864 |
+| calibration (seeds 11 and 23) | 1.000 | [0.993, 1.000] | 0.0000 | [0.0000, 0.0017] | 0.0000 | 576 |
+| VALIDATION (seed 37, never seen) | 1.000 | [0.987, 1.000] | 0.0000 | [0.0000, 0.0033] | 0.0000 | 288 |
+| overall | 1.000 | [0.996, 1.000] | 0.0000 | [0.0000, 0.0011] | 0.0000 | 864 |
 
 The per-dossier rate is the one the user feels: the probability that at least one
 alarm goes off on an entirely clean dossier. It is the one that decides whether
@@ -315,8 +459,19 @@ the gate stays credible.
 
 Cells below the floor: 0 out of 288.
 
+At the published threshold, by level of foreign ink laid in a watched zone:
+
+| parasite | recall | 95% CI | false positives per target | per clean dossier | positives |
+|---|---|---|---|---|---|
+| 0.0 | 1.000 | [0.996, 1.000] | 0.0000 | 0.0000 | 864 |
+| 0.002 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 324 |
+| 0.01 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 324 |
+| 0.04 | 0.336 | [0.287, 0.390] | 0.1481 | 0.3333 | 324 |
+
+Recall lost between a clean page and the worst level (0.04): +0.664. This check is measurably degraded by foreign ink, and the figure above is the one to weigh against whatever the scans in question actually look like.
+
 Outside the domain (dpi < 150), RAW SENSORS, that is, what the tool
-would do if it had no abstention rule: recall 1.000 [0.987, 1.000], firings on a clean dossier 0.0000 over 864 targets.
+would do if it had no abstention rule: recall 1.000 [0.987, 1.000], firings on a clean dossier 0.0000 over 1152 targets.
 Those figures therefore do not describe the product, they justify the rule: in
 production a check that READS abstains below the floor instead of producing
 what is read here. They are deliberately raw-sensor measurements, because a
@@ -330,6 +485,7 @@ Recall per factor, at the retained threshold:
 - dpi: 150 -> 1.000 [0.99, 1.00], 200 -> 1.000 [0.99, 1.00], 300 -> 1.000 [0.99, 1.00]
 - jpeg: 30 -> 1.000 [0.98, 1.00], 55 -> 1.000 [0.98, 1.00], 75 -> 1.000 [0.98, 1.00], 95 -> 1.000 [0.98, 1.00]
 - sigma: 0.0 -> 1.000 [0.98, 1.00], 3.0 -> 1.000 [0.98, 1.00], 6.0 -> 1.000 [0.98, 1.00], 12.0 -> 1.000 [0.98, 1.00]
+- parasite: 0.0 -> 1.000 [1.00, 1.00]
 
 ## required_field
 
@@ -338,7 +494,7 @@ Retained settings: text_sensor=ink, ink_threshold=128. Threshold -0.345.
 | set | recall | 95% CI | false positives per target | 95% CI | per clean dossier | positives |
 |---|---|---|---|---|---|---|
 | calibration (seeds 11 and 23) | 1.000 | [0.993, 1.000] | 0.0000 | [0.0000, 0.0003] | 0.0000 | 576 |
-| VALIDATION (seed 37, never seen) | 1.000 | [0.987, 1.000] | 0.0000 | [0.0000, 0.0007] | 0.0000 | 288 |
+| VALIDATION (seed 37, never seen) | 1.000 | [0.987, 1.000] | 0.0000 | [0.0000, 0.0005] | 0.0000 | 288 |
 | overall | 1.000 | [0.996, 1.000] | 0.0000 | [0.0000, 0.0002] | 0.0000 | 864 |
 
 The per-dossier rate is the one the user feels: the probability that at least one
@@ -347,8 +503,19 @@ the gate stays credible.
 
 Cells below the floor: 0 out of 288.
 
+At the published threshold, by level of foreign ink laid in a watched zone:
+
+| parasite | recall | 95% CI | false positives per target | per clean dossier | positives |
+|---|---|---|---|---|---|
+| 0.0 | 1.000 | [0.996, 1.000] | 0.0000 | 0.0000 | 864 |
+| 0.002 | 1.000 | [0.988, 1.000] | 0.0021 | 0.0525 | 324 |
+| 0.01 | 1.000 | [0.988, 1.000] | 0.0322 | 0.3580 | 324 |
+| 0.04 | 1.000 | [0.988, 1.000] | 0.1065 | 0.3858 | 324 |
+
+Recall lost between a clean page and the worst level (0.0): +0.000.
+
 Outside the domain (dpi < 150), RAW SENSORS, that is, what the tool
-would do if it had no abstention rule: recall 1.000 [0.987, 1.000], firings on a clean dossier 0.0000 over 5760 targets.
+would do if it had no abstention rule: recall 1.000 [0.987, 1.000], firings on a clean dossier 0.0000 over 7488 targets.
 Those figures therefore do not describe the product, they justify the rule: in
 production a check that READS abstains below the floor instead of producing
 what is read here. They are deliberately raw-sensor measurements, because a
@@ -362,6 +529,7 @@ Recall per factor, at the retained threshold:
 - dpi: 150 -> 1.000 [0.99, 1.00], 200 -> 1.000 [0.99, 1.00], 300 -> 1.000 [0.99, 1.00]
 - jpeg: 30 -> 1.000 [0.98, 1.00], 55 -> 1.000 [0.98, 1.00], 75 -> 1.000 [0.98, 1.00], 95 -> 1.000 [0.98, 1.00]
 - sigma: 0.0 -> 1.000 [0.98, 1.00], 3.0 -> 1.000 [0.98, 1.00], 6.0 -> 1.000 [0.98, 1.00], 12.0 -> 1.000 [0.98, 1.00]
+- parasite: 0.0 -> 1.000 [1.00, 1.00]
 
 ## resolution
 
@@ -369,9 +537,9 @@ Retained settings: no settings. Threshold -148.5.
 
 | set | recall | 95% CI | false positives per target | 95% CI | per clean dossier | positives |
 |---|---|---|---|---|---|---|
-| calibration (seeds 11 and 23) | 1.000 | [0.993, 1.000] | 0.0000 | [0.0000, 0.0022] | 0.0000 | 576 |
-| VALIDATION (seed 37, never seen) | 1.000 | [0.987, 1.000] | 0.0000 | [0.0000, 0.0044] | 0.0000 | 288 |
-| overall | 1.000 | [0.996, 1.000] | 0.0000 | [0.0000, 0.0015] | 0.0000 | 864 |
+| calibration (seeds 11 and 23) | 1.000 | [0.993, 1.000] | 0.0000 | [0.0000, 0.0017] | 0.0000 | 576 |
+| VALIDATION (seed 37, never seen) | 1.000 | [0.987, 1.000] | 0.0000 | [0.0000, 0.0033] | 0.0000 | 288 |
+| overall | 1.000 | [0.996, 1.000] | 0.0000 | [0.0000, 0.0011] | 0.0000 | 864 |
 
 The per-dossier rate is the one the user feels: the probability that at least one
 alarm goes off on an entirely clean dossier. It is the one that decides whether
@@ -379,8 +547,19 @@ the gate stays credible.
 
 Cells below the floor: 0 out of 288.
 
+At the published threshold, by level of foreign ink laid in a watched zone:
+
+| parasite | recall | 95% CI | false positives per target | per clean dossier | positives |
+|---|---|---|---|---|---|
+| 0.0 | 1.000 | [0.996, 1.000] | 0.0000 | 0.0000 | 864 |
+| 0.002 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 324 |
+| 0.01 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 324 |
+| 0.04 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 324 |
+
+Recall lost between a clean page and the worst level (0.0): +0.000.
+
 Outside the domain (dpi < 150), RAW SENSORS, that is, what the tool
-would do if it had no abstention rule: recall 1.000 [0.987, 1.000], firings on a clean dossier 1.0000 over 864 targets.
+would do if it had no abstention rule: recall 1.000 [0.987, 1.000], firings on a clean dossier 1.0000 over 1152 targets.
 Those figures therefore do not describe the product, they justify the rule: in
 production a check that READS abstains below the floor instead of producing
 what is read here. They are deliberately raw-sensor measurements, because a
@@ -398,6 +577,7 @@ Recall per factor, at the retained threshold:
 - dpi: 150 -> 1.000 [0.99, 1.00], 200 -> 1.000 [0.99, 1.00], 300 -> 1.000 [0.99, 1.00]
 - jpeg: 30 -> 1.000 [0.98, 1.00], 55 -> 1.000 [0.98, 1.00], 75 -> 1.000 [0.98, 1.00], 95 -> 1.000 [0.98, 1.00]
 - sigma: 0.0 -> 1.000 [0.98, 1.00], 3.0 -> 1.000 [0.98, 1.00], 6.0 -> 1.000 [0.98, 1.00], 12.0 -> 1.000 [0.98, 1.00]
+- parasite: 0.0 -> 1.000 [1.00, 1.00]
 
 ## rotated_page
 
@@ -405,9 +585,9 @@ Retained settings: no settings. Threshold 0.3585.
 
 | set | recall | 95% CI | false positives per target | 95% CI | per clean dossier | positives |
 |---|---|---|---|---|---|---|
-| calibration (seeds 11 and 23) | 1.000 | [0.993, 1.000] | 0.0000 | [0.0000, 0.0022] | 0.0000 | 576 |
-| VALIDATION (seed 37, never seen) | 1.000 | [0.987, 1.000] | 0.0000 | [0.0000, 0.0044] | 0.0000 | 288 |
-| overall | 1.000 | [0.996, 1.000] | 0.0000 | [0.0000, 0.0015] | 0.0000 | 864 |
+| calibration (seeds 11 and 23) | 1.000 | [0.993, 1.000] | 0.0000 | [0.0000, 0.0017] | 0.0000 | 576 |
+| VALIDATION (seed 37, never seen) | 1.000 | [0.987, 1.000] | 0.0000 | [0.0000, 0.0033] | 0.0000 | 288 |
+| overall | 1.000 | [0.996, 1.000] | 0.0000 | [0.0000, 0.0011] | 0.0000 | 864 |
 
 The per-dossier rate is the one the user feels: the probability that at least one
 alarm goes off on an entirely clean dossier. It is the one that decides whether
@@ -415,8 +595,19 @@ the gate stays credible.
 
 Cells below the floor: 0 out of 288.
 
+At the published threshold, by level of foreign ink laid in a watched zone:
+
+| parasite | recall | 95% CI | false positives per target | per clean dossier | positives |
+|---|---|---|---|---|---|
+| 0.0 | 1.000 | [0.996, 1.000] | 0.0000 | 0.0000 | 864 |
+| 0.002 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 324 |
+| 0.01 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 324 |
+| 0.04 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 324 |
+
+Recall lost between a clean page and the worst level (0.0): +0.000.
+
 Outside the domain (dpi < 150), RAW SENSORS, that is, what the tool
-would do if it had no abstention rule: recall 1.000 [0.987, 1.000], firings on a clean dossier 0.0000 over 864 targets.
+would do if it had no abstention rule: recall 1.000 [0.987, 1.000], firings on a clean dossier 0.0000 over 1152 targets.
 Those figures therefore do not describe the product, they justify the rule: in
 production a check that READS abstains below the floor instead of producing
 what is read here. They are deliberately raw-sensor measurements, because a
@@ -430,6 +621,7 @@ Recall per factor, at the retained threshold:
 - dpi: 150 -> 1.000 [0.99, 1.00], 200 -> 1.000 [0.99, 1.00], 300 -> 1.000 [0.99, 1.00]
 - jpeg: 30 -> 1.000 [0.98, 1.00], 55 -> 1.000 [0.98, 1.00], 75 -> 1.000 [0.98, 1.00], 95 -> 1.000 [0.98, 1.00]
 - sigma: 0.0 -> 1.000 [0.98, 1.00], 3.0 -> 1.000 [0.98, 1.00], 6.0 -> 1.000 [0.98, 1.00], 12.0 -> 1.000 [0.98, 1.00]
+- parasite: 0.0 -> 1.000 [1.00, 1.00]
 
 ## signature
 
@@ -447,6 +639,17 @@ the gate stays credible.
 
 Cells below the floor: 0 out of 288.
 
+At the published threshold, by level of foreign ink laid in a watched zone:
+
+| parasite | recall | 95% CI | false positives per target | per clean dossier | positives |
+|---|---|---|---|---|---|
+| 0.0 | 1.000 | [0.996, 1.000] | 0.0000 | 0.0000 | 864 |
+| 0.002 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 324 |
+| 0.01 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 324 |
+| 0.04 | 1.000 | [0.988, 1.000] | 0.0000 | 0.0000 | 324 |
+
+Recall lost between a clean page and the worst level (0.0): +0.000.
+
 Outside the domain (dpi < 150), RAW SENSORS, that is, what the tool
 would do if it had no abstention rule: recall 1.000 [0.987, 1.000], firings on a clean dossier 0.0000 over 288 targets.
 Those figures therefore do not describe the product, they justify the rule: in
@@ -462,4 +665,5 @@ Recall per factor, at the retained threshold:
 - dpi: 150 -> 1.000 [0.99, 1.00], 200 -> 1.000 [0.99, 1.00], 300 -> 1.000 [0.99, 1.00]
 - jpeg: 30 -> 1.000 [0.98, 1.00], 55 -> 1.000 [0.98, 1.00], 75 -> 1.000 [0.98, 1.00], 95 -> 1.000 [0.98, 1.00]
 - sigma: 0.0 -> 1.000 [0.98, 1.00], 3.0 -> 1.000 [0.98, 1.00], 6.0 -> 1.000 [0.98, 1.00], 12.0 -> 1.000 [0.98, 1.00]
+- parasite: 0.0 -> 1.000 [1.00, 1.00]
 

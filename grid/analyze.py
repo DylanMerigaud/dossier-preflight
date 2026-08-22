@@ -1146,6 +1146,40 @@ def write_limits(results, path, n_pairs, domain, n_retained, attempts, crossed=N
          "- Precision depends on prevalence. The curves give it at "
          f"{PREVALENCE:.0%} faulty dossiers, an ASSUMED value and not a measured one.",
          ""]
+    targeted = os.path.join(ROOT, "grid", "results", "target_parasite.json")
+    if os.path.exists(targeted):
+        d = json.load(open(targeted))
+        l += ["## Foreign ink laid ON the field a check must catch", "",
+              "The grid above draws the parasite among the zones a check WATCHES, and a variant's",
+              "damaged target is one zone among several. Checked explicitly: over the 36",
+              "placements of the experiment the draw does hit the damaged target for",
+              "required_checkbox, signature and expiry, and hits it exactly ZERO times for",
+              "required_field. So the grid measures what foreign ink does to a check in general,",
+              "and never once exercises the mechanism the probe found, which needs the ink to land",
+              "ON the emptied field so the ink sensor calls it filled.",
+              "",
+              "That gap was found by reading the partial results, not by reading the plan. This",
+              "section closes it: the parasite goes exactly on the zone the variant damaged, and",
+              f"both sides are read at every condition, over {d['cells']} cells x "
+              f"{len(d['levels'])} levels x {len(d['seeds'])} seeds.",
+              "",
+              "  recall           the faulty dossier: does the check still catch its own defect",
+              "  false positives  the clean dossier, same parasite, same place: does it now cry",
+              "",
+              "forbidden_value is not here on purpose: its target is a VALUE read anywhere on the",
+              "page, not a zone, so there is no field to aim at and any placement would be",
+              "arbitrary.", ""]
+        for check, c in sorted(d["checks"].items()):
+            l += [f"### {check}, parasite on `{c['zone']}`", "",
+                  "| sensor | level | recall | 95% CI | false positives on a clean page |",
+                  "|---|---|---|---|---|"]
+            for sname, levels in c["sensors"].items():
+                for lv, sides in levels.items():
+                    v, cl = sides["variant"], sides["clean"]
+                    l.append(f"| {sname} | {lv} | {v['rate']:.3f} | [{v['ci'][0]:.3f}, "
+                             f"{v['ci'][1]:.3f}] | {cl['rate']:.3f} |")
+            l.append("")
+
     followup = os.path.join(ROOT, "grid", "results", "followup.json")
     if os.path.exists(followup):
         d = json.load(open(followup))
@@ -1351,15 +1385,33 @@ def write_thresholds(results, path):
         # THE CONDITION TRAVELS WITH THE NUMBER, in the same object and not in a note. B's single
         # failure mode is keeping a flattering 1.000 at the top and leaving the weakness under
         # foreign ink in a file next door; that would be loosening a threshold, only politer.
+        #
+        # TWO DIFFERENT NUMBERS, AND CONFUSING THEM WOULD BE THE SAME FAULT AGAIN. In the grid
+        # the parasite lands on a watched zone that is almost never the one the variant damaged,
+        # so recall barely moves and the field reads 1.000. Laid ON the damaged field, the ink
+        # sensor goes to 0.000. Publishing only the first under a name like "under foreign ink"
+        # would be a true number with a false meaning, which is precisely what this repo keeps
+        # catching. Both are published, and their names say which is which.
         under_ink = {str(lv): round(m["recall"], 4)
                      for lv, m in sorted((r.get("by_parasite") or {}).items()) if lv}
+        on_target = {}
+        tp_path = os.path.join(ROOT, "grid", "results", "target_parasite.json")
+        if os.path.exists(tp_path):
+            tp = json.load(open(tp_path)).get("checks", {}).get(check, {})
+            sensors = tp.get("sensors", {})
+            name = "published" if "published" in sensors else next(iter(sensors), None)
+            if name:
+                on_target = {lv: round(v["variant"]["rate"], 4)
+                             for lv, v in sensors[name].items() if float(lv)}
         measurements = {
             "recall": round(r["validation"]["recall"], 4),
             "false_positives": round(r["validation"]["fpr"], 5),
             "measured_with": "seed 37, never used to choose the threshold",
-            "chosen_on": "clean pages only (parasite level 0). See recall_under_foreign_ink for "
-                         "what this recall becomes when ink lands where it should not.",
-            "recall_under_foreign_ink": under_ink,
+            "chosen_on": "clean pages only (parasite level 0). The two fields below say what "
+                         "this recall becomes when foreign ink is present.",
+            "recall_with_ink_elsewhere": under_ink,
+            "recall_with_ink_on_the_damaged_field": on_target or
+                "not measured for this check, see grid/target_parasite.py",
             "settings": r["settings_text"],
             "measured_settings": _useful_settings(r["settings"], check),
             "curve": f"grid/results/pr_{check}.csv",
@@ -1382,9 +1434,11 @@ def write_thresholds(results, path):
             "recall": round(r["validation"]["recall"], 4),
             "false_positives": round(r["validation"]["fpr"], 5),
             "measured_with": "seed 37, never used to choose the threshold",
-            "chosen_on": "clean pages only (parasite level 0). See recall_under_foreign_ink for "
-                         "what this recall becomes when ink lands where it should not.",
-            "recall_under_foreign_ink": under_ink,
+            "chosen_on": "clean pages only (parasite level 0). The two fields below say what "
+                         "this recall becomes when foreign ink is present.",
+            "recall_with_ink_elsewhere": under_ink,
+            "recall_with_ink_on_the_damaged_field": on_target or
+                "not measured for this check, see grid/target_parasite.py",
             "curve": f"grid/results/pr_{check}.csv",
             "cells_under_floor": f"{len(r['fallen_cells'])}/{r['n_cells']}",
             "nominal_domain_dpi": r.get("domain"),

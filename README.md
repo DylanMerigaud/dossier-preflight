@@ -29,9 +29,9 @@ below is the one from seed 37, never looked at beforehand.
 | cropped_page | a truncated page | coverage of the blank's ink | 0.088 | 1.000 | 0.00000 |
 | rotated_page | an upside-down page | correlation margin per quarter turn | 0.359 | 1.000 | 0.00000 |
 
-**WHAT THIS TABLE DOES NOT COVER, AND IT HAS TO BE READ ALONGSIDE IT.** The 1152 dossiers are
-ONE fictional dossier of three forms (W-9, I-9, Cerfa 14011, page 1 of each), ONE invented
-person, ONE single defect per check, rendered 1152 times through a SYNTHETIC noise model. No
+**WHAT THIS TABLE DOES NOT COVER, AND IT HAS TO BE READ ALONGSIDE IT.** The dossiers are ONE
+fictional dossier of four forms (W-9, its Spanish edition, I-9, Cerfa 14011, page 1 of each),
+ONE invented person, ONE single defect per check, rendered through a SYNTHETIC noise model. No
 real scan ever entered this measurement. The 1152 therefore measure the noise model and not the
 world: a recall of 1.000 is that of the same defect seen 864 times, not of 864 different
 defects. What these figures do not say: what the tool does on another form, on another way of
@@ -42,6 +42,14 @@ that won its duel.
 The number a user feels is not the one in the right-hand column, it is the one for the whole
 dossier: **4 dossiers out of 864 entirely clean ones carry at least one alarm, that is 0.46%**,
 and all four come from the forbidden-value check.
+
+**And all four land on the Cerfa, which is why the Spanish W-9 is in the corpus.** With two
+English forms and one French one, "French" and "boxed field layout" named the same object and
+nothing could say which one the tool struggles with. The IRS publishes its own Spanish W-9: same
+producer, same licence, same 23 declared zones, comb tax number of identical geometry. It varies
+the language and holds the layout. It produces **zero** false alarms, and it lowered the
+per-target rate of the forbidden-value check from 0.00058 to 0.00043 purely by adding clean
+targets. So it is the Cerfa's character-by-character boxing that costs, not the language.
 
 A faulty dossier is rejected at the counter: months of delay. A gate that cries for nothing
 loses its credibility, and a rule that cries wolf makes every rule next to it get skimmed. The
@@ -119,12 +127,32 @@ there is a step. For that field of 15,770 canonical pixels, 0.35% is a 9 x 8 px 
 dpi, that is, a piece of dust on the scanner glass. A pen stroke barely spilling out of the
 neighbouring field already adds 0.61%.
 
-The threshold and the sensor were NOT changed, and that is deliberate: this probe covers a
-single field, two cells and three hand-drawn parasite shapes, n=151. It is enough to show that a
-design choice was settled on biased ground; it is not enough to fix a threshold. Doing that
-would require replaying the whole grid with parasitic ink as a fifth factor. Until then, the row
-of the duel table saying 0.0000 false positives for ink stays true, and it says nothing about
-what its single failure mode costs.
+**The grid has since been replayed with parasitic ink as a fifth factor, and the probe holds.**
+Laid on the very field a variant emptied, over 27 cells and 3 seeds:
+
+| sensor | recall, clean | @0.2% ink | @1% | @4% | false positives @4% |
+|---|---|---|---|---|---|
+| ink, threshold 128 (RETAINED) | 1.000 | 0.333 | **0.000** | **0.000** | 0.000 |
+| union, confidence 0 | 1.000 | 0.778 | 0.679 | 0.519 | 0.296 |
+| full-page OCR | 1.000 | 1.000 | 1.000 | 0.778 | 0.556 |
+| per zone OCR | 1.000 | 0.778 | 0.679 | 0.630 | 0.481 |
+
+Past 1% of foreign ink on the emptied field, the retained sensor is **completely blind**: every
+such field is declared filled. In exchange it never once cries wolf, at any level. The word
+sensors keep seeing, and start crying: at 4% they raise false alarms on 30 to 56% of clean pages,
+which is the cost that destroys a gate rather than degrading it.
+
+**The sensor was still not changed, and that is now a measured decision rather than a wait.** The
+operating point is chosen on clean pages, deliberately: the four parasite levels exist in equal
+proportion for statistical power, and choosing a threshold on the pooled set would silently
+assume that three pages in four carry foreign ink. On clean pages ink still wins, so ink stays.
+What changed is that the weakness is now published next to the strength: `thresholds.json`
+carries `recall_with_ink_on_the_damaged_field` in the same object as `recall`, so nobody reads
+the 1.000 without reading the 0.000.
+
+If your scans come off a dirty glass, this is the row to weigh, and full-page OCR is the sensor
+to prefer at the price of its false alarms. That trade is yours to make; the measurement is
+here to make it with.
 
 For "is this signature missing", differential ink against connected components: **a tie**. All
 six settings return exactly 1.000 recall and 0.0000 false positives at every dpi. This corpus
@@ -206,6 +234,8 @@ that is already what it answers, "I cannot read this page" and not "this page is
     python3 spike/proof.py            # the first green case, standalone
     python3 -m pytest tests/ -q       # 64 tests, about 2 min 20 (they render and OCR)
     python3 grid/run.py               # the grid, ~2 h on 13 workers, resumable
+    python3 grid/run.py --parasite    # the fifth factor, ~2 h 30
+    python3 grid/target_parasite.py   # foreign ink on the field a check must catch, ~25 min
     python3 grid/analyze.py --publish # reads the thresholds off the curves, writes LIMITS.md
     python3 grid/corner_followup.py   # the outside-protocol follow-up on one cell
 

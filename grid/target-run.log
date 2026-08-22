@@ -1,0 +1,51 @@
+2592 readings, 13 workers
+  100/2592, 1.1 min, 26.2 min left
+  200/2592, 2.0 min, 24.3 min left
+  300/2592, 3.2 min, 24.1 min left
+  400/2592, 4.2 min, 23.2 min left
+  500/2592, 5.6 min, 23.5 min left
+  600/2592, 7.0 min, 23.4 min left
+  700/2592, 8.3 min, 22.4 min left
+  800/2592, 9.4 min, 20.9 min left
+  900/2592, 10.4 min, 19.5 min left
+  1000/2592, 11.5 min, 18.4 min left
+  1100/2592, 12.7 min, 17.2 min left
+  1200/2592, 14.0 min, 16.3 min left
+  1300/2592, 15.3 min, 15.3 min left
+  1400/2592, 16.3 min, 13.9 min left
+  1500/2592, 17.1 min, 12.5 min left
+  1600/2592, 18.2 min, 11.3 min left
+  1700/2592, 19.4 min, 10.2 min left
+  1800/2592, 20.7 min, 9.1 min left
+  1900/2592, 22.1 min, 8.0 min left
+  2000/2592, 23.4 min, 6.9 min left
+  2100/2592, 24.4 min, 5.7 min left
+  2200/2592, 25.6 min, 4.6 min left
+  2300/2592, 26.9 min, 3.4 min left
+  2400/2592, 28.5 min, 2.3 min left
+  2500/2592, 30.1 min, 1.1 min left
+finished in 31.4 min
+
+expiry  (parasite on Exp Date mmddyyyy)
+   published recall 0.0:1.000, 0.002:0.815, 0.01:0.667, 0.04:0.333
+            FP     0.0:0.000, 0.002:0.000, 0.01:0.000, 0.04:0.025
+
+required_checkbox  (parasite on c1_1[0])
+   published recall 0.0:1.000, 0.002:1.000, 0.01:1.000, 0.04:0.667
+            FP     0.0:0.000, 0.002:0.000, 0.01:0.000, 0.04:0.000
+
+required_field  (parasite on City or Town)
+   ink      recall 0.0:1.000, 0.002:0.333, 0.01:0.000, 0.04:0.000
+            FP     0.0:0.000, 0.002:0.000, 0.01:0.000, 0.04:0.000
+   union    recall 0.0:1.000, 0.002:0.778, 0.01:0.679, 0.04:0.519
+            FP     0.0:0.000, 0.002:0.000, 0.01:0.000, 0.04:0.296
+   page     recall 0.0:1.000, 0.002:1.000, 0.01:1.000, 0.04:0.778
+            FP     0.0:0.000, 0.002:0.000, 0.01:0.000, 0.04:0.556
+   zone     recall 0.0:1.000, 0.002:0.778, 0.01:0.679, 0.04:0.630
+            FP     0.0:0.000, 0.002:0.000, 0.01:0.000, 0.04:0.481
+
+signature  (parasite on Signature of Employee)
+   published recall 0.0:1.000, 0.002:1.000, 0.01:1.000, 0.04:0.333
+            FP     0.0:0.000, 0.002:0.000, 0.01:0.000, 0.04:0.000
+
+-> /Users/dylanmerigaud/Code/dossier-preflight/grid/results/target_parasite.json
