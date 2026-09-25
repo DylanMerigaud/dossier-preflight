@@ -62,7 +62,7 @@ def main():
     base = os.path.join(ROOT, "grid", "measurements")
 
     sets = {}
-    main_set = complete_dossiers(load(os.path.join(base, "measurements.jsonl")))
+    main_set = complete_dossiers(load(os.path.join(base, "measurements.jsonl")), ref)
     # Level 0 only: this follow-up measures a cell of the ORIGINAL grid, and the fifth factor
     # added three parasited copies of that same cell to the same file. Pooling them would mix
     # two different questions and quietly quadruple n.
@@ -70,7 +70,7 @@ def main():
                         if (k[1], k[2], k[3]) == CORNER and not k[5]}
     for name, path in (("corner", "followup/corner.jsonl"),
                        ("control", "followup/control.jsonl")):
-        sets[name] = complete_dossiers(load(os.path.join(base, path)))
+        sets[name] = complete_dossiers(load(os.path.join(base, path)), ref)
 
     out = {"check": CHECK, "threshold": threshold, "settings": settings.text_sensor,
            "corner": {"dpi": CORNER[0], "jpeg": CORNER[1], "sigma": CORNER[2]},

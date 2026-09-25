@@ -17,7 +17,7 @@ read the page. Every section below also gives what the check does OUTSIDE the do
 because hiding it would be lying about it.
 
 Domains tried, from widest to narrowest, with the worst recall of the checks that
-depend on OCR: dpi >= 96 -> 0.000, dpi >= 150 -> 0.997.
+depend on OCR: dpi >= 96 -> 0.000, dpi >= 150 -> 0.991.
 
 Measured over 2124 cell/seed pairs: angle (0, 0.25, 0.5, 1, 2, 4 deg) x
 dpi (96, 150, 200, 300) x JPEG quality (30, 55, 75, 95) x noise sigma (0, 3, 6, 12),

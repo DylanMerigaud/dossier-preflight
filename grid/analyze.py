@@ -106,8 +106,8 @@ def load(path):
     return index
 
 
-def complete_dossiers(index):
-    """A variant's dossier = the edited piece, plus the two pieces of the clean dossier.
+def complete_dossiers(index, ref):
+    """A variant's dossier = the edited piece, plus the other pieces of the clean dossier.
 
     Incomplete cells are dropped silently: the grid resumes where it stopped, and a
     half-written cell would manufacture a false negative that does not exist.
@@ -118,7 +118,7 @@ def complete_dossiers(index):
         if not expected <= set(by_variant):
             continue
         clean = by_variant["clean"]
-        if len(clean) < 3:
+        if len(clean) < len(ref.pieces):
             continue
         d = {"clean": clean}
         for v in VARIANTS:
@@ -791,7 +791,7 @@ def choose_domain(sweeps, checks):
         worst = 1.0
         for c in needed:
             r = analyze_check(unparasited(subgrid(sweeps[c], lambda k: k[1] >= dpi_min)), c)
-            worst = min(worst, 0.0 if r is None else r["validation"]["recall"])
+            worst = min(worst, 0.0 if r is None else r["calibration"]["recall"])
         attempts.append((dpi_min, worst))
         if worst >= RECALL_FLOOR:
             return dpi_min, attempts
@@ -889,7 +889,7 @@ def main():
 
     ref = load_reference()
     index = load(a.measurements)
-    dossiers = complete_dossiers(index)
+    dossiers = complete_dossiers(index, ref)
     cells = {cell_of(c) for c in dossiers}
     print(f"{len(dossiers)} complete cell/seed pairs, {len(cells)} distinct cells")
 

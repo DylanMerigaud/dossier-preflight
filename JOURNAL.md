@@ -278,3 +278,21 @@ again, it stays, and that is a result.
 **A pilot runs first.** `grid/run.py --pilot 4` on the new axis, to check the cost model against
 reality before committing the 102 minutes. If the measured cost per reading exceeds the model by
 more than 30%, the design is thinned again before the full run rather than after it.
+
+## 2026-09-25
+
+The domain rule now reads the calibration seeds, not the held-out seed. `choose_domain` picked
+the 150 dpi floor by minimising `r["validation"]["recall"]`, the very number the held-out
+protocol exists to report untouched: the floor was chosen on data it was then validated against.
+Fixed to `r["calibration"]["recall"]`. Same floor, 150 dpi; the printed worst recall at that floor
+moves from 0.997 to 0.991, because it now reads the calibration seeds (11, 23) instead of the
+held-out one (37). No threshold in `thresholds.json` changed.
+
+`complete_dossiers` also carried a literal `len(clean) < 3` from the three-piece corpus; the
+dossier has carried four pieces since the Spanish W-9 was added, and every complete cell already
+has four clean readings, so the fix (`len(clean) < len(ref.pieces)`) changes nothing observable,
+only the source of truth for the count. Three stale comments in `grid/run.py` (module docstring,
+the parasite sub-grid cost estimate, `pieces_to_read`'s docstring) and one in `grid/analyze.py`'s
+`complete_dossiers` docstring still said three pieces and twelve readings; corrected to four and
+thirteen. `grid/run.py:232`'s backfill comment, which correctly describes the file's state before
+the fourth piece was backfilled, was left as written.

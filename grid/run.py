@@ -4,8 +4,8 @@
     angle (0, 0.25, 0.5, 1, 2, 4 deg)  x  dpi (96, 150, 200, 300)
       x  JPEG quality (30, 55, 75, 95)  x  noise sigma (0, 3, 6, 12)   x  N seeds
 
-That is 384 cells. For every cell and every seed it reads the CLEAN dossier (three pieces) and
-the nine single-defect variants (one edited piece each): twelve readings, one JSONL line per
+That is 384 cells. For every cell and every seed it reads the CLEAN dossier (four pieces) and
+the nine single-defect variants (one edited piece each): thirteen readings, one JSONL line per
 reading. Nothing is compared to a threshold here, and that is deliberate: the analysis then
 sweeps thousands of operating points over those measurements without touching a single image.
 
@@ -49,7 +49,7 @@ PARASITE_LEVELS = (0.0, 0.002, 0.01, 0.04)
 
 # The fractional sub-grid crossed fully with the new factor. The four old factors are already
 # established by the full grid; the unknown is the parasite dose, so they are thinned and it is
-# not. Full crossing would have cost 13,824 readings per level, over four hours.
+# not. Full crossing would have cost 14,976 readings per level, over four hours.
 SUB_ANGLES = (0.0, 0.5, 2.0, 4.0)
 SUB_DPIS = (150, 200, 300)
 SUB_JPEGS = (30, 75, 95)
@@ -79,11 +79,11 @@ def _bootstrap():
 
 
 def pieces_to_read():
-    """The twelve (variant, piece) pairs to read per cell and per seed.
+    """The thirteen (variant, piece) pairs to read per cell and per seed.
 
-    A variant only touches ONE piece: the other two are identical to the clean dossier's and
+    A variant only touches ONE piece: the other three are identical to the clean dossier's and
     their reading is reused as is by the analysis. Without that saving the grid would cost
-    thirty readings per cell instead of twelve.
+    forty readings per cell instead of thirteen.
     """
     _bootstrap()
     couples = [("clean", p) for p, _ in _REF.pieces]
@@ -151,10 +151,10 @@ def _draw(seed, level, piece_id, template):
 
 
 def task(job):
-    """`job` may carry the exact (variant, piece) couples to read; None means all twelve.
+    """`job` may carry the exact (variant, piece) couples to read; None means all thirteen.
 
     That is what makes --backfill worth having: producing one missing reading must not cost the
-    twelve that sit next to it in the same task.
+    thirteen that sit next to it in the same task.
     """
     cell, seed, level, couples = job
     angle, dpi, jpeg, sigma = cell
