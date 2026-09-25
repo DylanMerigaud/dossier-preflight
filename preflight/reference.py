@@ -27,6 +27,15 @@ class Reference:
     pieces: tuple
     consistencies: tuple
     templates: dict
+    # IDENTITY, not part of v0.1.0's schema: derived from the file name, never declared in the
+    # YAML itself, so fixtures/reference.yaml stays byte-identical and its identity is
+    # "reference". A file under fixtures/identities/ named id01.yaml carries identity "id01".
+    identity: str = "reference"
+    # The signature fixture used to draw on a HARD-CODED seed 11 (preflight/fixtures.py), so
+    # every dossier carried the same handwriting regardless of who filed it. Optional and
+    # defaulted to 11 so fixtures/reference.yaml, which never declares it, keeps the exact
+    # signature it always had.
+    signature_seed: int = 11
 
     def value(self, role):
         """The expected value for a role, flattened address included."""
@@ -37,6 +46,15 @@ class Reference:
 
     def clock(self, name):
         return self.clocks[name]
+
+    @property
+    def country(self):
+        """The 2-letter code printed next to the city on the W-9's foreign address line.
+
+        Optional, under person.address, defaulting to "FR": fixtures/reference.yaml never
+        declares it and keeps reading as "FR", exactly as the hard-coded value it replaces.
+        """
+        return (self.person.get("address") or {}).get("country", "FR")
 
 
 def load_reference(path=None, root=ROOT):
@@ -51,6 +69,7 @@ def load_reference(path=None, root=ROOT):
     path = path or os.path.join(root, "fixtures", "reference.yaml")
     d = yaml.safe_load(open(path, encoding="utf-8"))
     pieces = tuple((p["id"], p["template"]) for p in d["pieces"])
+    identity = os.path.splitext(os.path.basename(path))[0]
     return Reference(
         dossier=d["dossier"],
         clocks={k: _date(v) for k, v in d["clocks"].items()},
@@ -60,4 +79,6 @@ def load_reference(path=None, root=ROOT):
         pieces=pieces,
         consistencies=tuple(d.get("consistencies") or ()),
         templates={t: load(t, root) for _, t in pieces},
+        identity=identity,
+        signature_seed=int(d.get("signature_seed", 11)),
     )

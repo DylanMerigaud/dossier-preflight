@@ -39,10 +39,19 @@ class Variant:
     expired_date: bool = False
     replace: dict = field(default_factory=dict)   # role -> wrong value
     image: dict = field(default_factory=dict)     # degradation override
+    # Days the expiry date is placed BEFORE the filing clock, when set: 1 or 365 (the two
+    # magnitudes the enumeration in enumerate_variants() injects). None means "use the fixed
+    # expired_expiry_date of the reference instead", the v0.1.0 behaviour, unchanged.
+    expired_days: "int | None" = None
 
 
 CLEAN = Variant("clean", check="")
 
+# ONE INSTANCE PER DEFECT, on the single reference identity of v0.1.0. Kept EXACTLY as it was,
+# name for name: grid/target_parasite.py and the tests in tests/test_fixtures.py import this
+# tuple directly and depend on its shape, and the published grid (A0) was measured against it.
+# enumerate_variants() below is the exhaustive, per-identity superset this v0.1.0 tuple is now
+# one slice of.
 VARIANTS = (
     CLEAN,
     Variant("empty_required_field", "required_field", piece="employment", empty_fields=("city",)),
@@ -62,6 +71,79 @@ VARIANTS = (
 
 BY_NAME = {v.name: v for v in VARIANTS}
 TARGETED_CHECKS = tuple(v.check for v in VARIANTS if v.check)
+
+# The social security or taxpayer number roles a piece must carry for the form's own example
+# number (999-99-9999, forbidden_values[0]) to be a defect that fits it at all. The Cerfa
+# declares neither, so it carries no forbidden_value instance: measured against templates.py,
+# not guessed.
+FORBIDDEN_VALUE_ROLES = ("tax_id", "ssn")
+
+# The three page-level defects, one instance per piece under the exhaustive enumeration. Same
+# overrides as the v0.1.0 variants above, generalised from "the tax piece only" to "every piece".
+PAGE_DEFECTS = (
+    ("low_resolution", "resolution", {"dpi": 72}),
+    ("cropped_page", "cropped_page", {"crop": 0.18}),
+    ("rotated_page", "rotated_page", {"quarter_turns": 1}),
+)
+
+
+def _forbidden_value_role(tpl):
+    for role in FORBIDDEN_VALUE_ROLES:
+        if role in tpl.fields:
+            return role
+    return None
+
+
+def enumerate_variants(ref):
+    """Every single-defect instance this reference's pieces declare, one Variant each.
+
+    Unlike VARIANTS (one instance per check, the v0.1.0 grid), this walks every ROLE the
+    templates declare, for every piece: every required field emptied in turn, every required
+    checkbox unticked, one missing signature per signed piece, expiry at 1 day and at 365 days
+    past the filing clock, one disagreement per declared consistency pair (placed on the second
+    reading of the pair, as v0.1.0 placed it on the Cerfa side), the forbidden value on each
+    piece that carries a social security or taxpayer number field, and the three page defects
+    on each piece. The rule and its arithmetic are prereg-v1's (perfect-recall-study
+    prereg/PREREG.md section 3.2): 45 instances on the four pieces this repo ships.
+
+    Variant NAMES do not carry the identity: they describe WHICH field of WHICH piece is
+    touched, a purely structural fact that is the same for every identity sharing this schema.
+    The identity enters through the key a caller stores the reading under, not through the
+    name, so pooling two identities' readings for "empty_required_field@tax.name" is exactly
+    pooling the same instance measured twice.
+    """
+    out = [CLEAN]
+    for piece_id, template_name in ref.pieces:
+        tpl = ref.templates[template_name]
+        for role in tpl.required:
+            out.append(Variant(f"empty_required_field@{piece_id}.{role}", "required_field",
+                                piece=piece_id, empty_fields=(role,)))
+        for role in tpl.required_boxes:
+            out.append(Variant(f"unchecked_box@{piece_id}.{role}", "required_checkbox",
+                                piece=piece_id, uncheck=(role,)))
+        for role in tpl.required_signatures:
+            out.append(Variant(f"missing_signature@{piece_id}.{role}", "signature",
+                                piece=piece_id, without_signature=True))
+        for role, kind in tpl.dates.items():
+            if kind != "expiration":
+                continue
+            for days in (1, 365):
+                out.append(Variant(f"expired_date@{piece_id}.{role}.{days}d", "expiry",
+                                    piece=piece_id, expired_days=days))
+        role = _forbidden_value_role(tpl)
+        if role is not None and ref.forbidden_values:
+            # Only the form's own example number is injected, never the rest of
+            # forbidden_values, exactly as v0.1.0 injected only "999-99-9999" and never
+            # "A COMPLETER".
+            out.append(Variant(f"forbidden_value@{piece_id}", "forbidden_value",
+                                piece=piece_id, replace={role: ref.forbidden_values[0]}))
+        for name, check, override in PAGE_DEFECTS:
+            out.append(Variant(f"{name}@{piece_id}", check, piece=piece_id, image=dict(override)))
+    for cons in ref.consistencies:
+        piece_id = cons["readings"][-1]["piece"]
+        out.append(Variant(f"diverging_{cons['data']}@{piece_id}", "consistency",
+                            piece=piece_id, replace={cons["data"]: "DES TILLEULS"}))
+    return tuple(out)
 
 
 @dataclass(frozen=True)
@@ -231,9 +313,16 @@ def _values(ref, tpl, var, piece_id):
         if var.piece == piece_id and role in var.replace:
             v = var.replace[role]
         elif role in tpl.dates and tpl.dates[role] == "expiration":
-            expired = var.piece == piece_id and var.expired_date
-            v = _fmt(ref.expiry["expired_expiry_date" if expired else "valid_expiry_date"],
-                     tpl.date_format)
+            if var.piece == piece_id and var.expired_days is not None:
+                # The exhaustive enumeration's two magnitudes: the date is computed off the
+                # FILING clock itself, not off a fixed expired_expiry_date, so it stays "1 day
+                # past" or "365 days past" for whatever clock this identity declares.
+                v = _fmt(ref.clocks["filing"] - dt.timedelta(days=var.expired_days),
+                         tpl.date_format)
+            else:
+                expired = var.piece == piece_id and var.expired_date
+                v = _fmt(ref.expiry["expired_expiry_date" if expired else "valid_expiry_date"],
+                         tpl.date_format)
         elif role == "signature_date":
             v = _fmt(ref.clocks["filing"], tpl.date_format)
         elif role == "birth_date":
@@ -244,7 +333,7 @@ def _values(ref, tpl, var, piece_id):
             v = f"{a['number']} {a['street_type']} {a['street_name']}"
         elif role == "city" and tpl.name in ("fw9", "fw9sp"):
             a = ref.person["address"]
-            v = f"{a['city']}, FR {a['postal_code']}"
+            v = f"{a['city']}, {ref.country} {a['postal_code']}"
         else:
             v = ref.value(role)
         _place(vals, tpl.field_ids(role), str(v), maxlen)
@@ -283,7 +372,10 @@ def build(ref, variant, dest, reuse=True):
     pieces = []
     for piece_id, template_name in ref.pieces:
         tpl = ref.templates[template_name]
-        path = os.path.join(dest, f"{var.name}-{piece_id}.pdf")
+        # The identity goes FIRST in the cache file name. Without it a second identity built
+        # into the same `dest` silently reused the first one's PDFs: same variant name, same
+        # piece id, same path, a different person's dossier never actually rendered.
+        path = os.path.join(dest, f"{ref.identity}-{var.name}-{piece_id}.pdf")
         if reuse and os.path.exists(path):
             pieces.append(BuiltPiece(piece_id, tpl, path,
                                           dict(var.image) if var.piece == piece_id else {}))
@@ -302,11 +394,13 @@ def build(ref, variant, dest, reuse=True):
                                  combs.get(field, 0))
                       for field, value in vals.items() if field not in boxes)
         if tpl.signatures and not (var.piece == piece_id and var.without_signature):
-            ops += "".join(_draw_signature(*_pdf_rect(tpl.pdf, field, tpl.page))
+            ops += "".join(_draw_signature(*_pdf_rect(tpl.pdf, field, tpl.page),
+                                           seed=ref.signature_seed)
                            for field in tpl.signatures.values())
         if ops:
             _stamp(w, tpl.page, ops,
-                     os.path.join(dest, f"{var.name}-{piece_id}-overlay-{os.getpid()}.pdf"))
+                     os.path.join(dest, f"{ref.identity}-{var.name}-{piece_id}"
+                                        f"-overlay-{os.getpid()}.pdf"))
         buffer = path + f".{os.getpid()}"
         w.write(buffer)
         os.replace(buffer, path)

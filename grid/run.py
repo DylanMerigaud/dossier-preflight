@@ -30,7 +30,7 @@ import numpy as np
 from preflight import parasite
 from preflight.checks import zones
 from preflight.degradation import Degradation
-from preflight.fixtures import VARIANTS, build
+from preflight.fixtures import VARIANTS, build, enumerate_variants
 from preflight.reading import read_piece, blank
 from preflight.reference import load_reference
 
@@ -39,6 +39,20 @@ DPIS = (96, 150, 200, 300)
 JPEGS = (30, 55, 75, 95)
 SIGMAS = (0.0, 3.0, 6.0, 12.0)
 SEEDS = (11, 23, 37)
+
+# The single default identity's name, fixtures/reference.yaml's own (preflight.reference
+# derives it from the file's stem). Readings produced with no --identities carry this value, so
+# an old measurements.jsonl line with no "identity" field (A0, written before this existed)
+# reads back as exactly this same constant everywhere it is defaulted.
+DEFAULT_IDENTITY = "reference"
+
+# T08's reduced cell set (plan section 2.1), ALREADY CUT to the 30,000-reading cap declared in
+# perfect-recall-study/prereg/PREREG.md section 3.3: JPEG 55 dropped first, sigma 6 kept. Not
+# the default: the default grid keeps running the full ANGLES x DPIS x JPEGS x SIGMAS cross
+# unless --cells R is passed.
+CELL_SETS = {
+    "R": ((0.0, 0.5, 2.0), (150, 200, 300), (95,), (0.0, 6.0)),
+}
 
 # THE FIFTH FACTOR: foreign ink. The four factors above move, blur or dirty the ink already on
 # the page; none of them ADDS any. That is the ground the ink sensor won its duel on, and a
@@ -59,35 +73,72 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTPUT = os.path.join(ROOT, "grid", "measurements")
 FIXTURES = os.path.join(ROOT, "grid", ".fixtures")
 
-_REF = None
-_PIECES = None
+_REFS = None            # {identity: Reference}
+_PIECES = None          # {(identity, variant_name, piece_id): BuiltPiece}
+_VARIANTS = None        # {identity: tuple[Variant, ...]}
 
 
-def _bootstrap():
-    """Every worker builds its fixtures once and warms up the blanks."""
-    global _REF, _PIECES
-    if _REF is not None:
+def _load_identities(identities_dir):
+    """{identity: Reference}. With no directory, the single default reference, DEFAULT_IDENTITY.
+
+    load_reference() derives an identity from the file name, so id01.yaml through id06.yaml
+    produce "id01" through "id06" with no further bookkeeping here.
+    """
+    if identities_dir is None:
+        ref = load_reference()
+        return {ref.identity: ref}
+    refs = {}
+    for name in sorted(os.listdir(identities_dir)):
+        if not name.endswith(".yaml"):
+            continue
+        ref = load_reference(os.path.join(identities_dir, name))
+        refs[ref.identity] = ref
+    if not refs:
+        raise ValueError(f"no identity file (*.yaml) found in {identities_dir}")
+    return refs
+
+
+def _bootstrap(identities_dir=None):
+    """Every worker builds its fixtures once and warms up the blanks, for every identity.
+
+    identities_dir travels inside every job (see task()), not through a bare module global:
+    multiprocessing on this machine spawns workers rather than forking them, and a spawned
+    worker re-imports this module from scratch, so a value only ASSIGNED at run time in the
+    parent (as opposed to passed as an argument) never reaches it.
+
+    With no --identities, this is exactly v0.1.0's bootstrap: one reference, VARIANTS (nine
+    single-defect instances), the same fixture cache the published grid used. With
+    --identities, every identity gets the EXHAUSTIVE enumeration of enumerate_variants().
+    """
+    global _REFS, _PIECES, _VARIANTS
+    if _REFS is not None:
         return
-    _REF = load_reference()
+    _REFS = _load_identities(identities_dir)
+    _VARIANTS = ({DEFAULT_IDENTITY: VARIANTS} if identities_dir is None
+                 else {identity: enumerate_variants(ref) for identity, ref in _REFS.items()})
     _PIECES = {}
-    for v in VARIANTS:
-        d = build(_REF, v.name, FIXTURES)
-        for p in d.pieces:
-            _PIECES[(v.name, p.id)] = p
-    for _, name in _REF.pieces:
-        blank(_REF.templates[name])
+    for identity, ref in _REFS.items():
+        for v in _VARIANTS[identity]:
+            d = build(ref, v, FIXTURES)
+            for p in d.pieces:
+                _PIECES[(identity, v.name, p.id)] = p
+        for _, name in ref.pieces:
+            blank(ref.templates[name])
 
 
-def pieces_to_read():
-    """The thirteen (variant, piece) pairs to read per cell and per seed.
+def pieces_to_read(identity):
+    """The (variant, piece) pairs to read per cell, per seed, for ONE identity.
 
-    A variant only touches ONE piece: the other three are identical to the clean dossier's and
-    their reading is reused as is by the analysis. Without that saving the grid would cost
-    forty readings per cell instead of thirteen.
+    Thirteen for the default identity (v0.1.0's nine variants, a variant only touching one
+    piece so the other three are the clean dossier's and reused). Forty-nine under
+    --identities: four clean pieces plus the 45 defect instances enumerate_variants() derives
+    for this identity's schema (perfect-recall-study prereg/PREREG.md section 3.2).
     """
     _bootstrap()
-    couples = [("clean", p) for p, _ in _REF.pieces]
-    couples += [(v.name, v.piece) for v in VARIANTS if v.check]
+    ref = _REFS[identity]
+    variants = _VARIANTS[identity]
+    couples = [("clean", p) for p, _ in ref.pieces]
+    couples += [(v.name, v.piece) for v in variants if v.check]
     return couples
 
 
@@ -151,18 +202,21 @@ def _draw(seed, level, piece_id, template):
 
 
 def task(job):
-    """`job` may carry the exact (variant, piece) couples to read; None means all thirteen.
+    """`job` may carry the exact (variant, piece) couples to read; None means every one of them.
 
     That is what makes --backfill worth having: producing one missing reading must not cost the
-    thirteen that sit next to it in the same task.
+    others that sit next to it in the same task.
+
+    identities_dir rides inside the job (see _bootstrap's docstring for why): a spawned worker
+    has no other way to learn it.
     """
-    cell, seed, level, couples = job
+    cell, seed, level, identity, identities_dir, couples = job
     angle, dpi, jpeg, sigma = cell
-    _bootstrap()
+    _bootstrap(identities_dir)
     base = Degradation(angle=angle, dpi=dpi, jpeg=jpeg, sigma=sigma, seed=seed)
     lines = []
-    for variant_name, piece_id in (couples if couples is not None else pieces_to_read()):
-        p = _PIECES[(variant_name, piece_id)]
+    for variant_name, piece_id in (couples if couples is not None else pieces_to_read(identity)):
+        p = _PIECES[(identity, variant_name, piece_id)]
         deg = replace(base, **p.image_override) if p.image_override else base
         shape = zone_name = None
         inject = None
@@ -177,15 +231,19 @@ def task(job):
         reading = read_piece(p, deg, parasite=inject)
         lines.append({"angle": angle, "dpi": dpi, "jpeg": jpeg, "sigma": sigma,
                       "seed": seed, "parasite": level, "parasite_shape": shape,
-                      "parasite_zone": zone_name,
+                      "parasite_zone": zone_name, "identity": identity,
                       "variant": variant_name, "piece": piece_id,
                       "seconds": round(time.perf_counter() - t, 2), "reading": reading.dict()})
     return lines
 
 
 def key(line):
+    # identity appended LAST, seed at index 4 and parasite at index 5 unchanged: an old line
+    # with no "identity" field (every line of A0) reads back as DEFAULT_IDENTITY, the same
+    # constant on every such line, so grouping by this key is unaffected for old data.
     return (line["angle"], line["dpi"], line["jpeg"], line["sigma"], line["seed"],
-            line.get("parasite", 0.0), line["variant"], line["piece"])
+            line.get("parasite", 0.0), line.get("identity", DEFAULT_IDENTITY),
+            line["variant"], line["piece"])
 
 
 def already_done(path):
@@ -211,45 +269,61 @@ def main():
     ap.add_argument("--backfill", action="store_true",
                     help="only produce the readings missing from the output file, without "
                          "re-running the tasks it already holds")
+    ap.add_argument("--identities", default=None,
+                    help="directory of identity YAML files (fixtures/make_identities.py's "
+                         "output). Default: the single fixtures/reference.yaml, exactly as "
+                         "v0.1.0 ran, so the published grid keeps replaying with no flags.")
+    ap.add_argument("--cells", choices=sorted(CELL_SETS), default=None,
+                    help="a named reduced cell set (perfect-recall-study prereg/PREREG.md "
+                         "section 3.3) instead of the full ANGLES x DPIS x JPEGS x SIGMAS cross")
     a = ap.parse_args()
 
     os.makedirs(os.path.dirname(a.output), exist_ok=True)
     if a.parasite:
         cells = list(itertools.product(SUB_ANGLES, SUB_DPIS, SUB_JPEGS, SUB_SIGMAS))
         levels = [x for x in PARASITE_LEVELS if x]
+    elif a.cells:
+        cells = list(itertools.product(*CELL_SETS[a.cells]))
+        levels = [0.0]
     else:
         cells = list(itertools.product(ANGLES, DPIS, JPEGS, SIGMAS))
         levels = [0.0]
     if a.pilot:
         step = max(1, len(cells) // a.pilot)
         cells = cells[::step][:a.pilot]
-    tasks = [(c, g, l, None) for c in cells for g in SEEDS for l in levels]
 
-    _bootstrap()          # fixtures are built ONCE, before any fork
+    _bootstrap(a.identities)          # fixtures are built ONCE, before any fork
+    identities = sorted(_REFS)
+    tasks = [(c, g, l, identity, a.identities, None)
+             for c in cells for g in SEEDS for l in levels for identity in identities]
+
     done = already_done(a.output)
-    expected = len(pieces_to_read())
+    expected_by_identity = {identity: len(pieces_to_read(identity)) for identity in identities}
     # BACKFILL exists because adding a fourth piece to the dossier made every task of the
     # existing 13,824-reading file one reading short. Re-running those tasks whole would have
     # cost two hours to reproduce readings that are already there and deterministic; the missing
     # piece alone costs ten minutes. The rest of the file is reused untouched.
     if a.backfill:
-        want = {(c[0], c[1], c[2], c[3], g, l, v, p)
+        want = {(c[0], c[1], c[2], c[3], g, l, identity, v, p)
                 for c in cells for g in SEEDS for l in levels
-                for v, p in pieces_to_read()}
+                for identity in identities for v, p in pieces_to_read(identity)}
         missing = want - done
         by_task = collections.defaultdict(list)
         for k in missing:
-            by_task[(k[:4], k[4], k[5])].append((k[6], k[7]))
-        remaining = [(c, g, l, tuple(sorted(v))) for (c, g, l), v in sorted(by_task.items())]
+            by_task[(k[:4], k[4], k[5], k[6])].append((k[7], k[8]))
+        remaining = [(c, g, l, identity, a.identities, tuple(sorted(v)))
+                     for (c, g, l, identity), v in sorted(by_task.items())]
         print(f"backfill: {len(missing)} readings missing over {len(want)}, "
               f"{len(remaining)} tasks touched")
     else:
         remaining = [t for t in tasks
                      if sum(1 for f in done
-                            if f[:6] == (t[0][0], t[0][1], t[0][2], t[0][3], t[1], t[2]))
-                     < expected]
+                            if f[:4] == t[0] and f[4] == t[1] and f[5] == t[2] and f[6] == t[3])
+                     < expected_by_identity[t[3]]]
+        total = len(cells) * len(SEEDS) * len(levels) * sum(expected_by_identity.values())
         print(f"{len(cells)} cells x {len(SEEDS)} seeds x {len(levels)} parasite level(s) x "
-              f"{expected} readings = {len(tasks) * expected} readings")
+              f"{len(identities)} identit{'y' if len(identities) == 1 else 'ies'} = "
+              f"{total} readings")
     print(f"{len(done)} already done, {len(remaining)} tasks left, {a.procs} workers")
     if not remaining:
         return 0

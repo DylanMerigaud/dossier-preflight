@@ -296,3 +296,24 @@ the parasite sub-grid cost estimate, `pieces_to_read`'s docstring) and one in `g
 `complete_dossiers` docstring still said three pieces and twelve readings; corrected to four and
 thirteen. `grid/run.py:232`'s backfill comment, which correctly describes the file's state before
 the fourth piece was backfilled, was left as written.
+
+**Identities and every defect instance** (for perfect-recall-study's arm A1). One reference
+identity meant one instance per check: `VARIANTS` carried nine single-defect fixtures, the
+fixture cache had no identity in its path so a second person would silently reuse the first
+one's PDFs, and `sweep` took only the first variant matching a check. `enumerate_variants(ref)`
+walks every required field, checkbox, signature, expiry magnitude (1 and 365 days past the
+filing clock), consistency pair and page defect the four pieces declare: 45 instances per
+identity (9 W-9, 9 Spanish W-9, 15 I-9, 12 Cerfa), matching perfect-recall-study's
+`prereg/PREREG.md` section 3.2 exactly, by piece and by check, for all six new fictional
+identities (`fixtures/make_identities.py`, seed 20260925) and for the reference identity alike.
+`VARIANTS` itself is untouched, name for name: `grid/target_parasite.py` still imports it
+directly. The build cache now keys on identity first (`{identity}-{variant}-{piece}.pdf`), the
+signature fixture draws on the identity's own `signature_seed` instead of a hard-coded 11, and
+the W-9's foreign-address line reads the identity's own country instead of a hard-coded "FR".
+`grid/run.py --identities DIR --cells R` and `grid/analyze.py --identities DIR` thread the
+identity through the key everywhere it is used (`key()`, `load()`, `complete_dossiers`), and
+`sweep` now pools positives across every variant of a check instead of stopping at the first
+one a fixed catalog declares. With no `--identities`, both scripts take the single default
+reference exactly as v0.1.0 did: replayed `python3 grid/analyze.py --publish` on the committed
+A0 file and `git status --short grid/results` showed only `curves.png` (matplotlib-version
+noise, reverted), `thresholds.json` and `LIMITS.md` unchanged.

@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from preflight.sensors import DISC_RATIOS, INK_THRESHOLDS
 from preflight.checks import CHECKS, NUISANCES, Settings, evaluate
-from preflight.fixtures import BY_NAME, VARIANTS
+from preflight.fixtures import BY_NAME, VARIANTS, enumerate_variants
 from preflight.reading import Reading
 from preflight.reference import load_reference
 
@@ -86,12 +86,22 @@ def combinations(check):
             for v in itertools.product(*[SWEPT_VALUES[n] for n in names])]
 
 
-def load(path):
-    """index[(angle, dpi, jpeg, sigma, seed, parasite)][variant][piece] = Reading
+# The single default identity's name, matching preflight.reference.load_reference()'s own
+# derivation for fixtures/reference.yaml (its file stem) and grid.run.DEFAULT_IDENTITY. Every
+# line of A0 predates the "identity" field and reads back as this one constant.
+DEFAULT_IDENTITY = "reference"
 
-    The parasite level goes LAST and the seed stays at index 4 on purpose: split() isolates the
-    validation seed on k[4], and moving it would have silently mixed the held-out seed back into
-    calibration. Readings written before the fifth factor existed carry no level and read as 0.0.
+
+def load(path):
+    """index[(angle, dpi, jpeg, sigma, seed, parasite, identity)][variant][piece] = Reading
+
+    The parasite level goes at index 5 and the seed stays at index 4 on purpose: split()
+    isolates the validation seed on k[4], and moving it would have silently mixed the held-out
+    seed back into calibration. identity is appended LAST, at index 6, for the same reason:
+    every OLDER line (readings written before this field existed, which is every line of A0)
+    carries no "identity" key and reads back as DEFAULT_IDENTITY on every such line alike, so
+    grouping by this key is unaffected for old data. Readings written before the fifth factor
+    existed carry no level and read as 0.0.
     """
     index = collections.defaultdict(lambda: collections.defaultdict(dict))
     with open(path, encoding="utf-8") as f:
@@ -101,7 +111,7 @@ def load(path):
                 continue
             d = json.loads(line)
             key = (d["angle"], d["dpi"], d["jpeg"], d["sigma"], d["seed"],
-                   d.get("parasite", 0.0))
+                   d.get("parasite", 0.0), d.get("identity", DEFAULT_IDENTITY))
             index[key][d["variant"]][d["piece"]] = Reading.from_dict(d["reading"])
     return index
 
@@ -109,21 +119,31 @@ def load(path):
 def complete_dossiers(index, ref):
     """A variant's dossier = the edited piece, plus the other pieces of the clean dossier.
 
+    "Complete" is no longer the fixed nine names of VARIANTS: it is every variant name OBSERVED
+    for THAT SAME identity anywhere else in the file. That is what lets this one function read
+    an old single-instance grid (A0, one identity, nine variants) and a new every-instance one
+    (several identities, enumerate_variants()'s forty-five each) without being told in advance
+    which shape it is looking at, and it reduces to the old rule exactly when a file only ever
+    carries the fixed nine: their union IS that fixed set.
+
     Incomplete cells are dropped silently: the grid resumes where it stopped, and a
     half-written cell would manufacture a false negative that does not exist.
     """
-    expected = {v.name for v in VARIANTS}
+    expected_by_identity = collections.defaultdict(set)
+    for key, by_variant in index.items():
+        expected_by_identity[key[6]] |= set(by_variant)
     out = {}
     for key, by_variant in index.items():
+        expected = expected_by_identity[key[6]]
         if not expected <= set(by_variant):
             continue
-        clean = by_variant["clean"]
+        clean = by_variant.get("clean", {})
         if len(clean) < len(ref.pieces):
             continue
         d = {"clean": clean}
-        for v in VARIANTS:
-            if v.check:
-                d[v.name] = dict(clean, **by_variant[v.name])
+        for name in expected:
+            if name != "clean":
+                d[name] = dict(clean, **by_variant[name])
         out[key] = d
     return out
 
@@ -164,7 +184,7 @@ def damaged_targets(var, ref):
         return {(var.piece, tpl.boxes[role]) for role in var.uncheck}
     if var.without_signature:
         return {(var.piece, c) for c in tpl.signatures.values()}
-    if var.expired_date:
+    if var.expired_date or var.expired_days is not None:
         return {(var.piece, c) for role, kind in tpl.dates.items() if kind == "expiration"
                 for c in tpl.field_ids(role)}
     if var.check == "forbidden_value":
@@ -244,23 +264,53 @@ def chosen_point(pts, budget=FP_BUDGET):
     return plateau[len(plateau) // 2]
 
 
-def sweep(dossiers, ref, check):
-    """For each settings, the per-target scores, cell by cell.
+def variant_catalog(ref):
+    """Every variant name this ref's data could carry, name -> Variant: the fixed nine of
+    v0.1.0 (VARIANTS, BY_NAME) plus this identity's exhaustive enumerate_variants(). The two
+    naming schemes never collide (the new one always carries an "@"), so the merge is total."""
+    catalog = dict(BY_NAME)
+    catalog.update({v.name: v for v in enumerate_variants(ref)})
+    return catalog
+
+
+def sweep(dossiers, ref, check, catalog=None, ref_of=None):
+    """For each settings, the per-target scores, cell by cell, POOLED ACROSS EVERY VARIANT OF
+    THIS CHECK, not only the first one a fixed catalog happens to declare.
 
     Returns: {settings: {cell_key: {"pos": {target: score}, "neg": {target: score}}}}
-    The positives are the targets the variant damages; the negatives are ALL the targets of the
-    clean dossier, which gives the false positive rate the statistical power it lacked.
+    The positives are the union of what every matching variant damages; the negatives are ALL
+    the targets of the clean dossier, which gives the false positive rate the statistical power
+    it lacked.
+
+    `catalog` names every variant `dossiers` could carry (default: variant_catalog(ref), correct
+    whenever every row is this one identity's, which A0 and any single-arm run are). `ref_of`
+    resolves the Reference for a row carrying a DIFFERENT identity than `ref` (default: always
+    `ref`, correct under the same single-identity condition). A cell missing a given variant's
+    reading (v0.1.0 data next to a variant only the new enumeration produces) is silently
+    skipped for THAT variant, which is exactly how A0 reduces to its own one-variant-per-check
+    behaviour: every variant this pooling adds is simply absent from A0's cells.
     """
-    var = next(v for v in VARIANTS if v.check == check)
-    targets = damaged_targets(var, ref)
+    if catalog is None:
+        catalog = variant_catalog(ref)
+    if ref_of is None:
+        def ref_of(identity):
+            return ref
+    variants = [v for v in catalog.values() if v.check == check]
     out = {}
     for reg in combinations(check):
         per_cell = {}
         for key, d in dossiers.items():
-            all_scores = target_scores(d[var.name], ref, check, reg)
-            pos = {k: v for k, v in all_scores.items() if k in targets} or all_scores
+            row_ref = ref_of(key[6]) if len(key) > 6 else ref
+            pos = {}
+            for var in variants:
+                if var.name not in d:
+                    continue
+                targets = damaged_targets(var, row_ref)
+                all_scores = target_scores(d[var.name], row_ref, check, reg)
+                matched = {k: v for k, v in all_scores.items() if k in targets} or all_scores
+                pos.update(matched)
             per_cell[key] = {"pos": pos,
-                             "neg": target_scores(d["clean"], ref, check, reg)}
+                             "neg": target_scores(d["clean"], row_ref, check, reg)}
         out[reg] = per_cell
     return out
 
@@ -389,6 +439,16 @@ def settings_summary(per_cell):
 # parasite is at index 5 and not 4: the seed keeps index 4 so that split() goes on holding the
 # validation seed out. Deriving the index from the position in this tuple would put the parasite
 # on the seed and quietly poison the calibration/validation split.
+#
+# identity sits at index 6, appended LAST by load() (grid/run.py's key() the same way), and is
+# deliberately NOT a member of this table. A "cell" stays the five factors above, pooled over
+# every seed AND every identity, exactly as it already pooled over every seed: identity is a
+# replicate axis like seed, not a curve axis, so P6's leave-one-identity-out protocol filters
+# rows by key[6] the way split() filters by key[4], rather than reading it off a "factors" or
+# "frontier" breakdown. Adding it here would grow every by_factor(), frontier() and
+# worst_conjunctions() table with an "identity" row and new factor-pairs even when every row
+# shares the one default identity, which would change LIMITS.md and resume.json for A0 though
+# not one of its readings moved: the byte-identical replay this repo tests for forbids that.
 AXIS_INDEX = {"angle": 0, "dpi": 1, "jpeg": 2, "sigma": 3, "parasite": 5}
 AXES = tuple(AXIS_INDEX)
 
@@ -884,10 +944,33 @@ def main():
     ap.add_argument("--checks", nargs="*", default=list(CHECKS))
     ap.add_argument("--publish", action="store_true",
                     help="write LIMITS.md and thresholds.json at the repo root")
+    ap.add_argument("--identities", default=None,
+                    help="directory of identity YAML files, the same one grid/run.py --identities "
+                         "read. Default: the single fixtures/reference.yaml, exactly as v0.1.0 "
+                         "ran, so --publish on the A0 file keeps reproducing it unchanged. Every "
+                         "row is then scored against ITS OWN identity's Reference through "
+                         "ref_of, not against whichever one happens to load first.")
     a = ap.parse_args()
     os.makedirs(a.output, exist_ok=True)
 
-    ref = load_reference()
+    if a.identities:
+        refs = {}
+        for name in sorted(os.listdir(a.identities)):
+            if name.endswith(".yaml"):
+                r = load_reference(os.path.join(a.identities, name))
+                refs[r.identity] = r
+        if not refs:
+            raise SystemExit(f"no identity file (*.yaml) found in {a.identities}")
+        ref = next(iter(refs.values()))          # any of them: same piece count, same schema
+        ref_of = refs.get
+        catalog = {}
+        for r in refs.values():
+            catalog.update(variant_catalog(r))
+    else:
+        ref = load_reference()
+        ref_of = None
+        catalog = None
+
     index = load(a.measurements)
     dossiers = complete_dossiers(index, ref)
     cells = {cell_of(c) for c in dossiers}
@@ -896,7 +979,7 @@ def main():
     sweeps = {}
     for check in a.checks:
         t = time.perf_counter()
-        sweeps[check] = sweep(dossiers, ref, check)
+        sweeps[check] = sweep(dossiers, ref, check, catalog=catalog, ref_of=ref_of)
         print(f"  sweep {check:17s} {len(sweeps[check]):3d} settings, "
               f"{time.perf_counter() - t:5.1f}s", flush=True)
 
