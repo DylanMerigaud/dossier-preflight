@@ -18,10 +18,22 @@ variant damaged. Both sides are read at each condition:
     recall           the variant's dossier: does the check still catch its own defect
     false positives  the clean dossier, same parasite, same place: does the check now cry
 
-    27 cells (angle 0.5 x 3 dpi x 3 JPEG x 3 sigma) x 4 levels x 3 seeds x 5 variants x 2 sides
+    27 cells (angle 0.5 x 3 dpi x 3 JPEG x 3 sigma) x 4 levels x 3 seeds x 4 variants x 2 sides
 
     python3 grid/target_parasite.py    # writes grid/results/target_parasite.json
+
+Two flags exist for the archival run (T12 of the paper plan). Plain `seed % 3` picks the parasite
+shape from a sorted `SHAPES` list without ever looking at the cell, and with only 3 seeds and 3
+shapes two of the three seeds land on the same index: the "fold" shape never ran, at any cell, for
+any variant. `--all-shapes` replaces the index with `(seed + cell index) % 3`, which draws on the
+cell too, so every shape appears across the 27 cells. `--dump PATH` writes every raw row (one
+reading per line, JSONL, each carrying its own `ts`) instead of keeping rows only in memory for
+the aggregate; passing it changes nothing about the aggregate `target_parasite.json` written.
+
+    python3 grid/target_parasite.py --dump raw.jsonl                  # replay: same shape rule
+    python3 grid/target_parasite.py --dump raw.jsonl --all-shapes     # the fold shape included
 """
+import argparse
 import collections
 import itertools
 import json
@@ -29,6 +41,7 @@ import os
 import sys
 import time
 from dataclasses import replace
+from datetime import datetime, timezone
 from multiprocessing import Pool
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -94,8 +107,20 @@ def targeted():
     return out
 
 
+def shape_for(seed, cell_index, all_shapes):
+    """Which parasite shape a (seed, cell) draws.
+
+    Plain `seed % 3` never looks at the cell, so with only 3 seeds two of them collide on the
+    same index and one shape (sorted first: "fold") never runs, at any cell. `all_shapes` folds
+    the cell index into the draw so every shape appears across the 27 cells.
+    """
+    shapes = sorted(parasite.SHAPES)
+    index = (seed + cell_index) % len(shapes) if all_shapes else seed % len(shapes)
+    return shapes[index]
+
+
 def task(job):
-    cell, seed, level, variant_name, piece_id, zone_name, side = job
+    cell_index, cell, seed, level, variant_name, piece_id, zone_name, side, all_shapes = job
     _bootstrap()
     ref = _STATE["ref"]
     angle, dpi, jpeg, sigma = cell
@@ -106,36 +131,61 @@ def task(job):
     inject = None
     shape = None
     if level:
-        shape = sorted(parasite.SHAPES)[seed % len(parasite.SHAPES)]
+        shape = shape_for(seed, cell_index, all_shapes)
         z, f = zones(p.template)[zone_name], parasite.SHAPES[shape]
 
         def inject(grey, dpi_render, z=z, f=f, level=level, seed=seed):
             return f(grey.copy(), z, dpi_render, level, np.random.default_rng(seed))
     reading = read_piece(p, deg, parasite=inject)
-    return {"cell": list(cell), "seed": seed, "parasite": level, "shape": shape,
-            "variant": variant_name, "piece": piece_id, "zone": zone_name, "side": side,
-            "reading": reading.dict()}
+    ts = datetime.now(timezone.utc).isoformat()
+    return {"cell": list(cell), "cell_index": cell_index, "seed": seed, "parasite": level,
+            "shape": shape, "variant": variant_name, "piece": piece_id, "zone": zone_name,
+            "side": side, "reading": reading.dict(), "ts": ts}
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--dump", default=None,
+                    help="write every raw row (JSONL, one reading per line, each carrying its "
+                         "own ts) to this path, in addition to the aggregate")
+    ap.add_argument("--all-shapes", action="store_true",
+                    help="shape index draws on (seed + cell index) mod 3 instead of seed mod 3 "
+                         "alone, so the fold shape is no longer skipped at every cell")
+    a = ap.parse_args()
+
     _bootstrap()
     ref = _STATE["ref"]
-    jobs = [(c, s, lv, v.name, v.piece, z, side)
+    jobs = [(ci, c, s, lv, v.name, v.piece, z, side, a.all_shapes)
             for v, z in targeted()
-            for c in CELLS for s in SEEDS for lv in PARASITE_LEVELS
+            for ci, c in enumerate(CELLS) for s in SEEDS for lv in PARASITE_LEVELS
             for side in ("variant", "clean")]
     procs = max(1, (os.cpu_count() or 4) - 1)
     print(f"{len(jobs)} readings, {procs} workers")
     t0 = time.perf_counter()
     rows = []
-    with Pool(procs) as pool:
-        for i, row in enumerate(pool.imap_unordered(task, jobs), 1):
-            rows.append(row)
-            if i % 100 == 0:
-                el = time.perf_counter() - t0
-                print(f"  {i}/{len(jobs)}, {el/60:.1f} min, {el/i*(len(jobs)-i)/60:.1f} min left",
-                      flush=True)
+    dump_f = None
+    if a.dump:
+        dump_dir = os.path.dirname(os.path.abspath(a.dump))
+        if dump_dir:
+            os.makedirs(dump_dir, exist_ok=True)
+        dump_f = open(a.dump, "w", encoding="utf-8")
+    try:
+        with Pool(procs) as pool:
+            for i, row in enumerate(pool.imap_unordered(task, jobs), 1):
+                rows.append(row)
+                if dump_f:
+                    dump_f.write(json.dumps(row, ensure_ascii=False) + "\n")
+                    dump_f.flush()
+                if i % 100 == 0:
+                    el = time.perf_counter() - t0
+                    print(f"  {i}/{len(jobs)}, {el/60:.1f} min, "
+                          f"{el/i*(len(jobs)-i)/60:.1f} min left", flush=True)
+    finally:
+        if dump_f:
+            dump_f.close()
     print(f"finished in {(time.perf_counter()-t0)/60:.1f} min")
+    if a.dump:
+        print(f"-> {a.dump} ({len(rows)} raw rows)")
 
     out = {"what": "foreign ink laid ON the field the variant damaged",
            "cells": len(CELLS), "levels": list(PARASITE_LEVELS), "seeds": list(SEEDS),

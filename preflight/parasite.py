@@ -39,7 +39,10 @@ def speck(grey, zone, dpi, fraction, rng, darkness=45):
     im = Image.fromarray(grey)
     d = ImageDraw.Draw(im)
     d.ellipse([cx - rx, cy - ry, cx + rx, cy + ry], fill=int(darkness))
-    return np.asarray(im.filter(ImageFilter.GaussianBlur(max(0.6, ry * 0.12))))
+    # float(): ry is a numpy scalar (np.sqrt), and Pillow's GaussianBlur.filter() compares its
+    # radius against the tuple (0, 0) before the scalar check; a numpy scalar there broadcasts
+    # into a 2-element boolean array and "if" on it raises ValueError. A plain float sidesteps it.
+    return np.asarray(im.filter(ImageFilter.GaussianBlur(float(max(0.6, ry * 0.12)))))
 
 
 def fold(grey, zone, dpi, fraction, rng):
