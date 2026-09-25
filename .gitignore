@@ -14,3 +14,10 @@ dist/
 .travail/
 .venv/
 .venv-augraphy/
+
+# Augraphy writes these into the CURRENT working directory the first time its default pipeline
+# runs (paper texture cache, bundled fonts for its text augmentations): resources it downloads
+# and reuses, not anything this repo authors. grid/augraphy_render.py (T11) is meant to be run
+# from this directory, which is why they land here.
+augraphy_cache/
+fonts/
