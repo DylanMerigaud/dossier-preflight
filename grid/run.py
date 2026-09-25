@@ -21,6 +21,7 @@ import os
 import sys
 import time
 from dataclasses import replace
+from datetime import datetime, timezone
 from multiprocessing import Pool
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -216,12 +217,13 @@ def task(job):
     others that sit next to it in the same task.
 
     identities_dir rides inside the job (see _bootstrap's docstring for why): a spawned worker
-    has no other way to learn it.
+    has no other way to learn it. jitter rides the same way, for the same reason (--jitter is
+    argparse state in the parent, invisible to a spawned worker unless it travels with the job).
     """
-    cell, seed, level, identity, identities_dir, couples = job
+    cell, seed, level, identity, identities_dir, jitter, couples = job
     angle, dpi, jpeg, sigma = cell
     _bootstrap(identities_dir)
-    base = Degradation(angle=angle, dpi=dpi, jpeg=jpeg, sigma=sigma, seed=seed)
+    base = Degradation(angle=angle, dpi=dpi, jpeg=jpeg, sigma=sigma, seed=seed, jitter=jitter)
     lines = []
     for variant_name, piece_id in (couples if couples is not None else pieces_to_read(identity)):
         p = _PIECES[(identity, variant_name, piece_id)]
@@ -237,21 +239,28 @@ def task(job):
                 return f(grey.copy(), z, dpi_render, level, np.random.default_rng(seed))
         t = time.perf_counter()
         reading = read_piece(p, deg, parasite=inject)
+        # ts: every readings line carries a wall-clock timestamp from here on (perfect-recall-
+        # study prereg/PREREG.md, T07's done line), so T31 can check no A1 or A2 row predates
+        # the prereg tag's commit time. analyze.py reads readings by field name and ignores it.
         lines.append({"angle": angle, "dpi": dpi, "jpeg": jpeg, "sigma": sigma,
                       "seed": seed, "parasite": level, "parasite_shape": shape,
                       "parasite_zone": zone_name, "identity": identity,
-                      "variant": variant_name, "piece": piece_id,
-                      "seconds": round(time.perf_counter() - t, 2), "reading": reading.dict()})
+                      "variant": variant_name, "piece": piece_id, "jitter": jitter,
+                      "seconds": round(time.perf_counter() - t, 2), "reading": reading.dict(),
+                      "ts": datetime.now(timezone.utc).isoformat()})
     return lines
 
 
 def key(line):
-    # identity appended LAST, seed at index 4 and parasite at index 5 unchanged: an old line
-    # with no "identity" field (every line of A0) reads back as DEFAULT_IDENTITY, the same
-    # constant on every such line, so grouping by this key is unaffected for old data.
+    # identity appended LAST before T10, seed at index 4 and parasite at index 5 unchanged: an
+    # old line with no "identity" field (every line of A0) reads back as DEFAULT_IDENTITY, the
+    # same constant on every such line, so grouping by this key is unaffected for old data.
+    # jitter (T10) is appended AFTER that, one index further, for the same reason: an A0 or A1
+    # line with no "jitter" field reads back as False, so every existing index (0 to 8) keeps
+    # meaning what it meant before jitter existed.
     return (line["angle"], line["dpi"], line["jpeg"], line["sigma"], line["seed"],
             line.get("parasite", 0.0), line.get("identity", DEFAULT_IDENTITY),
-            line["variant"], line["piece"])
+            line["variant"], line["piece"], line.get("jitter", False))
 
 
 def already_done(path):
@@ -284,6 +293,12 @@ def main():
     ap.add_argument("--cells", choices=sorted(CELL_SETS), default=None,
                     help="a named reduced cell set (perfect-recall-study prereg/PREREG.md "
                          "section 3.3) instead of the full ANGLES x DPIS x JPEGS x SIGMAS cross")
+    ap.add_argument("--jitter", action="store_true",
+                    help="G0j (arm A2): draw continuous per-page jitter (angle, translation, "
+                         "blur, JPEG quality) on top of the cell, see preflight.degradation.apply")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="print the enumerated design size (the same --pilot-style count line) "
+                         "and exit before producing a single reading")
     a = ap.parse_args()
     if a.identities is not None:
         a.identities = os.path.abspath(a.identities)
@@ -304,7 +319,7 @@ def main():
 
     _bootstrap(a.identities)          # fixtures are built ONCE, before any fork
     identities = sorted(_REFS)
-    tasks = [(c, g, l, identity, a.identities, None)
+    tasks = [(c, g, l, identity, a.identities, a.jitter, None)
              for c in cells for g in SEEDS for l in levels for identity in identities]
 
     done = already_done(a.output)
@@ -314,14 +329,16 @@ def main():
     # cost two hours to reproduce readings that are already there and deterministic; the missing
     # piece alone costs ten minutes. The rest of the file is reused untouched.
     if a.backfill:
-        want = {(c[0], c[1], c[2], c[3], g, l, identity, v, p)
+        # jitter appended LAST, matching key()'s own order: a backfill run only ever wants
+        # readings at its OWN --jitter setting, and done-tuples from key() carry jitter last too.
+        want = {(c[0], c[1], c[2], c[3], g, l, identity, v, p, a.jitter)
                 for c in cells for g in SEEDS for l in levels
                 for identity in identities for v, p in pieces_to_read(identity)}
         missing = want - done
         by_task = collections.defaultdict(list)
         for k in missing:
             by_task[(k[:4], k[4], k[5], k[6])].append((k[7], k[8]))
-        remaining = [(c, g, l, identity, a.identities, tuple(sorted(v)))
+        remaining = [(c, g, l, identity, a.identities, a.jitter, tuple(sorted(v)))
                      for (c, g, l, identity), v in sorted(by_task.items())]
         print(f"backfill: {len(missing)} readings missing over {len(want)}, "
               f"{len(remaining)} tasks touched")
@@ -333,8 +350,10 @@ def main():
         total = len(cells) * len(SEEDS) * len(levels) * sum(expected_by_identity.values())
         print(f"{len(cells)} cells x {len(SEEDS)} seeds x {len(levels)} parasite level(s) x "
               f"{len(identities)} identit{'y' if len(identities) == 1 else 'ies'} = "
-              f"{total} readings")
+              f"{total} readings" + (" (jitter)" if a.jitter else ""))
     print(f"{len(done)} already done, {len(remaining)} tasks left, {a.procs} workers")
+    if a.dry_run:
+        return 0
     if not remaining:
         return 0
 
