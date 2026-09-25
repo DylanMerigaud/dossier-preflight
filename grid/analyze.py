@@ -23,12 +23,14 @@ an alarm for nothing, and that is the number the user actually feels.
 import argparse
 import collections
 import csv
+import hashlib
 import itertools
 import json
 import math
 import os
 import sys
 import time
+from dataclasses import replace
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -37,6 +39,7 @@ from preflight.checks import CHECKS, NUISANCES, Settings, evaluate
 from preflight.fixtures import BY_NAME, VARIANTS, enumerate_variants
 from preflight.reading import Reading
 from preflight.reference import load_reference
+from grid.predicates import KEY_FIELDS, Holdout, Predicate
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(ROOT, "grid", "results")
@@ -95,6 +98,15 @@ DEFAULT_IDENTITY = "reference"
 # see the comment above AXIS_INDEX.
 IDENTITY_INDEX = 6
 
+# The source a line with no "source" field belongs to: the parametric generator G0 (grid/run.py).
+DEFAULT_SOURCE = "g0"
+assert KEY_FIELDS.index("seed") == 4 and KEY_FIELDS.index("identity") == IDENTITY_INDEX
+
+# The published protocol, as predicates on the key: two seeds choose, the third reports. Every
+# function below that splits takes a Holdout and falls back to this one, so the defaults replay
+# the published numbers byte for byte (tests/test_holdout.py).
+DEFAULT_HOLDOUT = Holdout(f"seed != {VALIDATION_SEED}", f"seed == {VALIDATION_SEED}")
+
 # Each check's ONE v0.1.0 variant name. The crosstalk table keeps these as its column labels
 # whatever the data: on A0 a column is that one variant, on an every-instance run it pools every
 # instance of the same check under the same label, so the published table keeps its shape.
@@ -102,7 +114,8 @@ LEGACY_BY_CHECK = {v.check: v.name for v in VARIANTS if v.check}
 
 
 def load(path):
-    """index[(angle, dpi, jpeg, sigma, seed, parasite, identity)][variant][piece] = Reading
+    """index[(angle, dpi, jpeg, sigma, seed, parasite, identity, source, jitter, capture,
+    mark_step)][variant][piece] = Reading
 
     The parasite level goes at index 5 and the seed stays at index 4 on purpose: split()
     isolates the validation seed on k[4], and moving it would have silently mixed the held-out
@@ -111,6 +124,13 @@ def load(path):
     carries no "identity" key and reads back as DEFAULT_IDENTITY on every such line alike, so
     grouping by this key is unaffected for old data. Readings written before the fifth factor
     existed carry no level and read as 0.0.
+
+    source, jitter, capture and mark_step (grid.predicates.KEY_FIELDS) come after identity, for
+    the same reason and with the same kind of default: a line of the parametric generator G0
+    carries none of them and reads back as ("g0", False, None, None). They exist so that a
+    reading of another generator (grid/read_images.py, source "g1"), of the jittered G0 (jitter
+    true) or of a real capture never lands on the key of a G0 reading of the same factors, and
+    so that the holdout predicates (--calibrate-on, --report-on) can name them.
     """
     index = collections.defaultdict(lambda: collections.defaultdict(dict))
     with open(path, encoding="utf-8") as f:
@@ -120,7 +140,9 @@ def load(path):
                 continue
             d = json.loads(line)
             key = (d["angle"], d["dpi"], d["jpeg"], d["sigma"], d["seed"],
-                   d.get("parasite", 0.0), d.get("identity", DEFAULT_IDENTITY))
+                   d.get("parasite", 0.0), d.get("identity", DEFAULT_IDENTITY),
+                   d.get("source", DEFAULT_SOURCE), bool(d.get("jitter", False)),
+                   d.get("capture"), d.get("mark_step"))
             index[key][d["variant"]][d["piece"]] = Reading.from_dict(d["reading"])
     return index
 
@@ -347,16 +369,28 @@ def flatten(per_cell):
     return pos, neg
 
 
-def split(per_cell):
+def split(per_cell, calibrate=None, report=None):
     """Calibration against validation.
 
     Choosing a threshold on data and then reporting its recall on the SAME data always
     overestimates it: the threshold has lodged itself in the noise of those particular draws.
-    Two seeds calibrate, the third is never looked at before the number is written.
+    By default two seeds calibrate, the third is never looked at before the number is written.
+
+    `calibrate` and `report` are predicates on the key (grid.predicates.Predicate, or any
+    callable). None means the published protocol's side (DEFAULT_HOLDOUT). A key both accept
+    lands in both sets, a key neither accepts in neither: the caller declares the protocol, this
+    function does not second-guess it.
     """
-    cal = {k: v for k, v in per_cell.items() if k[4] != VALIDATION_SEED}
-    val = {k: v for k, v in per_cell.items() if k[4] == VALIDATION_SEED}
+    calibrate = calibrate or DEFAULT_HOLDOUT.calibrate
+    report = report or DEFAULT_HOLDOUT.report
+    cal = {k: v for k, v in per_cell.items() if calibrate(k)}
+    val = {k: v for k, v in per_cell.items() if report(k)}
     return cal, val
+
+
+def split_by(per_cell, holdout=None):
+    holdout = holdout or DEFAULT_HOLDOUT
+    return split(per_cell, holdout.calibrate, holdout.report)
 
 
 def measure(per_cell, threshold):
@@ -414,13 +448,13 @@ def certifiability(per_cell):
             {c: t for c, t in sorted(rate.items(), key=lambda kv: -kv[1]) if t > FP_BUDGET})
 
 
-def restricted_to_certifiable(per_cell, kept, check):
+def restricted_to_certifiable(per_cell, kept, check, holdout=None):
     """A SECONDARY figure, labelled as such: what the check is worth if it is only asked about
     the targets it can certify. Never the headline number, never in thresholds.json."""
     if not kept or len(kept) == len(next(iter(per_cell.values()))["neg"]):
         return None
     subset = restrict(per_cell, kept)
-    cal, val = split(subset)
+    cal, val = split_by(subset, holdout)
     pos, neg = flatten(cal)
     pt = chosen_point(curve(pos, neg))
     if pt is None:
@@ -453,9 +487,9 @@ def noisy_targets(per_cell, threshold, n=8):
     return [(c, count[c], seen[c]) for c, _ in count.most_common(n)]
 
 
-def settings_summary(per_cell):
+def settings_summary(per_cell, holdout=None):
     """The curve and the point are computed on the CALIBRATION set alone."""
-    cal, _ = split(per_cell)
+    cal, _ = split_by(per_cell, holdout)
     pos, neg = flatten(cal)
     pts = curve(pos, neg)
     return pts, chosen_point(pts)
@@ -668,7 +702,7 @@ def dpi_estimator_error(dossiers):
     return worst
 
 
-def remeasure(r, threshold):
+def remeasure(r, threshold, holdout=None):
     """Recompute everything AT THE THRESHOLD WE PUBLISH. Otherwise we publish a recall measured
     somewhere else.
 
@@ -679,7 +713,7 @@ def remeasure(r, threshold):
     configuration, published next to another.
     """
     pc = r["_per_cell"]
-    cal, val = split(pc)
+    cal, val = split_by(pc, holdout)
     fallen_cells, n_cel = floor(pc, threshold)
     r.update({"threshold": threshold,
               "calibration": measure(cal, threshold), "validation": measure(val, threshold),
@@ -753,7 +787,7 @@ def subgrid(by_settings, keep):
             for settings, pc in by_settings.items()}
 
 
-def analyze_check(by_settings, check, output=None):
+def analyze_check(by_settings, check, output=None, holdout=None):
     """Retain the best settings within budget, measure, look for the floor.
 
     Takes the ALREADY computed sweep: the nominal domain search tries four sub-grids and there
@@ -763,7 +797,7 @@ def analyze_check(by_settings, check, output=None):
     for reg, per_cell in by_settings.items():
         if not per_cell:
             continue
-        pts, pt = settings_summary(per_cell)
+        pts, pt = settings_summary(per_cell, holdout)
         ranking.append((reg, per_cell, pts, pt))
     if not ranking:
         return None
@@ -780,14 +814,14 @@ def analyze_check(by_settings, check, output=None):
         # With the threshold imposed, the sweep only serves to choose the SENSOR: keep the one
         # that recalls best AT THAT THRESHOLD, not the one that would recall best elsewhere.
         def note(c):
-            m = measure(split(c[1])[0], imposed)
+            m = measure(split_by(c[1], holdout)[0], imposed)
             return (m["recall"], -m["fpr"])
         reg, per_cell, pts, pt = max(ranking, key=note)
-        m = measure(split(per_cell)[0], imposed)
+        m = measure(split_by(per_cell, holdout)[0], imposed)
         pt = dict(m, threshold=imposed, **precisions(m["recall"], m["fpr"]))
     kept, excluded = certifiability(per_cell)
     threshold = pt["threshold"] if pt else max(p["threshold"] for p in pts)
-    cal, val = split(per_cell)
+    cal, val = split_by(per_cell, holdout)
     fallen_cells, n_cel = floor(per_cell, threshold)
     if output:
         with open(os.path.join(output, f"pr_{check}.csv"), "w", newline="",
@@ -807,7 +841,7 @@ def analyze_check(by_settings, check, output=None):
         "noisy_targets": noisy_targets(per_cell, threshold),
         "threshold_frozen_by_definition": frozen,
         "uncertifiable_targets": [(f"{a} / {b}", round(t, 4)) for (a, b), t in excluded.items()],
-        "restricted": restricted_to_certifiable(per_cell, kept, check),
+        "restricted": restricted_to_certifiable(per_cell, kept, check, holdout),
         "ranking": [{"settings": settings_name(r, check),
                         "recall": (q or {}).get("recall"), "fpr": (q or {}).get("fpr"),
                         "threshold": (q or {}).get("threshold")}
@@ -838,7 +872,20 @@ def unparasited(by_settings):
     return subgrid(by_settings, lambda k: not k[5])
 
 
-def parasite_ranking(by_settings, check):
+def clean_pages(by_settings, holdout=None):
+    """unparasited(), unless the holdout itself reads the parasite level.
+
+    A fold that calibrates on one level and reports on another (for example
+    --calibrate-on "parasite == 0" --report-on "parasite > 0") would be emptied by the level-0
+    cut before it was ever looked at: there, the predicates ARE the choice of which pages the
+    threshold is read on, and they replace the cut instead of being silently overruled by it.
+    """
+    if holdout is not None and holdout.on_parasite:
+        return by_settings
+    return unparasited(by_settings)
+
+
+def parasite_ranking(by_settings, check, holdout=None):
     """The same ranking as analyze_check builds, but over ALL parasite levels.
 
     Needed for the duel by level: each contender has to be judged at its own operating point over
@@ -848,7 +895,8 @@ def parasite_ranking(by_settings, check):
     for reg, per_cell in by_settings.items():
         if not per_cell:
             continue
-        pts, pt = settings_summary(unparasited({reg: per_cell})[reg] or per_cell)
+        pts, pt = settings_summary(clean_pages({reg: per_cell}, holdout)[reg] or per_cell,
+                                   holdout)
         out.append((reg, per_cell, pts, pt))
     return out
 
@@ -863,7 +911,7 @@ def by_parasite(per_cell, threshold):
     return out
 
 
-def choose_domain(sweeps, checks):
+def choose_domain(sweeps, checks, holdout=None):
     """The nominal domain: the lowest dpi where the checks that READ hold their floor.
 
     Without this step, the operating point of every text check is decided by the cells where the
@@ -891,7 +939,8 @@ def choose_domain(sweeps, checks):
             continue
         worst = 1.0
         for c in needed:
-            r = analyze_check(unparasited(subgrid(sweeps[c], lambda k: k[1] >= dpi_min)), c)
+            r = analyze_check(clean_pages(subgrid(sweeps[c], lambda k: k[1] >= dpi_min),
+                                          holdout), c, holdout=holdout)
             worst = min(worst, 0.0 if r is None else r["calibration"]["recall"])
         attempts.append((dpi_min, worst))
         if worst >= RECALL_FLOOR:
@@ -978,6 +1027,115 @@ def settings_name(reg, check):
     return ", ".join(f"{n}={getattr(reg, n)}" for n in names) or "no settings"
 
 
+def frozen_settings(path):
+    """{check: (Settings, threshold)} as a thresholds file ships them: no refit, no sweep.
+
+    The same reading of the file preflight.checks.measured_settings() does for the shipped one,
+    applied to ANY file with that schema, so a copy archived next to a study ("thresholds as
+    shipped at v0.2.0") scores exactly as the tool would with that file in place.
+    """
+    from preflight.thresholds import load_settings, load_thresholds
+    values, settings = load_thresholds(path), load_settings(path)
+    base = Settings()
+    return {c: (replace(base, **{k: v for k, v in (settings.get(c) or {}).items()
+                                 if hasattr(base, k)}), float(values[c]))
+            for c in CHECKS if c in values}
+
+
+def frozen_rows(dossiers, ref, path, checks=CHECKS, catalog=None, ref_of=None,
+                clock="filing", abstention=True):
+    """Every target of every dossier scored at the thresholds of `path`, one dict per target.
+
+    The scoring is preflight.checks.evaluate() itself, called with the file's thresholds and each
+    check's own settings, which is what the command line runs on a real dossier. Positives are
+    the targets each variant damages, pooled over every instance of the check exactly as sweep()
+    pools them (legacy all-targets fallback included, so A0 scores as the published grid did);
+    negatives are every target of the clean dossier. `abstention` defaults to ON, the product's
+    behaviour: a target below the resolution floor gets score None, and it is kept (abstained)
+    rather than dropped, so the report can say how many positives the tool refused to judge.
+    """
+    from preflight.thresholds import load_thresholds
+    if catalog is None:
+        catalog = variant_catalog(ref)
+    if ref_of is None:
+        def ref_of(identity):
+            return ref
+    table = frozen_settings(path)
+    thresholds = load_thresholds(path)
+    rows = []
+    for key, d in dossiers.items():
+        row_ref = ref_of(key[IDENTITY_INDEX])
+        for check in checks:
+            if check not in table:
+                continue
+            reg, threshold = table[check]
+
+            def score(readings):
+                return {(c.piece, str(c.target)): c.score
+                        for c in evaluate(readings, row_ref, clock, reg, thresholds,
+                                          checks=[check], abstention=abstention)}
+            for name in d:
+                if name == "clean":
+                    rows += [dict(key=key, check=check, variant="clean", piece=t[0],
+                                  target=t[1], positive=False, score=x, threshold=threshold)
+                             for t, x in score(d["clean"]).items()]
+                    continue
+                v = catalog[name]
+                if v.check != check:
+                    continue
+                found = score(d[name])
+                targets = damaged_targets(v, row_ref)
+                matched = {t: x for t, x in found.items() if t in targets}
+                # sweep()'s legacy fallback, on the same condition: no damaged target SCORED.
+                if not any(x is not None for x in matched.values()) and name in BY_NAME:
+                    matched = found
+                rows += [dict(key=key, check=check, variant=name, piece=t[0], target=t[1],
+                              positive=True, score=x, threshold=threshold)
+                         for t, x in matched.items()]
+    for r in rows:
+        r["abstained"] = r["score"] is None
+        r["fires"] = (not r["abstained"]) and r["score"] > r["threshold"]
+    return rows
+
+
+def frozen_report(rows, path, checks=CHECKS):
+    """measure() per check over the scored rows, with the abstentions counted beside it."""
+    table = frozen_settings(path)
+    out = {}
+    for check in checks:
+        if check not in table:
+            continue
+        reg, threshold = table[check]
+        per_cell = collections.defaultdict(lambda: {"pos": {}, "neg": {}})
+        abstained = {"pos": 0, "neg": 0}
+        for r in rows:
+            if r["check"] != check:
+                continue
+            side = "pos" if r["positive"] else "neg"
+            if r["abstained"]:
+                abstained[side] += 1
+                continue
+            per_cell[r["key"]][side][(r["variant"], r["piece"], r["target"])] = r["score"]
+        m = measure(dict(per_cell), threshold)
+        judged = m["n_pos"] + abstained["pos"]
+        m.update({"settings": _useful_settings(reg, check),
+                  "n_pos_abstained": abstained["pos"], "n_neg_abstained": abstained["neg"],
+                  "recall_abstention_as_miss": m["tp"] / judged if judged else 0.0})
+        out[check] = m
+    return out
+
+
+def write_frozen_rows(rows, path):
+    with open(path, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(list(KEY_FIELDS) + ["check", "variant", "piece", "target", "positive",
+                                       "score", "threshold", "fires", "abstained"])
+        for r in rows:
+            w.writerow(list(r["key"]) + [r["check"], r["variant"], r["piece"], r["target"],
+                                         r["positive"], r["score"], r["threshold"], r["fires"],
+                                         r["abstained"]])
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--measurements", default=os.path.join(ROOT, "grid", "measurements", "measurements.jsonl"))
@@ -991,7 +1149,33 @@ def main():
                          "ran, so --publish on the A0 file keeps reproducing it unchanged. Every "
                          "row is then scored against ITS OWN identity's Reference through "
                          "ref_of, not against whichever one happens to load first.")
+    ap.add_argument("--calibrate-on", default=None, metavar="EXPR",
+                    help="predicate on the key choosing the calibration rows, e.g. "
+                         "'source == \"g0\" and seed in (11, 23)' (grid/predicates.py). "
+                         f"Default: {DEFAULT_HOLDOUT.calibrate.text!r}, the published split.")
+    ap.add_argument("--report-on", default=None, metavar="EXPR",
+                    help="predicate choosing the rows the numbers are reported on. Default: "
+                         f"{DEFAULT_HOLDOUT.report.text!r}. Rows neither predicate keeps are "
+                         "left out of the analysis entirely.")
+    ap.add_argument("--expected", default=None, metavar="JSON",
+                    help="{identity: [variant, ...]}: the variants a dossier of that identity "
+                         "must carry to count as complete, declared for a source that does not "
+                         "carry every enumerated instance (a real-capture kit). Default: the "
+                         "legacy nine, or every enumerate_variants() instance under --identities.")
+    ap.add_argument("--frozen", default=None, metavar="THRESHOLDS.json",
+                    help="score the readings at the thresholds and settings of this file, with "
+                         "no refit, and print (or --frozen-out) the per-check measures. Rows: "
+                         "every complete dossier, or those --report-on keeps if it is given.")
+    ap.add_argument("--frozen-out", default=None, help="JSON file for --frozen (default stdout)")
+    ap.add_argument("--frozen-rows", default=None,
+                    help="CSV of every scored target for --frozen (key fields, check, variant, "
+                         "piece, target, positive, score, threshold, fires, abstained)")
+    ap.add_argument("--no-abstention", action="store_true",
+                    help="--frozen only: disable the refusal to judge a piece below the "
+                         "resolution floor (the product keeps it on)")
     a = ap.parse_args()
+    holdout = Holdout(a.calibrate_on or DEFAULT_HOLDOUT.calibrate.text,
+                      a.report_on or DEFAULT_HOLDOUT.report.text)
     os.makedirs(a.output, exist_ok=True)
 
     if a.identities:
@@ -1012,6 +1196,14 @@ def main():
         ref = load_reference()
         refs = {DEFAULT_IDENTITY: ref}
         ref_of = catalog = expected_of = None
+    if a.expected:
+        declared = {i: frozenset(names) for i, names in
+                    json.load(open(a.expected, encoding="utf-8")).items()}
+        known = catalog or variant_catalog(ref)
+        unknown = sorted({n for names in declared.values() for n in names} - set(known))
+        if unknown:
+            raise SystemExit(f"--expected names unknown variants: {', '.join(unknown)}")
+        expected_of = declared.__getitem__
 
     index = load(a.measurements)
     # A row whose identity has no Reference here would otherwise be scored against another
@@ -1025,6 +1217,30 @@ def main():
     if not dossiers:
         raise SystemExit(f"no complete cell in {a.measurements}: every cell misses a clean "
                          "piece or a declared variant")
+    if a.frozen:
+        if a.report_on:
+            dossiers = {k: v for k, v in dossiers.items() if holdout.report(k)}
+        rows = frozen_rows(dossiers, ref, a.frozen, a.checks, catalog=catalog, ref_of=ref_of,
+                           abstention=not a.no_abstention)
+        report = {"thresholds_file": os.path.abspath(a.frozen),
+                  "thresholds_sha256": hashlib.sha256(open(a.frozen, "rb").read()).hexdigest(),
+                  "measurements": os.path.abspath(a.measurements),
+                  "report_on": a.report_on or "every complete dossier",
+                  "abstention": not a.no_abstention, "n_dossiers": len(dossiers),
+                  "checks": _jsonable(frozen_report(rows, a.frozen, a.checks))}
+        text = json.dumps(report, indent=2, default=str)
+        if a.frozen_out:
+            open(a.frozen_out, "w", encoding="utf-8").write(text + "\n")
+        else:
+            print(text)
+        if a.frozen_rows:
+            write_frozen_rows(rows, a.frozen_rows)
+        return 0
+    # Rows the protocol names on neither side take no part in anything below (domain, curves,
+    # floors, crosstalk). Under the default split every row is on one side or the other.
+    dossiers = {k: v for k, v in dossiers.items() if holdout.keeps(k)}
+    if not dossiers:
+        raise SystemExit(f"no complete cell is kept by {holdout!r}")
     cells = {cell_of(c) for c in dossiers}
     print(f"{len(dossiers)} complete cell/seed pairs, {len(cells)} distinct cells")
 
@@ -1035,7 +1251,7 @@ def main():
         print(f"  sweep {check:17s} {len(sweeps[check]):3d} settings, "
               f"{time.perf_counter() - t:5.1f}s", flush=True)
 
-    domain, attempts = choose_domain(sweeps, a.checks)
+    domain, attempts = choose_domain(sweeps, a.checks, holdout)
     retained = {k: v for k, v in dossiers.items() if k[1] >= domain}
     print(f"nominal domain retained: dpi >= {domain} ({len(retained)} pairs). Attempts: "
           + ", ".join(f"{d} dpi -> " + ("no data" if r is None else
@@ -1047,14 +1263,14 @@ def main():
     results = {}
     for check in a.checks:
         in_domain = subgrid(sweeps[check], lambda k: k[1] >= domain)
-        r = analyze_check(unparasited(in_domain), check, a.output)
+        r = analyze_check(clean_pages(in_domain, holdout), check, a.output, holdout)
         if r is None:
             print(f"  {check:17s} NO usable measurement")
             continue
         r["domain"] = domain
         # The fifth factor, measured at the threshold just chosen on clean pages.
         r["_full_per_cell"] = in_domain[r["settings"]]
-        r["_parasite_ranking"] = parasite_ranking(in_domain, check)
+        r["_parasite_ranking"] = parasite_ranking(in_domain, check, holdout)
         r["by_parasite"] = by_parasite(r["_full_per_cell"], r["threshold"])
         outside = subgrid(sweeps[check], lambda k: k[1] < domain)[r["settings"]]
         r["outside_domain"] = measure(outside, r["threshold"]) if outside else None
@@ -1067,7 +1283,7 @@ def main():
 
     if "resolution" in results:
         results["resolution"].update(operational_floor(results, domain, retained))
-        r = remeasure(results["resolution"], results["resolution"]["threshold"])
+        r = remeasure(results["resolution"], results["resolution"]["threshold"], holdout)
         r["point"] = dict(r["validation"], threshold=r["threshold"],
                           **precisions(r["validation"]["recall"], r["validation"]["fpr"]))
         print(f"  {'resolution':17s} threshold raised to {r['threshold']:.4g} = floor "

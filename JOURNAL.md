@@ -335,3 +335,24 @@ The fixture cache name also carries a content tag of the identity and of `prefli
 so an edited identity is never served stale PDFs. `AXIS_INDEX` stays without identity: identity
 is a replicate axis like the seed (`IDENTITY_INDEX = 6`), and a factor row for it would have
 changed A0's LIMITS.md. The A0 `--publish` replay is again byte-identical but for `curves.png`.
+
+**Readings from images, holdout predicates, a frozen mode** (for perfect-recall-study's arms A3
+and X2, and its protocols P1 to P6). `grid/read_images.py MANIFEST OUT` reads each image through
+the production path, a `ScannedPiece` handed to `read_piece` with `replace(PRISTINE, dpi=<row
+dpi>)`, and writes the grid's own line (every sensor setting's score) plus `source`, the key
+fields, the manifest's columns, a `ts`, and what the production path says about orientation
+(quarter turn chosen, the one expected, peak, margin). It resumes, and runs on cores minus one.
+One step is not the command line's: an image is already a raster, so it is not wrapped into a
+PDF for pdftoppm. Measured before deciding: poppler resamples an embedded image even at exactly
+1:1, and changed 42% of the pixels of an Augraphy page (mean absolute difference 7 grey levels).
+The adapter returns the file as `render()` returns its own cached PNG; a test shows a raster
+reads exactly as the command line reads the PDF it came from. The known quarter-turn weakness of
+the registration search is left as it is and recorded per line, not corrected.
+`grid/analyze.py` now splits on two predicates over the key (`--calibrate-on`, `--report-on`,
+parsed by `grid/predicates.py`, never passed to eval), with `source`, `jitter`, `capture` and
+`mark_step` appended to the key after identity; the defaults are the published split, and the
+A0 `--publish` replay is byte-identical but for `curves.png`. A fold that reads the parasite
+level bypasses the level-0 cut. `--frozen THRESHOLDS.json` scores a readings file at a
+thresholds file's values and settings with no refit, through `checks.evaluate` itself, counting
+abstentions beside the recall; `--expected` declares the variants a dossier must carry when a
+source does not carry every instance.
