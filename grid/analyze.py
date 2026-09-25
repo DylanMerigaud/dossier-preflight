@@ -90,6 +90,15 @@ def combinations(check):
 # derivation for fixtures/reference.yaml (its file stem) and grid.run.DEFAULT_IDENTITY. Every
 # line of A0 predates the "identity" field and reads back as this one constant.
 DEFAULT_IDENTITY = "reference"
+# Where the identity sits in the key load() builds (grid/run.py's key() carries it at the same
+# rank relative to the five factors and the seed). A replicate axis like the seed, NOT a factor:
+# see the comment above AXIS_INDEX.
+IDENTITY_INDEX = 6
+
+# Each check's ONE v0.1.0 variant name. The crosstalk table keeps these as its column labels
+# whatever the data: on A0 a column is that one variant, on an every-instance run it pools every
+# instance of the same check under the same label, so the published table keeps its shape.
+LEGACY_BY_CHECK = {v.check: v.name for v in VARIANTS if v.check}
 
 
 def load(path):
@@ -116,32 +125,34 @@ def load(path):
     return index
 
 
-def complete_dossiers(index, ref):
+def complete_dossiers(index, ref, expected_of=None):
     """A variant's dossier = the edited piece, plus the other pieces of the clean dossier.
 
-    "Complete" is no longer the fixed nine names of VARIANTS: it is every variant name OBSERVED
-    for THAT SAME identity anywhere else in the file. That is what lets this one function read
-    an old single-instance grid (A0, one identity, nine variants) and a new every-instance one
-    (several identities, enumerate_variants()'s forty-five each) without being told in advance
-    which shape it is looking at, and it reduces to the old rule exactly when a file only ever
-    carries the fixed nine: their union IS that fixed set.
+    `expected_of(identity)` names the variants a cell of that identity MUST carry to count as
+    complete, DECLARED and never inferred from the file: inferring it from what the file holds
+    would quietly shrink the expectation to whatever the run managed to write, and a variant
+    that failed on every cell would vanish from the denominators instead of emptying the cell.
+    Default: the fixed nine names of VARIANTS for every identity, v0.1.0's rule exactly (A0).
+    main() under --identities passes each identity's own enumerate_variants() names.
 
     Incomplete cells are dropped silently: the grid resumes where it stopped, and a
     half-written cell would manufacture a false negative that does not exist.
     """
-    expected_by_identity = collections.defaultdict(set)
-    for key, by_variant in index.items():
-        expected_by_identity[key[6]] |= set(by_variant)
+    if expected_of is None:
+        legacy = frozenset(v.name for v in VARIANTS)
+
+        def expected_of(identity):
+            return legacy
     out = {}
     for key, by_variant in index.items():
-        expected = expected_by_identity[key[6]]
+        expected = expected_of(key[IDENTITY_INDEX])
         if not expected <= set(by_variant):
             continue
-        clean = by_variant.get("clean", {})
+        clean = by_variant["clean"]
         if len(clean) < len(ref.pieces):
             continue
         d = {"clean": clean}
-        for name in expected:
+        for name in sorted(expected):
             if name != "clean":
                 d[name] = dict(clean, **by_variant[name])
         out[key] = d
@@ -282,13 +293,26 @@ def sweep(dossiers, ref, check, catalog=None, ref_of=None):
     the targets of the clean dossier, which gives the false positive rate the statistical power
     it lacked.
 
+    A positive is keyed (variant name, piece, target), never (piece, target) alone: two
+    instances can damage the SAME target (expiry at 1 day and at 365 days past both hit the one
+    expiry field), and a target-only key let the second overwrite the first, counting one
+    positive where two were measured.
+
     `catalog` names every variant `dossiers` could carry (default: variant_catalog(ref), correct
     whenever every row is this one identity's, which A0 and any single-arm run are). `ref_of`
-    resolves the Reference for a row carrying a DIFFERENT identity than `ref` (default: always
-    `ref`, correct under the same single-identity condition). A cell missing a given variant's
-    reading (v0.1.0 data next to a variant only the new enumeration produces) is silently
-    skipped for THAT variant, which is exactly how A0 reduces to its own one-variant-per-check
-    behaviour: every variant this pooling adds is simply absent from A0's cells.
+    resolves the Reference for a row's identity (default: always `ref`, correct under the same
+    single-identity condition). A cell missing a given variant's reading (v0.1.0 data next to a
+    variant only the new enumeration produces) skips THAT variant, which is exactly how A0
+    reduces to its own one-variant-per-check behaviour: every variant this pooling adds is
+    absent from A0's cells, and complete_dossiers() already refused any cell missing one of
+    the variants it DECLARES expected.
+
+    The v0.1.0 fallback (no damaged target scored: count every target of the check as a
+    positive) is kept for the nine legacy names only, so A0 replays. On an enumerated instance
+    it would be wrong by a factor of the target count: one abstention on an emptied field would
+    count the sixteen filled fields of the dossier as sixteen missed positives. An enumerated
+    instance whose damaged target abstains contributes no positive, exactly as an abstaining
+    clean target contributes no negative.
     """
     if catalog is None:
         catalog = variant_catalog(ref)
@@ -300,15 +324,17 @@ def sweep(dossiers, ref, check, catalog=None, ref_of=None):
     for reg in combinations(check):
         per_cell = {}
         for key, d in dossiers.items():
-            row_ref = ref_of(key[6]) if len(key) > 6 else ref
+            row_ref = ref_of(key[IDENTITY_INDEX])
             pos = {}
             for var in variants:
                 if var.name not in d:
                     continue
                 targets = damaged_targets(var, row_ref)
                 all_scores = target_scores(d[var.name], row_ref, check, reg)
-                matched = {k: v for k, v in all_scores.items() if k in targets} or all_scores
-                pos.update(matched)
+                matched = {k: v for k, v in all_scores.items() if k in targets}
+                if not matched and var.name in BY_NAME:
+                    matched = all_scores
+                pos.update({(var.name,) + k: v for k, v in matched.items()})
             per_cell[key] = {"pos": pos,
                              "neg": target_scores(d["clean"], row_ref, check, reg)}
         out[reg] = per_cell
@@ -585,7 +611,7 @@ def plot(results, path):
 OCR_DEPENDENT = ("required_field", "expiry", "consistency", "forbidden_value")
 
 
-def crosstalk(dossiers, ref, results):
+def crosstalk(dossiers, ref, results, catalog=None, ref_of=None):
     """Does check c fire when the defect belongs to ANOTHER check.
 
     The tests already demanded this, but on a single cell. The grid measures it everywhere,
@@ -595,23 +621,38 @@ def crosstalk(dossiers, ref, results):
     The table is not made only of faults. A CROPPED page takes real fields with it: the
     required-field check is right to cry there. What the table gives is the means to separate a
     physical consequence from a contamination.
+
+    A column is a DEFECT CHECK, labelled by that check's v0.1.0 variant name (LEGACY_BY_CHECK)
+    so A0's table keeps its exact shape. On A0 it holds that one variant; on an every-instance
+    run it pools every instance of the check present in the dossiers, one trial per (dossier,
+    instance), each scored against ITS row's own Reference through `ref_of`. `catalog` and
+    `ref_of` default as in sweep().
     """
+    if catalog is None:
+        catalog = variant_catalog(ref)
+    if ref_of is None:
+        def ref_of(identity):
+            return ref
     out = {}
     for check, r in results.items():
         reg, threshold = r["settings"], r["threshold"]
-        lines = {}
-        for v in VARIANTS:
-            if not v.check or v.check == check:
-                continue
-            n = fired = 0
-            for d in dossiers.values():
+        counts = {}
+        for key, d in dossiers.items():
+            row_ref = ref_of(key[IDENTITY_INDEX])
+            for name in d:
+                v = catalog[name]
+                if not v.check or v.check == check:
+                    continue
                 # HERE abstention is ON: crosstalk measures the behaviour of the PRODUCT, not
                 # the raw capability of the sensors.
-                scores = target_scores(d[v.name], ref, check, reg, abstention=True)
-                n += 1
-                fired += any(x > threshold for x in scores.values())
-            lines[v.name] = {"rate": fired / max(1, n), "n": n, "ci": wilson(fired, n)}
-        out[check] = lines
+                scores = target_scores(d[name], row_ref, check, reg, abstention=True)
+                c = counts.setdefault(LEGACY_BY_CHECK[v.check], [0, 0])
+                c[0] += 1
+                c[1] += any(x > threshold for x in scores.values())
+        # Columns in VARIANTS order, the order A0's crosstalk.json was always written in.
+        out[check] = {name: {"rate": fired / max(1, n), "n": n, "ci": wilson(fired, n)}
+                      for name, (n, fired) in
+                      ((v.name, counts[v.name]) for v in VARIANTS if v.name in counts)}
     return out
 
 
@@ -962,17 +1003,28 @@ def main():
         if not refs:
             raise SystemExit(f"no identity file (*.yaml) found in {a.identities}")
         ref = next(iter(refs.values()))          # any of them: same piece count, same schema
-        ref_of = refs.get
         catalog = {}
         for r in refs.values():
             catalog.update(variant_catalog(r))
+        expected = {i: frozenset(v.name for v in enumerate_variants(r)) for i, r in refs.items()}
+        ref_of, expected_of = refs.__getitem__, expected.__getitem__
     else:
         ref = load_reference()
-        ref_of = None
-        catalog = None
+        refs = {DEFAULT_IDENTITY: ref}
+        ref_of = catalog = expected_of = None
 
     index = load(a.measurements)
-    dossiers = complete_dossiers(index, ref)
+    # A row whose identity has no Reference here would otherwise be scored against another
+    # person's values, or dropped as "incomplete" in silence: refuse the run instead.
+    stray = sorted({k[IDENTITY_INDEX] for k in index} - set(refs))
+    if stray:
+        raise SystemExit(f"{a.measurements} carries identities with no reference file: "
+                         f"{', '.join(stray)}. Pass the directory that holds them "
+                         "(--identities DIR).")
+    dossiers = complete_dossiers(index, ref, expected_of)
+    if not dossiers:
+        raise SystemExit(f"no complete cell in {a.measurements}: every cell misses a clean "
+                         "piece or a declared variant")
     cells = {cell_of(c) for c in dossiers}
     print(f"{len(dossiers)} complete cell/seed pairs, {len(cells)} distinct cells")
 
@@ -1022,7 +1074,7 @@ def main():
               f"{r['floor_dpi']} dpi minus {r['estimator_margin']:.1%} margin "
               f"(max measured estimator error {r['max_estimator_error']:.4%})")
     t = time.perf_counter()
-    crossed = crosstalk(retained, ref, results)
+    crossed = crosstalk(retained, ref, results, catalog=catalog, ref_of=ref_of)
     print(f"  crosstalk measured over the whole grid in {time.perf_counter() - t:.0f}s")
     if not results:
         print("no usable check, nothing to plot")

@@ -317,3 +317,21 @@ one a fixed catalog declares. With no `--identities`, both scripts take the sing
 reference exactly as v0.1.0 did: replayed `python3 grid/analyze.py --publish` on the committed
 A0 file and `git status --short grid/results` showed only `curves.png` (matplotlib-version
 noise, reverted), `thresholds.json` and `LIMITS.md` unchanged.
+
+**The review of that change found four counting faults, none visible on A0.** (1) `sweep` keyed a
+positive by target alone, so the two expiry instances (1 and 365 days past), which damage the
+same field, overwrote each other: one positive per cell where two were measured. Positives are
+now keyed (variant, piece, target); a one-cell smoke run on the six identities counts 36 expiry
+positives over 18 dossiers, not 18. (2) The v0.1.0 fallback (no damaged target scored: every
+target of the check becomes a positive) would, on an enumerated instance, count the filled
+fields as missed positives; it stays for the nine legacy names only. (3) `crosstalk` still
+iterated the nine legacy names against one reference, a KeyError on every-instance data; its
+columns keep the legacy labels, each pooling every instance of its check, scored on the row's
+own identity. (4) `complete_dossiers` inferred the expected variants from whatever the file held,
+so a variant that failed everywhere would leave the denominators silently; the expectation is
+now declared (legacy nine by default, each identity's `enumerate_variants()` under
+`--identities`), and `analyze.py` refuses a file carrying an identity it has no reference for.
+The fixture cache name also carries a content tag of the identity and of `preflight/fixtures.py`,
+so an edited identity is never served stale PDFs. `AXIS_INDEX` stays without identity: identity
+is a replicate axis like the seed (`IDENTITY_INDEX = 6`), and a factor row for it would have
+changed A0's LIMITS.md. The A0 `--publish` replay is again byte-identical but for `curves.png`.

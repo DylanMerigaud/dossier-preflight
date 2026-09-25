@@ -76,6 +76,7 @@ FIXTURES = os.path.join(ROOT, "grid", ".fixtures")
 _REFS = None            # {identity: Reference}
 _PIECES = None          # {(identity, variant_name, piece_id): BuiltPiece}
 _VARIANTS = None        # {identity: tuple[Variant, ...]}
+_BOOTED_WITH = None     # the identities_dir the fixtures above were built for
 
 
 def _load_identities(identities_dir):
@@ -110,9 +111,15 @@ def _bootstrap(identities_dir=None):
     single-defect instances), the same fixture cache the published grid used. With
     --identities, every identity gets the EXHAUSTIVE enumeration of enumerate_variants().
     """
-    global _REFS, _PIECES, _VARIANTS
+    global _REFS, _PIECES, _VARIANTS, _BOOTED_WITH
     if _REFS is not None:
+        # A process bootstrapped once keeps its fixtures: a later call naming ANOTHER set of
+        # identities would otherwise be served the first set in silence.
+        if identities_dir != _BOOTED_WITH:
+            raise RuntimeError(f"fixtures already built for identities={_BOOTED_WITH!r}, "
+                               f"asked for {identities_dir!r}")
         return
+    _BOOTED_WITH = identities_dir
     _REFS = _load_identities(identities_dir)
     _VARIANTS = ({DEFAULT_IDENTITY: VARIANTS} if identities_dir is None
                  else {identity: enumerate_variants(ref) for identity, ref in _REFS.items()})
@@ -134,7 +141,8 @@ def pieces_to_read(identity):
     --identities: four clean pieces plus the 45 defect instances enumerate_variants() derives
     for this identity's schema (perfect-recall-study prereg/PREREG.md section 3.2).
     """
-    _bootstrap()
+    if _REFS is None:
+        _bootstrap()
     ref = _REFS[identity]
     variants = _VARIANTS[identity]
     couples = [("clean", p) for p, _ in ref.pieces]
@@ -277,8 +285,10 @@ def main():
                     help="a named reduced cell set (perfect-recall-study prereg/PREREG.md "
                          "section 3.3) instead of the full ANGLES x DPIS x JPEGS x SIGMAS cross")
     a = ap.parse_args()
+    if a.identities is not None:
+        a.identities = os.path.abspath(a.identities)
 
-    os.makedirs(os.path.dirname(a.output), exist_ok=True)
+    os.makedirs(os.path.dirname(os.path.abspath(a.output)), exist_ok=True)
     if a.parasite:
         cells = list(itertools.product(SUB_ANGLES, SUB_DPIS, SUB_JPEGS, SUB_SIGMAS))
         levels = [x for x in PARASITE_LEVELS if x]

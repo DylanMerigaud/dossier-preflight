@@ -136,7 +136,7 @@ def test_sweep_pools_every_instance_of_a_check():
     swept = sweep(dossiers, ref, "required_field")
     assert swept, "no settings produced a sweep at all"
     found_both = any(
-        {piece for piece, _ in per_cell[key]["pos"]} >= {"tax", "identity"}
+        {piece for _, piece, _ in per_cell[key]["pos"]} >= {"tax", "identity"}
         for per_cell in swept.values())
     assert found_both, (
         "sweep() did not pool positives from both required_field variants: it is still "

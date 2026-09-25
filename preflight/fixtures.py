@@ -19,6 +19,8 @@ printer would. Checkboxes, by contrast, stay filled through the AcroForm: their 
 supplied by the form and it renders correctly (ink delta +21 to +28 on all three pieces).
 """
 import datetime as dt
+import hashlib
+import json
 import os
 import re
 from dataclasses import dataclass, field
@@ -141,6 +143,11 @@ def enumerate_variants(ref):
             out.append(Variant(f"{name}@{piece_id}", check, piece=piece_id, image=dict(override)))
     for cons in ref.consistencies:
         piece_id = cons["readings"][-1]["piece"]
+        # An identity that already lives on the replacement street would carry NO disagreement
+        # at all, and every "missed" positive of this instance would be a correct silence.
+        if str(ref.value(cons["data"])).strip().upper() == "DES TILLEULS":
+            raise ValueError(f"{ref.identity}: its own {cons['data']} is the injected "
+                             "disagreement value, the consistency instance would be no defect")
         out.append(Variant(f"diverging_{cons['data']}@{piece_id}", "consistency",
                             piece=piece_id, replace={cons["data"]: "DES TILLEULS"}))
     return tuple(out)
@@ -360,6 +367,20 @@ def _stamp(w, page_no, ops, buffer):
     os.unlink(buffer)
 
 
+def _content_tag(ref):
+    """Ten hex characters that change whenever what a fixture PRINTS could change: every value
+    of the reference (person, clocks, expiry, consistencies, forbidden values, signature seed,
+    pieces) and the source of this module, which decides how they are printed."""
+    payload = json.dumps({"dossier": ref.dossier, "clocks": ref.clocks, "person": ref.person,
+                          "forbidden_values": ref.forbidden_values, "expiry": ref.expiry,
+                          "pieces": ref.pieces, "consistencies": ref.consistencies,
+                          "signature_seed": ref.signature_seed},
+                         sort_keys=True, default=str).encode()
+    with open(__file__, "rb") as f:
+        payload += f.read()
+    return hashlib.sha1(payload).hexdigest()[:10]
+
+
 def build(ref, variant, dest, reuse=True):
     """Materialise the dossier: one filled PDF per piece, plus the image overrides.
 
@@ -369,13 +390,16 @@ def build(ref, variant, dest, reuse=True):
     """
     var = BY_NAME[variant] if isinstance(variant, str) else variant
     os.makedirs(dest, exist_ok=True)
+    tag = _content_tag(ref)
     pieces = []
     for piece_id, template_name in ref.pieces:
         tpl = ref.templates[template_name]
         # The identity goes FIRST in the cache file name. Without it a second identity built
         # into the same `dest` silently reused the first one's PDFs: same variant name, same
-        # piece id, same path, a different person's dossier never actually rendered.
-        path = os.path.join(dest, f"{ref.identity}-{var.name}-{piece_id}.pdf")
+        # piece id, same path, a different person's dossier never actually rendered. The
+        # content tag after it closes the same hole one level down: an identity file edited,
+        # or this module changed, after a first build would otherwise be served its stale PDFs.
+        path = os.path.join(dest, f"{ref.identity}-{tag}-{var.name}-{piece_id}.pdf")
         if reuse and os.path.exists(path):
             pieces.append(BuiltPiece(piece_id, tpl, path,
                                           dict(var.image) if var.piece == piece_id else {}))
@@ -399,8 +423,7 @@ def build(ref, variant, dest, reuse=True):
                            for field in tpl.signatures.values())
         if ops:
             _stamp(w, tpl.page, ops,
-                     os.path.join(dest, f"{ref.identity}-{var.name}-{piece_id}"
-                                        f"-overlay-{os.getpid()}.pdf"))
+                     path[:-len(".pdf")] + f"-overlay-{os.getpid()}.pdf")
         buffer = path + f".{os.getpid()}"
         w.write(buffer)
         os.replace(buffer, path)
