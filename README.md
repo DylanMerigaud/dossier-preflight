@@ -12,10 +12,11 @@ subject, and "file" and "document" lose the relation between the two.
 
 ## What it measures
 
-Nine checks, each with a threshold READ off a precision/recall curve, not picked by hand. A
-grid of 384 cells (angle x dpi x JPEG quality x noise) x 3 seeds = 1152 dossiers, 13,824 image
-readings, 121 minutes on 13 workers. The threshold is chosen on seeds 11 and 23; the figure
-below is the one from seed 37, never looked at beforehand.
+Nine checks, each with a continuous score and a threshold. Seven thresholds are READ off their own precision/recall curve, not picked by hand; expiry is zero days by definition, and resolution sits at the 150 dpi readability floor minus a 1% margin (see below). A
+grid of 384 cells (angle x dpi x JPEG quality x noise) x 3 seeds = 1152 dossiers, 14,976 image
+readings (the first 13,824 took 121 minutes on 13 workers, the Spanish W-9 added the rest). The
+threshold is chosen on seeds 11 and 23; the figure below is the one from seed 37, never used to
+choose a threshold or a sensor. Until v0.2.0 the rule that sets the 150 dpi floor (and with it the resolution threshold) read seed 37; it now reads seeds 11 and 23 and keeps the same floor.
 
 | check | what it catches | retained sensor | threshold | recall | false positives per target |
 |---|---|---|---|---|---|
@@ -24,7 +25,7 @@ below is the one from seed 37, never looked at beforehand.
 | signature | a missing signature | connected components | -342.1 | 1.000 | 0.00000 |
 | expiry | a piece expired AT THE CHOSEN CLOCK | date read by full-page OCR | 0 (definition) | 1.000 | 0.00000 |
 | consistency | the same data diverging between two pieces | per zone OCR, tokens | 0.394 | 1.000 | 0.00000 |
-| forbidden_value | a forbidden value reappearing | full-page OCR, n-grams | 0.721 | 0.997 | 0.00058 |
+| forbidden_value | a forbidden value reappearing | full-page OCR, n-grams | 0.721 | 0.997 | 0.00043 |
 | resolution | a scan below the readability floor | registration scale | -148.5 dpi | 1.000 | 0.00000 |
 | cropped_page | a truncated page | coverage of the blank's ink | 0.088 | 1.000 | 0.00000 |
 | rotated_page | an upside-down page | correlation margin per quarter turn | 0.359 | 1.000 | 0.00000 |
@@ -47,9 +48,8 @@ and all four come from the forbidden-value check.
 English forms and one French one, "French" and "boxed field layout" named the same object and
 nothing could say which one the tool struggles with. The IRS publishes its own Spanish W-9: same
 producer, same licence, same 23 declared zones, comb tax number of identical geometry. It varies
-the language and holds the layout. It produces **zero** false alarms, and it lowered the
-per-target rate of the forbidden-value check from 0.00058 to 0.00043 purely by adding clean
-targets. So it is the Cerfa's character-by-character boxing that costs, not the language.
+the language and holds the layout. It produces **zero** false alarms. So it is the Cerfa's
+character-by-character boxing that costs, not the language.
 
 A faulty dossier is rejected at the counter: months of delay. A gate that cries for nothing
 loses its credibility, and a rule that cries wolf makes every rule next to it get skimmed. The
@@ -68,7 +68,7 @@ READS abstains on the piece concerned**, with a verdict of "undecidable" that is
 "compliant". Before that rule, consistency cried on 456 of the 864 dossiers carrying a piece at
 72 dpi, comparing tokens it had failed to read.
 
-The resolution threshold is the only one that does not come from its own curve: its curve would
+The resolution threshold is one of two that do not come from their own curve (the other is expiry, zero by definition): its curve would
 place it at 111 dpi, the spot that best separates the faulty variant from the rest. But the
 question that check has to ask is not "is this page at 72 dpi", it is "is this page sharp enough
 for the OTHERS to hold". It is therefore set at the floor, minus 1% of margin, the margin being
@@ -96,7 +96,7 @@ For "is this required field empty", four competing sensors:
 | sensor | recall | false positives per target |
 |---|---|---|
 | added ink, threshold 128 (retained) | 1.000 | 0.0000 |
-| full-page OCR + per zone OCR, min confidence 0 | 1.000 | 0.0003 |
+| full-page OCR + per zone OCR, min confidence 0 | 1.000 | 0.0016 |
 | OCR alone, min confidence 10 and up | 0.000 | 0.0000 |
 
 The spike's real culprit was not the sensor, it was its confidence floor at 40. A COMB field
@@ -232,7 +232,7 @@ that is already what it answers, "I cannot read this page" and not "this page is
 ## Run the measurement rig
 
     python3 spike/proof.py            # the first green case, standalone
-    python3 -m pytest tests/ -q       # 64 tests, about 2 min 20 (they render and OCR)
+    python3 -m pytest tests/ -q       # 68 tests, about 3 min (they render and OCR)
     python3 grid/run.py               # the grid, ~2 h on 13 workers, resumable
     python3 grid/run.py --parasite    # the fifth factor, ~2 h 30
     python3 grid/target_parasite.py   # foreign ink on the field a check must catch, ~25 min

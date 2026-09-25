@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software or its measurements, please cite it as below."
+title: "dossier-preflight"
+abstract: >-
+  Checks a dossier of scanned administrative forms for the defects that get it rejected at the
+  counter, measured on what is actually printed, with detector thresholds calibrated on a
+  synthetic degradation grid and their failure modes published next to them.
+type: software
+authors:
+  - family-names: Merigaud
+    given-names: Dylan
+    # orcid: "https://orcid.org/XXXX-XXXX-XXXX-XXXX"  (fill in your ORCID iD, then uncomment)
+version: 0.1.0
+commit: 42732f04021ad899ab83cd760d30c54f8a1cd851
+date-released: 2026-08-22
+repository-code: "https://github.com/DylanMerigaud/dossier-preflight"
+license: MIT
+keywords:
+  - ocr
+  - pdf
+  - acroform
+  - compliance
+  - forms
+  - evaluation
+  - synthetic data
