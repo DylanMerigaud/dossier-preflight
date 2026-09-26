@@ -1,0 +1,176 @@
+{
+  "checks": {
+    "consistency": {
+      "false_alarms": {
+        "k": 48,
+        "n": 54,
+        "rate": 0.8889,
+        "unit": "clean targets"
+      },
+      "recall": {
+        "k": 52,
+        "n": 54,
+        "rate": 0.963,
+        "wilson_95": [
+          0.8746,
+          0.9898
+        ]
+      }
+    },
+    "cropped_page": {
+      "false_alarms": {
+        "k": 64,
+        "n": 216,
+        "rate": 0.2963,
+        "unit": "clean targets"
+      },
+      "recall": {
+        "k": 173,
+        "n": 213,
+        "rate": 0.8122,
+        "wilson_95": [
+          0.7544,
+          0.859
+        ]
+      }
+    },
+    "expiry": {
+      "false_alarms": {
+        "k": 0,
+        "n": 4,
+        "rate": 0.0,
+        "unit": "clean targets"
+      },
+      "recall": {
+        "k": 2,
+        "n": 2,
+        "rate": 1.0,
+        "wilson_95": [
+          0.3424,
+          1.0
+        ]
+      }
+    },
+    "forbidden_value": {
+      "false_alarms": {
+        "k": 0,
+        "n": 432,
+        "rate": 0.0,
+        "unit": "clean targets"
+      },
+      "recall": {
+        "k": 16,
+        "n": 162,
+        "rate": 0.0988,
+        "wilson_95": [
+          0.0617,
+          0.1544
+        ]
+      }
+    },
+    "required_checkbox": {
+      "false_alarms": {
+        "k": 159,
+        "n": 216,
+        "rate": 0.7361,
+        "unit": "clean targets"
+      },
+      "recall": {
+        "k": 204,
+        "n": 216,
+        "rate": 0.9444,
+        "wilson_95": [
+          0.9054,
+          0.9679
+        ]
+      }
+    },
+    "required_field": {
+      "false_alarms": {
+        "k": 446,
+        "n": 1404,
+        "rate": 0.3177,
+        "unit": "clean targets"
+      },
+      "recall": {
+        "condition": "pages with less than 0.05% ink in the emptied field",
+        "k": 422,
+        "n": 511,
+        "rate": 0.8258,
+        "wilson_95": [
+          0.7906,
+          0.8563
+        ]
+      },
+      "recall_with_ink_in_the_emptied_field": {
+        "condition": "pages where Augraphy laid at least 0.5% ink in the emptied field",
+        "k": 204,
+        "n": 515,
+        "pages_not_measured": 95,
+        "rate": 0.3961,
+        "unit": "an (identity, instance, dpi, seed) page; detected when the check fires on at least one field id of the emptied role (a role can span several ids: the W-9 tax_id is three comb boxes)",
+        "wilson_95": [
+          0.3548,
+          0.439
+        ]
+      }
+    },
+    "resolution": {
+      "false_alarms": {
+        "k": 2,
+        "n": 216,
+        "rate": 0.0093,
+        "unit": "clean targets"
+      },
+      "recall": {
+        "k": 216,
+        "n": 216,
+        "rate": 1.0,
+        "wilson_95": [
+          0.9825,
+          1.0
+        ]
+      }
+    },
+    "rotated_page": {
+      "false_alarms": {
+        "k": 0,
+        "n": 216,
+        "rate": 0.0,
+        "unit": "clean targets"
+      },
+      "recall": {
+        "k": 114,
+        "n": 216,
+        "rate": 0.5278,
+        "wilson_95": [
+          0.4613,
+          0.5933
+        ]
+      }
+    },
+    "signature": {
+      "false_alarms": {
+        "k": 19,
+        "n": 54,
+        "rate": 0.3519,
+        "unit": "clean targets"
+      },
+      "recall": {
+        "k": 54,
+        "n": 54,
+        "rate": 1.0,
+        "wilson_95": [
+          0.9336,
+          1.0
+        ]
+      }
+    }
+  },
+  "generator": "Augraphy 8.2.6 default_augraphy_pipeline(), unmodified (arm A3)",
+  "source": "perfect-recall-study results/hypotheses.json",
+  "source_commit": "af27fc3bffe6b532609082389be6501a338e9ab4",
+  "source_sha256": "a97324ebfffd98bda7cc5ce86a46df56b2858c20a4dc6b092d5ba8f92150e993",
+  "thresholds_sha256": "184351f68dacc89118f22efce0a052f6b596e07b7a24f93b0bdfdf1a7e4fe4a5",
+  "what": "the shipped thresholds scored, with no refit, on an independent generator"
+}

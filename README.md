@@ -150,6 +150,35 @@ What changed is that the weakness is now published next to the strength: `thresh
 carries `recall_with_ink_on_the_damaged_field` in the same object as `recall`, so nobody reads
 the 1.000 without reading the 0.000.
 
+**A correction to the table above (v0.2.0).** That run picked the ink shape as the seed modulo
+3, and over its three seeds (11, 23, 37) two seeds land on the same shape: the first shape, a
+fold line, never ran. The table describes a speck and a stroke only. The run was repeated with
+the shape drawn on the seed and the cell together, all three shapes 648 times each, every raw
+reading kept. For the retained ink sensor on the emptied field:
+
+| shape | @0.2% ink | @1% | @4% |
+|---|---|---|---|
+| every shape | 54 of 81 (0.667) | 27 of 81 (0.333) | 0 of 81 (0.000) |
+| fold | 27 of 27 | 27 of 27 | 0 of 27 |
+| speck | 27 of 27 | 0 of 27 | 0 of 27 |
+| stroke | 0 of 27 | 0 of 27 | 0 of 27 |
+
+So "completely blind past 1%" is true for the speck and the stroke, not for the fold at 1%; at
+4% no shape is caught. Since v0.2.0 `thresholds.json` carries these values as
+`recall_with_ink_on_the_damaged_field`, with the count per shape and the source file under
+`ink_on_the_damaged_field` (read from `grid/results/target_parasite_all_shapes.json`); the old
+two-shape values stay there, named as superseded. The same change touches the other three checks
+of the run, all in LIMITS.md.
+
+**The shipped thresholds on an independent generator.** perfect-recall-study scored the
+thresholds as shipped, with no refit, on pages degraded by a third-party library (Augraphy 8.2.6,
+its default pipeline, unmodified), which adds stains, marks and faded print. On pages where it
+laid at least 0.5% ink in the emptied required field, the ink sensor caught 204 of 515 empty
+fields (0.396, Wilson 95% [0.355, 0.439]); on pages with less than 0.05% ink there, 422 of 511
+(0.826). Each check's counts on that generator are in `thresholds.json` as
+`recall_on_an_independent_generator` and in LIMITS.md. No threshold value changed: they were
+frozen before those measurements, and a test checks they still equal v0.1.0's.
+
 If your scans come off a dirty glass, this is the row to weigh, and full-page OCR is the sensor
 to prefer at the price of its false alarms. That trade is yours to make; the measurement is
 here to make it with.
@@ -232,10 +261,12 @@ that is already what it answers, "I cannot read this page" and not "this page is
 ## Run the measurement rig
 
     python3 spike/proof.py            # the first green case, standalone
-    python3 -m pytest tests/ -q       # 68 tests, about 3 min (they render and OCR)
+    python3 -m pytest tests/ -q       # 197 tests, about 9 min (they render and OCR)
     python3 grid/run.py               # the grid, ~2 h on 13 workers, resumable
     python3 grid/run.py --parasite    # the fifth factor, ~2 h 30
     python3 grid/target_parasite.py   # foreign ink on the field a check must catch, ~25 min
+    python3 grid/target_parasite.py --from-dump RAW   # the all-shapes aggregate, from raw rows
+    python3 grid/independent_generator.py HYPOTHESES  # the study's A3 counts, for thresholds.json
     python3 grid/analyze.py --publish # reads the thresholds off the curves, writes LIMITS.md
     python3 grid/corner_followup.py   # the outside-protocol follow-up on one cell
 

@@ -356,3 +356,36 @@ level bypasses the level-0 cut. `--frozen THRESHOLDS.json` scores a readings fil
 thresholds file's values and settings with no refit, through `checks.evaluate` itself, counting
 abstentions beside the recall; `--expected` declares the variants a dossier must carry when a
 source does not carry every instance.
+
+## 2026-09-26
+
+### The failure metric in thresholds.json now comes from the run that drew every shape (v0.2.0)
+
+The `recall_with_ink_on_the_damaged_field` values shipped at v0.1.0 came from the targeted run
+that drew its ink shape as `seed % 3`: over seeds 11, 23 and 37 it never drew the fold shape, so
+the values described two shapes of three. The archival re-run (`--all-shapes --dump`, 2,592 raw
+rows, 648 per shape, archived by perfect-recall-study as A4) is now aggregated from its raw rows
+by `grid/target_parasite.py --from-dump`, which reads no image, into
+`grid/results/target_parasite_all_shapes.json`. `grid/analyze.py --publish` reads that file:
+`recall_with_ink_on_the_damaged_field` is the pooled value, and a new
+`ink_on_the_damaged_field` object beside it carries k and n per level, pooled and per shape, the
+false positives on the clean page, the raw rows' sha256, and the old two-shape values named as
+superseded. The published `target_parasite.json` is left exactly as published.
+
+For the retained ink sensor on the emptied required field: 54 of 81 at 0.2% ink (was 0.333), 27
+of 81 at 1% (was 0.000), 0 of 81 at 4%. All 27 caught at 1% are fold readings; the speck and the
+stroke are caught 0 of 27 at 1%, and at 4% no shape is caught. The other three checks move too:
+required_checkbox 0.444 at 4% (was 0.667), expiry 0.778 at 1% and 0.222 at 4% (was 0.667 and
+0.333), signature unchanged at 0.333 at 4% but with a different mix of shapes. The aggregate
+agrees count for count with perfect-recall-study's own scoring of the same rows.
+
+`grid/independent_generator.py` copies perfect-recall-study's A3 counts (Augraphy 8.2.6 default
+pipeline, unmodified, scored at the shipped thresholds with no refit) into
+`grid/results/independent_generator.json`, and `--publish` writes them into each check as
+`recall_on_an_independent_generator`. required_field: 204 of 515 (0.396) on pages with at least
+0.5% generator ink in the emptied field, 422 of 511 (0.826) on pages with less than 0.05%.
+LIMITS.md gains both sections, written by `write_limits`, so a replay keeps them.
+
+No threshold `value` and no `measured_settings` moved; `tests/test_failure_metric.py` checks
+both against v0.1.0. The A0 `--publish` replay on the committed readings is byte-identical to
+the committed files but for `curves.png` (matplotlib noise, reverted).

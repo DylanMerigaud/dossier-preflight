@@ -21,9 +21,143 @@
         "0.04": 1.0
       },
       "recall_with_ink_on_the_damaged_field": {
-        "0.002": 0.3333,
-        "0.01": 0.0,
+        "0.002": 0.6667,
+        "0.01": 0.3333,
         "0.04": 0.0
+      },
+      "ink_on_the_damaged_field": {
+        "source": "grid/results/target_parasite_all_shapes.json",
+        "raw_rows": "readings.jsonl (2592 rows, sha256 be3fdeb0af39b034b3ee4a09612d6b45f17dfeadb8ac33c6d6b41495ae9c17f7), archived by perfect-recall-study (A4)",
+        "sensor": "ink",
+        "shapes_drawn": {
+          "fold": 648,
+          "speck": 648,
+          "stroke": 648
+        },
+        "pooled": {
+          "0.002": {
+            "recall": 0.6667,
+            "k": 54,
+            "n": 81,
+            "false_positives_on_a_clean_page": 0.0
+          },
+          "0.01": {
+            "recall": 0.3333,
+            "k": 27,
+            "n": 81,
+            "false_positives_on_a_clean_page": 0.0
+          },
+          "0.04": {
+            "recall": 0.0,
+            "k": 0,
+            "n": 81,
+            "false_positives_on_a_clean_page": 0.0
+          }
+        },
+        "by_shape": {
+          "fold": {
+            "0.002": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.01": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.04": {
+              "recall": 0.0,
+              "k": 0,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            }
+          },
+          "speck": {
+            "0.002": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.01": {
+              "recall": 0.0,
+              "k": 0,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.04": {
+              "recall": 0.0,
+              "k": 0,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            }
+          },
+          "stroke": {
+            "0.002": {
+              "recall": 0.0,
+              "k": 0,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.01": {
+              "recall": 0.0,
+              "k": 0,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.04": {
+              "recall": 0.0,
+              "k": 0,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            }
+          }
+        },
+        "superseded_two_shape_run": {
+          "source": "grid/results/target_parasite.json",
+          "why": "the published run drew the shape as seed % 3; over seeds 11, 23 and 37 it never drew the fold shape, so its values describe two shapes of three",
+          "recall_with_ink_on_the_damaged_field": {
+            "0.002": 0.3333,
+            "0.01": 0.0,
+            "0.04": 0.0
+          }
+        }
+      },
+      "recall_on_an_independent_generator": {
+        "false_alarms": {
+          "k": 446,
+          "n": 1404,
+          "rate": 0.3177,
+          "unit": "clean targets"
+        },
+        "recall": {
+          "condition": "pages with less than 0.05% ink in the emptied field",
+          "k": 422,
+          "n": 511,
+          "rate": 0.8258,
+          "wilson_95": [
+            0.7906,
+            0.8563
+          ]
+        },
+        "recall_with_ink_in_the_emptied_field": {
+          "condition": "pages where Augraphy laid at least 0.5% ink in the emptied field",
+          "k": 204,
+          "n": 515,
+          "pages_not_measured": 95,
+          "rate": 0.3961,
+          "unit": "an (identity, instance, dpi, seed) page; detected when the check fires on at least one field id of the emptied role (a role can span several ids: the W-9 tax_id is three comb boxes)",
+          "wilson_95": [
+            0.3548,
+            0.439
+          ]
+        },
+        "generator": "Augraphy 8.2.6 default_augraphy_pipeline(), unmodified (arm A3)",
+        "source": "grid/results/independent_generator.json",
+        "measured_by": "perfect-recall-study results/hypotheses.json at commit af27fc3bffe6b532609082389be6501a338e9ab4"
       },
       "curve": "grid/results/pr_required_field.csv",
       "cells_under_floor": "0/288",
@@ -50,7 +184,128 @@
       "recall_with_ink_on_the_damaged_field": {
         "0.002": 1.0,
         "0.01": 1.0,
-        "0.04": 0.6667
+        "0.04": 0.4444
+      },
+      "ink_on_the_damaged_field": {
+        "source": "grid/results/target_parasite_all_shapes.json",
+        "raw_rows": "readings.jsonl (2592 rows, sha256 be3fdeb0af39b034b3ee4a09612d6b45f17dfeadb8ac33c6d6b41495ae9c17f7), archived by perfect-recall-study (A4)",
+        "sensor": "published",
+        "shapes_drawn": {
+          "fold": 648,
+          "speck": 648,
+          "stroke": 648
+        },
+        "pooled": {
+          "0.002": {
+            "recall": 1.0,
+            "k": 81,
+            "n": 81,
+            "false_positives_on_a_clean_page": 0.0
+          },
+          "0.01": {
+            "recall": 1.0,
+            "k": 81,
+            "n": 81,
+            "false_positives_on_a_clean_page": 0.0
+          },
+          "0.04": {
+            "recall": 0.4444,
+            "k": 36,
+            "n": 81,
+            "false_positives_on_a_clean_page": 0.0
+          }
+        },
+        "by_shape": {
+          "fold": {
+            "0.002": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.01": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.04": {
+              "recall": 0.0,
+              "k": 0,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            }
+          },
+          "speck": {
+            "0.002": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.01": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.04": {
+              "recall": 0.3333,
+              "k": 9,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            }
+          },
+          "stroke": {
+            "0.002": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.01": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.04": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            }
+          }
+        },
+        "superseded_two_shape_run": {
+          "source": "grid/results/target_parasite.json",
+          "why": "the published run drew the shape as seed % 3; over seeds 11, 23 and 37 it never drew the fold shape, so its values describe two shapes of three",
+          "recall_with_ink_on_the_damaged_field": {
+            "0.002": 1.0,
+            "0.01": 1.0,
+            "0.04": 0.6667
+          }
+        }
+      },
+      "recall_on_an_independent_generator": {
+        "false_alarms": {
+          "k": 159,
+          "n": 216,
+          "rate": 0.7361,
+          "unit": "clean targets"
+        },
+        "recall": {
+          "k": 204,
+          "n": 216,
+          "rate": 0.9444,
+          "wilson_95": [
+            0.9054,
+            0.9679
+          ]
+        },
+        "generator": "Augraphy 8.2.6 default_augraphy_pipeline(), unmodified (arm A3)",
+        "source": "grid/results/independent_generator.json",
+        "measured_by": "perfect-recall-study results/hypotheses.json at commit af27fc3bffe6b532609082389be6501a338e9ab4"
       },
       "curve": "grid/results/pr_required_checkbox.csv",
       "cells_under_floor": "0/288",
@@ -78,6 +333,127 @@
         "0.002": 1.0,
         "0.01": 1.0,
         "0.04": 0.3333
+      },
+      "ink_on_the_damaged_field": {
+        "source": "grid/results/target_parasite_all_shapes.json",
+        "raw_rows": "readings.jsonl (2592 rows, sha256 be3fdeb0af39b034b3ee4a09612d6b45f17dfeadb8ac33c6d6b41495ae9c17f7), archived by perfect-recall-study (A4)",
+        "sensor": "published",
+        "shapes_drawn": {
+          "fold": 648,
+          "speck": 648,
+          "stroke": 648
+        },
+        "pooled": {
+          "0.002": {
+            "recall": 1.0,
+            "k": 81,
+            "n": 81,
+            "false_positives_on_a_clean_page": 0.0
+          },
+          "0.01": {
+            "recall": 1.0,
+            "k": 81,
+            "n": 81,
+            "false_positives_on_a_clean_page": 0.0
+          },
+          "0.04": {
+            "recall": 0.3333,
+            "k": 27,
+            "n": 81,
+            "false_positives_on_a_clean_page": 0.0
+          }
+        },
+        "by_shape": {
+          "fold": {
+            "0.002": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.01": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.04": {
+              "recall": 0.0,
+              "k": 0,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            }
+          },
+          "speck": {
+            "0.002": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.01": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.04": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            }
+          },
+          "stroke": {
+            "0.002": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.01": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.04": {
+              "recall": 0.0,
+              "k": 0,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            }
+          }
+        },
+        "superseded_two_shape_run": {
+          "source": "grid/results/target_parasite.json",
+          "why": "the published run drew the shape as seed % 3; over seeds 11, 23 and 37 it never drew the fold shape, so its values describe two shapes of three",
+          "recall_with_ink_on_the_damaged_field": {
+            "0.002": 1.0,
+            "0.01": 1.0,
+            "0.04": 0.3333
+          }
+        }
+      },
+      "recall_on_an_independent_generator": {
+        "false_alarms": {
+          "k": 19,
+          "n": 54,
+          "rate": 0.3519,
+          "unit": "clean targets"
+        },
+        "recall": {
+          "k": 54,
+          "n": 54,
+          "rate": 1.0,
+          "wilson_95": [
+            0.9336,
+            1.0
+          ]
+        },
+        "generator": "Augraphy 8.2.6 default_augraphy_pipeline(), unmodified (arm A3)",
+        "source": "grid/results/independent_generator.json",
+        "measured_by": "perfect-recall-study results/hypotheses.json at commit af27fc3bffe6b532609082389be6501a338e9ab4"
       },
       "curve": "grid/results/pr_signature.csv",
       "cells_under_floor": "0/288",
@@ -112,8 +488,129 @@
       },
       "recall_with_ink_on_the_damaged_field": {
         "0.002": 0.8148,
-        "0.01": 0.6667,
-        "0.04": 0.3333
+        "0.01": 0.7778,
+        "0.04": 0.2222
+      },
+      "ink_on_the_damaged_field": {
+        "source": "grid/results/target_parasite_all_shapes.json",
+        "raw_rows": "readings.jsonl (2592 rows, sha256 be3fdeb0af39b034b3ee4a09612d6b45f17dfeadb8ac33c6d6b41495ae9c17f7), archived by perfect-recall-study (A4)",
+        "sensor": "published",
+        "shapes_drawn": {
+          "fold": 648,
+          "speck": 648,
+          "stroke": 648
+        },
+        "pooled": {
+          "0.002": {
+            "recall": 0.8148,
+            "k": 66,
+            "n": 81,
+            "false_positives_on_a_clean_page": 0.0
+          },
+          "0.01": {
+            "recall": 0.7778,
+            "k": 63,
+            "n": 81,
+            "false_positives_on_a_clean_page": 0.0
+          },
+          "0.04": {
+            "recall": 0.2222,
+            "k": 18,
+            "n": 81,
+            "false_positives_on_a_clean_page": 0.0123
+          }
+        },
+        "by_shape": {
+          "fold": {
+            "0.002": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.01": {
+              "recall": 1.0,
+              "k": 27,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.04": {
+              "recall": 0.0,
+              "k": 0,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            }
+          },
+          "speck": {
+            "0.002": {
+              "recall": 0.6667,
+              "k": 18,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.01": {
+              "recall": 0.6667,
+              "k": 18,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.04": {
+              "recall": 0.0,
+              "k": 0,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.037
+            }
+          },
+          "stroke": {
+            "0.002": {
+              "recall": 0.7778,
+              "k": 21,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.01": {
+              "recall": 0.6667,
+              "k": 18,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            },
+            "0.04": {
+              "recall": 0.6667,
+              "k": 18,
+              "n": 27,
+              "false_positives_on_a_clean_page": 0.0
+            }
+          }
+        },
+        "superseded_two_shape_run": {
+          "source": "grid/results/target_parasite.json",
+          "why": "the published run drew the shape as seed % 3; over seeds 11, 23 and 37 it never drew the fold shape, so its values describe two shapes of three",
+          "recall_with_ink_on_the_damaged_field": {
+            "0.002": 0.8148,
+            "0.01": 0.6667,
+            "0.04": 0.3333
+          }
+        }
+      },
+      "recall_on_an_independent_generator": {
+        "false_alarms": {
+          "k": 0,
+          "n": 4,
+          "rate": 0.0,
+          "unit": "clean targets"
+        },
+        "recall": {
+          "k": 2,
+          "n": 2,
+          "rate": 1.0,
+          "wilson_95": [
+            0.3424,
+            1.0
+          ]
+        },
+        "generator": "Augraphy 8.2.6 default_augraphy_pipeline(), unmodified (arm A3)",
+        "source": "grid/results/independent_generator.json",
+        "measured_by": "perfect-recall-study results/hypotheses.json at commit af27fc3bffe6b532609082389be6501a338e9ab4"
       }
     },
     "consistency": {
@@ -135,6 +632,26 @@
         "0.04": 1.0
       },
       "recall_with_ink_on_the_damaged_field": "not measured for this check, see grid/target_parasite.py",
+      "recall_on_an_independent_generator": {
+        "false_alarms": {
+          "k": 48,
+          "n": 54,
+          "rate": 0.8889,
+          "unit": "clean targets"
+        },
+        "recall": {
+          "k": 52,
+          "n": 54,
+          "rate": 0.963,
+          "wilson_95": [
+            0.8746,
+            0.9898
+          ]
+        },
+        "generator": "Augraphy 8.2.6 default_augraphy_pipeline(), unmodified (arm A3)",
+        "source": "grid/results/independent_generator.json",
+        "measured_by": "perfect-recall-study results/hypotheses.json at commit af27fc3bffe6b532609082389be6501a338e9ab4"
+      },
       "curve": "grid/results/pr_consistency.csv",
       "cells_under_floor": "0/288",
       "nominal_domain_dpi": 150
@@ -158,6 +675,26 @@
         "0.04": 0.9568
       },
       "recall_with_ink_on_the_damaged_field": "not measured for this check, see grid/target_parasite.py",
+      "recall_on_an_independent_generator": {
+        "false_alarms": {
+          "k": 0,
+          "n": 432,
+          "rate": 0.0,
+          "unit": "clean targets"
+        },
+        "recall": {
+          "k": 16,
+          "n": 162,
+          "rate": 0.0988,
+          "wilson_95": [
+            0.0617,
+            0.1544
+          ]
+        },
+        "generator": "Augraphy 8.2.6 default_augraphy_pipeline(), unmodified (arm A3)",
+        "source": "grid/results/independent_generator.json",
+        "measured_by": "perfect-recall-study results/hypotheses.json at commit af27fc3bffe6b532609082389be6501a338e9ab4"
+      },
       "curve": "grid/results/pr_forbidden_value.csv",
       "cells_under_floor": "6/288",
       "nominal_domain_dpi": 150
@@ -178,6 +715,26 @@
         "0.04": 1.0
       },
       "recall_with_ink_on_the_damaged_field": "not measured for this check, see grid/target_parasite.py",
+      "recall_on_an_independent_generator": {
+        "false_alarms": {
+          "k": 2,
+          "n": 216,
+          "rate": 0.0093,
+          "unit": "clean targets"
+        },
+        "recall": {
+          "k": 216,
+          "n": 216,
+          "rate": 1.0,
+          "wilson_95": [
+            0.9825,
+            1.0
+          ]
+        },
+        "generator": "Augraphy 8.2.6 default_augraphy_pipeline(), unmodified (arm A3)",
+        "source": "grid/results/independent_generator.json",
+        "measured_by": "perfect-recall-study results/hypotheses.json at commit af27fc3bffe6b532609082389be6501a338e9ab4"
+      },
       "curve": "grid/results/pr_resolution.csv",
       "cells_under_floor": "0/288",
       "nominal_domain_dpi": 150,
@@ -221,6 +778,26 @@
         "0.04": 1.0
       },
       "recall_with_ink_on_the_damaged_field": "not measured for this check, see grid/target_parasite.py",
+      "recall_on_an_independent_generator": {
+        "false_alarms": {
+          "k": 64,
+          "n": 216,
+          "rate": 0.2963,
+          "unit": "clean targets"
+        },
+        "recall": {
+          "k": 173,
+          "n": 213,
+          "rate": 0.8122,
+          "wilson_95": [
+            0.7544,
+            0.859
+          ]
+        },
+        "generator": "Augraphy 8.2.6 default_augraphy_pipeline(), unmodified (arm A3)",
+        "source": "grid/results/independent_generator.json",
+        "measured_by": "perfect-recall-study results/hypotheses.json at commit af27fc3bffe6b532609082389be6501a338e9ab4"
+      },
       "curve": "grid/results/pr_cropped_page.csv",
       "cells_under_floor": "0/288",
       "nominal_domain_dpi": 150
@@ -241,6 +818,26 @@
         "0.04": 1.0
       },
       "recall_with_ink_on_the_damaged_field": "not measured for this check, see grid/target_parasite.py",
+      "recall_on_an_independent_generator": {
+        "false_alarms": {
+          "k": 0,
+          "n": 216,
+          "rate": 0.0,
+          "unit": "clean targets"
+        },
+        "recall": {
+          "k": 114,
+          "n": 216,
+          "rate": 0.5278,
+          "wilson_95": [
+            0.4613,
+            0.5933
+          ]
+        },
+        "generator": "Augraphy 8.2.6 default_augraphy_pipeline(), unmodified (arm A3)",
+        "source": "grid/results/independent_generator.json",
+        "measured_by": "perfect-recall-study results/hypotheses.json at commit af27fc3bffe6b532609082389be6501a338e9ab4"
+      },
       "curve": "grid/results/pr_rotated_page.csv",
       "cells_under_floor": "0/288",
       "nominal_domain_dpi": 150

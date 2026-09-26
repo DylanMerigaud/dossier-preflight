@@ -161,6 +161,87 @@ arbitrary.
 | published | 0.01 | 1.000 | [0.955, 1.000] | 0.000 |
 | published | 0.04 | 0.333 | [0.240, 0.441] | 0.000 |
 
+## The same run with every ink shape: the failure metric thresholds.json carries
+
+The tables above come from the published targeted run, and that run had a fault found
+later: it picked the ink shape as the seed modulo 3, and over the three seeds it uses
+(11, 23, 37) two seeds land on the same shape, so the first shape, a fold line, never
+ran at any cell. Its numbers describe two shapes out of three. The run was repeated with
+the shape drawn on the seed and the cell together, and every raw reading kept
+(2592 readings; shapes drawn: fold 648, speck 648, stroke 648). Since v0.2.0 thresholds.json carries
+these values as recall_with_ink_on_the_damaged_field, with the count per shape. No
+threshold moved: the thresholds were frozen before this run and stay as they were.
+
+### expiry, ink on `Exp Date mmddyyyy`, sensor as shipped
+
+| shape | ink 0.2% | ink 1.0% | ink 4.0% |
+|---|---|---|---|
+| every shape | 66 of 81 (0.815) | 63 of 81 (0.778) | 18 of 81 (0.222) |
+| fold | 27 of 27 (1.000) | 27 of 27 (1.000) | 0 of 27 (0.000) |
+| speck | 18 of 27 (0.667) | 18 of 27 (0.667) | 0 of 27 (0.000) |
+| stroke | 21 of 27 (0.778) | 18 of 27 (0.667) | 18 of 27 (0.667) |
+
+### required_checkbox, ink on `c1_1[0]`, sensor as shipped
+
+| shape | ink 0.2% | ink 1.0% | ink 4.0% |
+|---|---|---|---|
+| every shape | 81 of 81 (1.000) | 81 of 81 (1.000) | 36 of 81 (0.444) |
+| fold | 27 of 27 (1.000) | 27 of 27 (1.000) | 0 of 27 (0.000) |
+| speck | 27 of 27 (1.000) | 27 of 27 (1.000) | 9 of 27 (0.333) |
+| stroke | 27 of 27 (1.000) | 27 of 27 (1.000) | 27 of 27 (1.000) |
+
+### required_field, ink on `City or Town`, sensor as shipped
+
+| shape | ink 0.2% | ink 1.0% | ink 4.0% |
+|---|---|---|---|
+| every shape | 54 of 81 (0.667) | 27 of 81 (0.333) | 0 of 81 (0.000) |
+| fold | 27 of 27 (1.000) | 27 of 27 (1.000) | 0 of 27 (0.000) |
+| speck | 27 of 27 (1.000) | 0 of 27 (0.000) | 0 of 27 (0.000) |
+| stroke | 0 of 27 (0.000) | 0 of 27 (0.000) | 0 of 27 (0.000) |
+
+### signature, ink on `Signature of Employee`, sensor as shipped
+
+| shape | ink 0.2% | ink 1.0% | ink 4.0% |
+|---|---|---|---|
+| every shape | 81 of 81 (1.000) | 81 of 81 (1.000) | 27 of 81 (0.333) |
+| fold | 27 of 27 (1.000) | 27 of 27 (1.000) | 0 of 27 (0.000) |
+| speck | 27 of 27 (1.000) | 27 of 27 (1.000) | 27 of 27 (1.000) |
+| stroke | 27 of 27 (1.000) | 27 of 27 (1.000) | 0 of 27 (0.000) |
+
+For the empty required field at 1% ink, the published run counted 0 of 81
+caught. With every shape the count is 27 of 81, and it splits by shape as: fold 27 of 27, speck 0 of 27, stroke 0 of 27.
+The claim "blind at 1% ink" holds for the shapes counted 0 and not for the
+others; the table above gives every level.
+
+## The shipped thresholds on an independent generator
+
+Every recall above comes from the generator the thresholds were chosen on. A second,
+independent generator was run by perfect-recall-study on the rendered pages of six
+fictional identities: Augraphy 8.2.6 default_augraphy_pipeline(), unmodified (arm A3). It was scored at the thresholds as shipped,
+with no refit. It adds what this grid never does: stains, marks, faded print, paper
+texture. Since v0.2.0 thresholds.json carries these counts as
+recall_on_an_independent_generator.
+
+| check | recall | false alarms per clean target |
+|---|---|---|
+| consistency | 52 of 54 (0.963) | 48 of 54 (0.889) |
+| cropped_page | 173 of 213 (0.812) | 64 of 216 (0.296) |
+| expiry | 2 of 2 (1.000) | 0 of 4 (0.000) |
+| forbidden_value | 16 of 162 (0.099) | 0 of 432 (0.000) |
+| required_checkbox | 204 of 216 (0.944) | 159 of 216 (0.736) |
+| required_field | 422 of 511 (0.826) | 446 of 1404 (0.318) |
+| resolution | 216 of 216 (1.000) | 2 of 216 (0.009) |
+| rotated_page | 114 of 216 (0.528) | 0 of 216 (0.000) |
+| signature | 54 of 54 (1.000) | 19 of 54 (0.352) |
+
+For the empty required field the table counts pages with less than 0.05% ink
+in the field. On pages where the generator laid at least 0.5% ink in the emptied
+field, the sensor as shipped caught 204 of 515 (0.396, Wilson 95% [0.355, 0.439]); 95 pages
+could not be measured and are left out.
+
+Source: perfect-recall-study results/hypotheses.json at commit af27fc3bffe6b532609082389be6501a338e9ab4, copied by
+grid/independent_generator.py into grid/results/independent_generator.json.
+
 ## Outside-protocol follow-up: the only cell where the tool misses something
 
 OUTSIDE THE PROTOCOL, and that has to be said before the numbers. The published

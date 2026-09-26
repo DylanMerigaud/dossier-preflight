@@ -1530,6 +1530,8 @@ def write_limits(results, path, n_pairs, domain, n_retained, attempts, crossed=N
                     l.append(f"| {sname} | {lv} | {v['rate']:.3f} | [{v['ci'][0]:.3f}, "
                              f"{v['ci'][1]:.3f}] | {cl['rate']:.3f} |")
             l.append("")
+    l += limits_all_shapes()
+    l += limits_independent_generator()
 
     followup = os.path.join(ROOT, "grid", "results", "followup.json")
     if os.path.exists(followup):
@@ -1727,6 +1729,165 @@ def write_limits(results, path, n_pairs, domain, n_retained, attempts, crossed=N
     open(path, "w", encoding="utf-8").write("\n".join(l) + "\n")
 
 
+TARGET_PARASITE = os.path.join(ROOT, "grid", "results", "target_parasite.json")
+TARGET_PARASITE_ALL_SHAPES = os.path.join(ROOT, "grid", "results",
+                                          "target_parasite_all_shapes.json")
+INDEPENDENT_GENERATOR = os.path.join(ROOT, "grid", "results", "independent_generator.json")
+
+
+def _sensor_of(sensors):
+    """The sensor a check ships with in the targeted runs: "published", else the first (ink)."""
+    return "published" if "published" in sensors else next(iter(sensors), None)
+
+
+def ink_on_the_damaged_field(check):
+    """(rates, detail) for foreign ink laid ON the field the check must catch.
+
+    rates is {level: recall} over the levels that lay ink. Since v0.2.0 it comes from the
+    all-shapes run (grid/target_parasite.py --all-shapes, aggregated by --from-dump), whose
+    detail gives k and n per level, pooled and per shape, with the raw rows' sha256. The
+    published two-shape run drew its shape as seed % 3 and never drew "fold" over seeds 11, 23
+    and 37; its values stay in the detail, named as superseded. Without the all-shapes file the
+    two-shape values are used as before and detail is None.
+    """
+    two = {}
+    if os.path.exists(TARGET_PARASITE):
+        sensors = json.load(open(TARGET_PARASITE)).get("checks", {}).get(check, {}) \
+            .get("sensors", {})
+        name = _sensor_of(sensors)
+        if name:
+            two = {lv: round(v["variant"]["rate"], 4) for lv, v in sensors[name].items()
+                   if float(lv)}
+    if not os.path.exists(TARGET_PARASITE_ALL_SHAPES):
+        return two, None
+    d = json.load(open(TARGET_PARASITE_ALL_SHAPES, encoding="utf-8"))
+    sensors = d.get("checks", {}).get(check, {}).get("sensors", {})
+    name = _sensor_of(sensors)
+    if not name:
+        return two, None
+    s = sensors[name]
+
+    def counts(levels):
+        return {lv: {"recall": round(v["variant"]["rate"], 4), "k": v["variant"]["fired"],
+                     "n": v["variant"]["n"],
+                     "false_positives_on_a_clean_page": round(v["clean"]["rate"], 4)}
+                for lv, v in sorted(levels.items(), key=lambda kv: float(kv[0]))
+                if float(lv)}
+
+    rates = {lv: c["recall"] for lv, c in counts(s["pooled"]).items()}
+    detail = {
+        "source": os.path.relpath(TARGET_PARASITE_ALL_SHAPES, ROOT),
+        "raw_rows": f"{d['source']} ({d['rows']} rows, sha256 "
+                    f"{d['source_sha256_uncompressed']}), archived by perfect-recall-study (A4)",
+        "sensor": name,
+        "shapes_drawn": d["shapes"],
+        "pooled": counts(s["pooled"]),
+        "by_shape": {shape: counts(levels) for shape, levels in sorted(s["by_shape"].items())},
+    }
+    if two:
+        detail["superseded_two_shape_run"] = {
+            "source": os.path.relpath(TARGET_PARASITE, ROOT),
+            "why": "the published run drew the shape as seed % 3; over seeds 11, 23 and 37 it "
+                   "never drew the fold shape, so its values describe two shapes of three",
+            "recall_with_ink_on_the_damaged_field": two}
+    return rates, detail
+
+
+def limits_all_shapes():
+    """LIMITS.md lines for the all-shapes targeted run, or none when its file is absent."""
+    if not os.path.exists(TARGET_PARASITE_ALL_SHAPES):
+        return []
+    d = json.load(open(TARGET_PARASITE_ALL_SHAPES, encoding="utf-8"))
+    shapes = ", ".join(f"{s} {n}" for s, n in d["shapes"].items())
+    l = ["## The same run with every ink shape: the failure metric thresholds.json carries", "",
+         "The tables above come from the published targeted run, and that run had a fault found",
+         "later: it picked the ink shape as the seed modulo 3, and over the three seeds it uses",
+         "(11, 23, 37) two seeds land on the same shape, so the first shape, a fold line, never",
+         "ran at any cell. Its numbers describe two shapes out of three. The run was repeated with",
+         "the shape drawn on the seed and the cell together, and every raw reading kept",
+         f"({d['rows']} readings; shapes drawn: {shapes}). Since v0.2.0 thresholds.json carries",
+         "these values as recall_with_ink_on_the_damaged_field, with the count per shape. No",
+         "threshold moved: the thresholds were frozen before this run and stay as they were.", ""]
+    for check, c in sorted(d["checks"].items()):
+        name = _sensor_of(c["sensors"])
+        s = c["sensors"][name]
+        levels = [lv for lv in s["pooled"] if float(lv)]
+        l += [f"### {check}, ink on `{c['zone']}`, sensor as shipped", "",
+              "| shape | " + " | ".join(f"ink {float(lv):.1%}" for lv in levels) + " |",
+              "|---|" + "---|" * len(levels)]
+        rows = [("every shape", s["pooled"])] + sorted(s["by_shape"].items())
+        for shape, lv_map in rows:
+            cells = []
+            for lv in levels:
+                v = lv_map[lv]["variant"]
+                cells.append(f"{v['fired']} of {v['n']} ({v['rate']:.3f})")
+            l.append(f"| {shape} | " + " | ".join(cells) + " |")
+        l.append("")
+    rf = d["checks"].get("required_field")
+    old = {}
+    if rf and os.path.exists(TARGET_PARASITE):
+        sensors = json.load(open(TARGET_PARASITE)).get("checks", {}).get("required_field", {}) \
+            .get("sensors", {})
+        if _sensor_of(sensors):
+            old = sensors[_sensor_of(sensors)].get("0.01", {}).get("variant", {})
+    if rf and old:
+        s = rf["sensors"][_sensor_of(rf["sensors"])]
+        at1 = s["pooled"]["0.01"]["variant"]
+        per = ", ".join(f"{shape} {lv['0.01']['variant']['fired']} of "
+                        f"{lv['0.01']['variant']['n']}" for shape, lv in sorted(s["by_shape"].items()))
+        l += ["For the empty required field at 1% ink, the published run counted "
+              f"{old['fired']} of {old['n']}",
+              f"caught. With every shape the count is {at1['fired']} of {at1['n']}, and it splits "
+              f"by shape as: {per}.",
+              "The claim \"blind at 1% ink\" holds for the shapes counted 0 and not for the",
+              "others; the table above gives every level.", ""]
+    return l
+
+
+def limits_independent_generator():
+    """LIMITS.md lines for the shipped thresholds scored on an independent generator."""
+    if not os.path.exists(INDEPENDENT_GENERATOR):
+        return []
+    d = json.load(open(INDEPENDENT_GENERATOR, encoding="utf-8"))
+    l = ["## The shipped thresholds on an independent generator", "",
+         "Every recall above comes from the generator the thresholds were chosen on. A second,",
+         "independent generator was run by perfect-recall-study on the rendered pages of six",
+         f"fictional identities: {d['generator']}. It was scored at the thresholds as shipped,",
+         "with no refit. It adds what this grid never does: stains, marks, faded print, paper",
+         "texture. Since v0.2.0 thresholds.json carries these counts as",
+         "recall_on_an_independent_generator.", "",
+         "| check | recall | false alarms per clean target |", "|---|---|---|"]
+    for check, c in sorted(d["checks"].items()):
+        r = c.get("recall")
+        fa = c["false_alarms"]
+        rec = f"{r['k']} of {r['n']} ({r['rate']:.3f})" if r else "no positive"
+        l.append(f"| {check} | {rec} | {fa['k']} of {fa['n']} "
+                 f"({fa['rate']:.3f}) |" if fa["n"] else f"| {check} | {rec} | none |")
+    wi = d["checks"].get("required_field", {}).get("recall_with_ink_in_the_emptied_field")
+    if wi:
+        l += ["", "For the empty required field the table counts pages with less than 0.05% ink",
+              "in the field. On pages where the generator laid at least 0.5% ink in the emptied",
+              f"field, the sensor as shipped caught {wi['k']} of {wi['n']} ({wi['rate']:.3f}, "
+              f"Wilson 95% [{wi['wilson_95'][0]:.3f}, {wi['wilson_95'][1]:.3f}]); "
+              f"{wi['pages_not_measured']} pages",
+              "could not be measured and are left out."]
+    l += ["", f"Source: {d['source']} at commit {d['source_commit']}, copied by",
+          "grid/independent_generator.py into grid/results/independent_generator.json.", ""]
+    return l
+
+
+def independent_generator(check):
+    """The shipped threshold scored on an independent generator (perfect-recall-study, A3)."""
+    if not os.path.exists(INDEPENDENT_GENERATOR):
+        return None
+    d = json.load(open(INDEPENDENT_GENERATOR, encoding="utf-8"))
+    c = d["checks"].get(check)
+    if not c:
+        return None
+    return dict(c, generator=d["generator"], source=os.path.relpath(INDEPENDENT_GENERATOR, ROOT),
+                measured_by=f"{d['source']} at commit {d['source_commit']}")
+
+
 def write_thresholds(results, path):
     d = json.load(open(path, encoding="utf-8"))
     for check, r in results.items():
@@ -1745,15 +1906,13 @@ def write_thresholds(results, path):
         # catching. Both are published, and their names say which is which.
         under_ink = {str(lv): round(m["recall"], 4)
                      for lv, m in sorted((r.get("by_parasite") or {}).items()) if lv}
-        on_target = {}
-        tp_path = os.path.join(ROOT, "grid", "results", "target_parasite.json")
-        if os.path.exists(tp_path):
-            tp = json.load(open(tp_path)).get("checks", {}).get(check, {})
-            sensors = tp.get("sensors", {})
-            name = "published" if "published" in sensors else next(iter(sensors), None)
-            if name:
-                on_target = {lv: round(v["variant"]["rate"], 4)
-                             for lv, v in sensors[name].items() if float(lv)}
+        on_target, on_target_detail = ink_on_the_damaged_field(check)
+        independent = independent_generator(check)
+        extra = {}
+        if on_target_detail:
+            extra["ink_on_the_damaged_field"] = on_target_detail
+        if independent:
+            extra["recall_on_an_independent_generator"] = independent
         measurements = {
             "recall": round(r["validation"]["recall"], 4),
             "false_positives": round(r["validation"]["fpr"], 5),
@@ -1763,6 +1922,7 @@ def write_thresholds(results, path):
             "recall_with_ink_elsewhere": under_ink,
             "recall_with_ink_on_the_damaged_field": on_target or
                 "not measured for this check, see grid/target_parasite.py",
+            **extra,
             "settings": r["settings_text"],
             "measured_settings": _useful_settings(r["settings"], check),
             "curve": f"grid/results/pr_{check}.csv",
@@ -1790,6 +1950,7 @@ def write_thresholds(results, path):
             "recall_with_ink_elsewhere": under_ink,
             "recall_with_ink_on_the_damaged_field": on_target or
                 "not measured for this check, see grid/target_parasite.py",
+            **extra,
             "curve": f"grid/results/pr_{check}.csv",
             "cells_under_floor": f"{len(r['fallen_cells'])}/{r['n_cells']}",
             "nominal_domain_dpi": r.get("domain"),
