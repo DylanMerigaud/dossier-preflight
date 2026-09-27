@@ -74,7 +74,13 @@ from preflight.sensors import ink_ratio, normalize, ocr_zone_words
 DEFAULT_IDENTITIES = os.path.join(ROOT, "fixtures", "identities")
 RASTER_SUFFIXES = (".png", ".jpg", ".jpeg", ".tif", ".tiff")
 INCOMING_SUFFIXES = (".pdf",) + RASTER_SUFFIXES
-SHEET_CODE_RE = re.compile(r"S\s*(\d{2})")
+# 1 or 2 digits, zero-padded back to 2 below: every sheet code this system ever stamps is 2
+# digits (rk.stamp_pdf always writes "S01".."S99"), so a single digit can only be a dropped
+# leading zero, never a genuinely one-digit code. Measured 2026-09-27 on the actual GitHub-hosted
+# runner (never on macOS, never in a matching Ubuntu 24.04 container tried repeatedly): at every
+# crop margin tried, that runner's tesseract read "S1" for a stamped "S01", not "S01" or nothing,
+# a specific digit ambiguity (a thin "0" merging away) rather than the crop clipping anything.
+SHEET_CODE_RE = re.compile(r"S\s*(\d{1,2})")
 DARK = 128          # the shipped required_field sensor's own ink level (thresholds.json)
 MANIFEST_FIELDS = ["image_path", "source", "identity", "piece", "variant", "instance", "seed",
                    "dpi", "capture", "mark_step", "ts", "mark_ink_share"]
@@ -187,9 +193,21 @@ def ocr_sheet_code(png_path):
     # S0-9, and either a wrong token matched the regex or the two overlapping texts garbled
     # into nothing. grid/realscan_kit.py's own stamp_rect() keeps the stamp inside a band with
     # no pre-printed ink at all (STAMP_MARGIN_BOTTOM_PT=2, STAMP_HEIGHT_PT=12 out of a 792 pt
-    # page, y fraction from the top about 0.982 to 0.997): this crop starts at 0.98, just above
-    # that band.
-    crop = img.crop((int(w * 0.80), int(h * 0.98), w, h))
+    # page, y fraction from the top about 0.982 to 0.997).
+    #
+    # 0.98 (measured 2026-09-27, this is what shipped and failed CI twice, run 36203102696 and
+    # 36222350264, both green locally): at the bottom-right corner a small rotation moves the
+    # stamp by roughly its own distance from the image centre times the angle in radians, about
+    # 12px for this fixture's "slight" 0.7 degrees, against a crop that only cleared the stamp's
+    # own top edge by 8px. A 0.7 degree capture read fine on every machine this was tried on
+    # (macOS tesseract 5.5.1, Ubuntu 24.04 tesseract 5.3.4, arm64 and amd64) but a 1.0 degree
+    # one reliably clipped the top of the stamp and came back empty (probed with the actual
+    # capture-to-OCR pipeline, JPEG round trip included): CI's own rendering must be landing on
+    # the same knife edge that 0.7 degrees sits on here, just past it. 0.972 keeps clearing the
+    # footer at every angle from -1.4 to +1.4 degrees measured (no wrong "S"+2-digits match
+    # appeared) while adding about 26px of headroom above the stamp's top edge, several times
+    # the shift a "slight" rotation produces.
+    crop = img.crop((int(w * 0.80), int(h * 0.972), w, h))
     fd, tmp = tempfile.mkstemp(suffix=".png")
     os.close(fd)
     try:
@@ -206,7 +224,7 @@ def ocr_sheet_code(png_path):
     finally:
         os.unlink(tmp)
     m = SHEET_CODE_RE.search(out.upper())
-    return f"S{m.group(1)}" if m else None
+    return f"S{int(m.group(1)):02d}" if m else None
 
 
 def align_sequences(observed, expected, matches=None):
