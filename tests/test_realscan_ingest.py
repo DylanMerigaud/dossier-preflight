@@ -9,6 +9,8 @@ image with no relation to a real capture's actual pipeline.
 import csv
 import datetime as dt
 import os
+import subprocess
+import tempfile
 
 import numpy as np
 import pytest
@@ -176,7 +178,31 @@ def test_ocr_sheet_code_reads_the_stamp_through_a_slight_rotation(stamped_sheets
     capture = _synthetic_capture(stamped_sheets["clean"], str(tmp_path / "cap.jpg"),
                                  "2026:09:26 08:00:00", rotate_deg=0.7)
     png = ing.render_to_png(capture, str(tmp_path / "rendered"))
-    assert ing.ocr_sheet_code(png) == "S01"
+    got = ing.ocr_sheet_code(png)
+    if got != "S01":
+        # TEMPORARY (2026-09-27): this passes on every machine it has been tried on (macOS
+        # tesseract 5.5.1, Ubuntu 24.04 tesseract 5.3.4 in a bare container and in
+        # catthehacker/ubuntu:act-24.04, arm64 and amd64) but fails on the real GitHub-hosted
+        # runner every time, and a 15x repeat inside the same container never reproduced it
+        # either: whatever differs is specific to that runner. Dump what a fixed-crop OCR at
+        # several margins and PSM modes actually sees there, so the next pass fixes the real
+        # cause instead of guessing again from a machine that cannot reproduce it.
+        img = Image.open(png).convert("L")
+        w, h = img.size
+        print(f"png size: {w}x{h}")
+        for top_frac in (0.98, 0.972, 0.965, 0.95):
+            crop = img.crop((int(w * 0.80), int(h * top_frac), w, h))
+            fd, tmp = tempfile.mkstemp(suffix=".png")
+            os.close(fd)
+            crop.save(tmp)
+            for psm in ("7", "11", "6"):
+                raw = subprocess.run(
+                    ["tesseract", tmp, "stdout", "-l", "eng", "--psm", psm,
+                     "-c", "tessedit_char_whitelist=S0123456789"],
+                    capture_output=True, text=True).stdout
+                print(f"top_frac={top_frac} psm={psm} crop_size={crop.size} raw={raw!r}")
+            os.unlink(tmp)
+    assert got == "S01"
 
 
 def test_ocr_sheet_code_reads_the_stamp_at_a_full_degree_each_way(stamped_sheets, tmp_path):
