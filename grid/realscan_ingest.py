@@ -74,7 +74,13 @@ from preflight.sensors import ink_ratio, normalize, ocr_zone_words
 DEFAULT_IDENTITIES = os.path.join(ROOT, "fixtures", "identities")
 RASTER_SUFFIXES = (".png", ".jpg", ".jpeg", ".tif", ".tiff")
 INCOMING_SUFFIXES = (".pdf",) + RASTER_SUFFIXES
-SHEET_CODE_RE = re.compile(r"S\s*(\d{2})")
+# 1 or 2 digits, zero-padded back to 2 below: every sheet code this system ever stamps is 2
+# digits (rk.stamp_pdf always writes "S01".."S99"), so a single digit can only be a dropped
+# leading zero, never a genuinely one-digit code. Measured 2026-09-27 on the actual GitHub-hosted
+# runner (never on macOS, never in a matching Ubuntu 24.04 container tried repeatedly): at every
+# crop margin tried, that runner's tesseract read "S1" for a stamped "S01", not "S01" or nothing,
+# a specific digit ambiguity (a thin "0" merging away) rather than the crop clipping anything.
+SHEET_CODE_RE = re.compile(r"S\s*(\d{1,2})")
 DARK = 128          # the shipped required_field sensor's own ink level (thresholds.json)
 MANIFEST_FIELDS = ["image_path", "source", "identity", "piece", "variant", "instance", "seed",
                    "dpi", "capture", "mark_step", "ts", "mark_ink_share"]
@@ -218,7 +224,7 @@ def ocr_sheet_code(png_path):
     finally:
         os.unlink(tmp)
     m = SHEET_CODE_RE.search(out.upper())
-    return f"S{m.group(1)}" if m else None
+    return f"S{int(m.group(1)):02d}" if m else None
 
 
 def align_sequences(observed, expected, matches=None):
