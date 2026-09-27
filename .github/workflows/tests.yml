@@ -32,8 +32,11 @@ jobs:
           tesseract --version
           pdftoppm -v
 
+      # dev alone omits matplotlib: tests/test_holdout.py exercises grid/analyze.py's plot(),
+      # which needs it (measured 2026-09-27, every run since the holdout test landed failed on
+      # ModuleNotFoundError: matplotlib). grid/run.py itself still never runs here.
       - name: install
-        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev,grid]"
 
       - name: the corpus manifest holds
         run: python -m pytest tests/test_corpus.py -q

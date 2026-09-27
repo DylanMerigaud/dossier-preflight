@@ -179,6 +179,20 @@ def test_ocr_sheet_code_reads_the_stamp_through_a_slight_rotation(stamped_sheets
     assert ing.ocr_sheet_code(png) == "S01"
 
 
+def test_ocr_sheet_code_reads_the_stamp_at_a_full_degree_each_way(stamped_sheets, tmp_path):
+    """0.7 degrees alone passed on every machine this was tried on and still failed on CI twice
+    (runs 36203102696, 36222350264): the crop cleared the stamp's own top edge by only 8px
+    against a rotation that moves it by roughly 12px at this corner, a margin thin enough that
+    ordinary rendering noise decides the outcome. 1.0 degree each way reproduces the clip
+    deterministically wherever this runs, which is what makes it a regression test rather than
+    a coin flip."""
+    for deg in (1.0, -1.0):
+        capture = _synthetic_capture(stamped_sheets["clean"], str(tmp_path / f"cap_{deg}.jpg"),
+                                     "2026:09:26 08:00:00", rotate_deg=deg)
+        png = ing.render_to_png(capture, str(tmp_path / f"rendered_{deg}"))
+        assert ing.ocr_sheet_code(png) == "S01", f"rotate_deg={deg}"
+
+
 def test_ocr_identity_name_matches_id01(stamped_sheets, tmp_path):
     capture = _synthetic_capture(stamped_sheets["clean"], str(tmp_path / "cap.jpg"),
                                  "2026:09:26 08:00:00", rotate_deg=0)

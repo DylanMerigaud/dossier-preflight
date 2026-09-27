@@ -187,9 +187,21 @@ def ocr_sheet_code(png_path):
     # S0-9, and either a wrong token matched the regex or the two overlapping texts garbled
     # into nothing. grid/realscan_kit.py's own stamp_rect() keeps the stamp inside a band with
     # no pre-printed ink at all (STAMP_MARGIN_BOTTOM_PT=2, STAMP_HEIGHT_PT=12 out of a 792 pt
-    # page, y fraction from the top about 0.982 to 0.997): this crop starts at 0.98, just above
-    # that band.
-    crop = img.crop((int(w * 0.80), int(h * 0.98), w, h))
+    # page, y fraction from the top about 0.982 to 0.997).
+    #
+    # 0.98 (measured 2026-09-27, this is what shipped and failed CI twice, run 36203102696 and
+    # 36222350264, both green locally): at the bottom-right corner a small rotation moves the
+    # stamp by roughly its own distance from the image centre times the angle in radians, about
+    # 12px for this fixture's "slight" 0.7 degrees, against a crop that only cleared the stamp's
+    # own top edge by 8px. A 0.7 degree capture read fine on every machine this was tried on
+    # (macOS tesseract 5.5.1, Ubuntu 24.04 tesseract 5.3.4, arm64 and amd64) but a 1.0 degree
+    # one reliably clipped the top of the stamp and came back empty (probed with the actual
+    # capture-to-OCR pipeline, JPEG round trip included): CI's own rendering must be landing on
+    # the same knife edge that 0.7 degrees sits on here, just past it. 0.972 keeps clearing the
+    # footer at every angle from -1.4 to +1.4 degrees measured (no wrong "S"+2-digits match
+    # appeared) while adding about 26px of headroom above the stamp's top edge, several times
+    # the shift a "slight" rotation produces.
+    crop = img.crop((int(w * 0.80), int(h * 0.972), w, h))
     fd, tmp = tempfile.mkstemp(suffix=".png")
     os.close(fd)
     try:
